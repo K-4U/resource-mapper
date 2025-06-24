@@ -11,5 +11,8 @@ export default defineNuxtConfig({
         preset: Aura
       }
     }
+  },
+  nitro: {
+    awsAmplify: {}
   }
 })
