@@ -1,4 +1,6 @@
 version: 1
+settings:
+  nodeVersion: "20"
 backend:
   phases:
     build:
