@@ -1,0 +1,264 @@
+openapi: 3.0.1
+info:
+  title: Resource Mapper API
+  description: API for managing and querying service definitions and their connections
+  contact:
+    name: K-4U
+    email: info@k-4u.nl
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Services & Groups
+  description: Service and group management API
+paths:
+  /api/services:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all services grouped by group
+      description: Retrieves all service definitions organized by group
+      operationId: getAllServices
+      responses:
+        "200":
+          description: Successfully retrieved all services
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ServiceDefinition"
+  /api/services/{serviceIdentifier}:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get a specific service by identifier
+      description: "Retrieves a service definition by its full identifier (format:\
+        \ group/service-id)"
+      operationId: getServiceByIdentifier
+      parameters:
+      - name: serviceIdentifier
+        in: path
+        description: "Service identifier in format: group/service-id"
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved service
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceDefinition"
+        "404":
+          description: Service not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServiceDefinition"
+  /api/services/group/{groupName}:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all services for a group
+      description: Retrieves all service definitions for a specific group (folder)
+      operationId: getServicesByGroup
+      parameters:
+      - name: groupName
+        in: path
+        description: Name of the group (folder name)
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved services
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceDefinition"
+  /api/services/connected-to/{serviceIdentifier}:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all services connected to a specific service
+      description: "Retrieves all services that have connections to the specified\
+        \ service identifier (format: group/service-id)"
+      operationId: getServicesConnectedTo
+      parameters:
+      - name: serviceIdentifier
+        in: path
+        description: "Service identifier in format: group/service-id"
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved connected services
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceDefinition"
+  /api/groups:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all group information
+      description: Retrieves metadata for all groups
+      operationId: getAllGroupInfo
+      responses:
+        "200":
+          description: Successfully retrieved all group info
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/GroupInfo"
+  /api/groups/{groupName}:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get group information
+      description: Retrieves metadata for a specific group
+      operationId: getGroupInfo
+      parameters:
+      - name: groupName
+        in: path
+        description: Name of the group
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved group info
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GroupInfo"
+        "404":
+          description: Group info not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GroupInfo"
+components:
+  schemas:
+    ServiceConnection:
+      required:
+      - description
+      - port
+      - targetIdentifier
+      type: object
+      properties:
+        port:
+          type: integer
+          description: Port number used for the connection
+          format: int32
+          example: 3306
+        targetIdentifier:
+          pattern: "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
+          type: string
+          description: Fully qualified identifier of the target service in format
+            'group/service-id'
+          example: web/database
+        description:
+          type: string
+          description: Human-readable description of what this connection is used
+            for
+          example: MySQL database connection for user data
+      description: Defines a connection from one service to another
+    ServiceDefinition:
+      required:
+      - friendlyName
+      - serviceType
+      type: object
+      properties:
+        friendlyName:
+          type: string
+          description: Human-readable name of the service
+          example: MySQL Database
+        description:
+          type: string
+          description: "Multi-line description explaining the service's purpose, configuration,\
+            \ and role in the system"
+        serviceType:
+          type: string
+          description: Type of infrastructure or application service
+          example: ECS
+          enum:
+          - VALKEY
+          - ECS
+          - EC2
+          - API_GATEWAY
+          - ALB
+          - NLB
+          - RDS
+          - DNS
+          - LAMBDA
+          - S3
+          - SQS
+          - SNS
+          - DYNAMODB
+          - ELASTICACHE
+          - CLOUDFRONT
+          - EVENTBRIDGE
+          - EVENTBRIDGE_RULE
+          - KINESIS
+          - STEP_FUNCTIONS
+          - EKS
+          - ECR
+          - SECRETS_MANAGER
+          - COGNITO
+        identifier:
+          pattern: "^[a-z][a-z0-9-]*$"
+          type: string
+          description: Unique identifier for the service within its group (derived
+            from filename)
+          example: database
+        outgoingConnections:
+          type: array
+          description: List of connections this service makes to other services
+          items:
+            $ref: "#/components/schemas/ServiceConnection"
+        groupName:
+          type: string
+          description: Name of the group (folder) this service belongs to
+          example: web
+        fullIdentifier:
+          type: string
+          description: Fully qualified identifier in format 'group/service-id'
+          example: web/database
+      description: Complete definition of a service including its configuration and
+        connections
+    GroupInfo:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the group
+          example: Web Services Team
+        description:
+          type: string
+          description: "Multi-line description explaining the group's purpose, responsibilities,\
+            \ and scope"
+        contactInfo:
+          type: string
+          description: Contact information for the team or person responsible for
+            this group
+          example: webteam@example.com
+        groupName:
+          type: string
+          description: Internal group identifier (folder name)
+          example: web
+      description: Metadata about a group of services including description and contact
+        information
