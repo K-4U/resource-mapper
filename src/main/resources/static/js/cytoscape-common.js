@@ -1,8 +1,8 @@
 /* Common cytoscape.js configuration and styles */
 
-// Common cytoscape stylesheet
+// Common cytoscape stylesheet - labels at top-center (cytoscape limitation)
 const cytoscapeStyles = [
-    // Group container styles - Modern blue tab design
+    // Group container styles
     {
         selector: 'node.group',
         style: {
@@ -11,6 +11,7 @@ const cytoscapeStyles = [
             'border-color': '#1976d2',
             'shape': 'roundrectangle',
             'label': 'data(label)',
+            'compound-sizing-wrt-labels': 'exclude',
             'text-valign': 'top',
             'text-halign': 'center',
             'text-margin-x': 0,
@@ -27,10 +28,12 @@ const cytoscapeStyles = [
             'text-shadow-offset-x': 0,
             'text-shadow-offset-y': 1,
             'text-shadow-blur': 3,
-            'padding': 30
+            'padding': 40,
+            'min-width': 300,
+            'min-height': 200
         }
     },
-    // External group container styles - Modern orange tab design
+    // External group container styles
     {
         selector: 'node.external-group',
         style: {
@@ -39,6 +42,7 @@ const cytoscapeStyles = [
             'border-color': '#f57c00',
             'shape': 'roundrectangle',
             'label': 'data(label)',
+            'compound-sizing-wrt-labels': 'exclude',
             'text-valign': 'top',
             'text-halign': 'center',
             'text-margin-x': 0,
@@ -55,10 +59,12 @@ const cytoscapeStyles = [
             'text-shadow-offset-x': 0,
             'text-shadow-offset-y': 1,
             'text-shadow-blur': 3,
-            'padding': 25
+            'padding': 30,
+            'min-width': 200,
+            'min-height': 150
         }
     },
-    // Internal service styles - Clean and modern
+    // Internal service styles
     {
         selector: 'node.service',
         style: {
@@ -73,12 +79,9 @@ const cytoscapeStyles = [
             'color': '#1b5e20',
             'width': 100,
             'height': 60,
-            'padding': 15,
             'shape': 'roundrectangle',
             'text-wrap': 'wrap',
-            'text-max-width': 90,
-            'transition-property': 'background-color, border-color',
-            'transition-duration': '0.2s'
+            'text-max-width': 90
         }
     },
     // External service styles
@@ -96,12 +99,9 @@ const cytoscapeStyles = [
             'color': '#e65100',
             'width': 90,
             'height': 50,
-            'padding': 12,
             'shape': 'roundrectangle',
             'text-wrap': 'wrap',
-            'text-max-width': 80,
-            'transition-property': 'background-color, border-color',
-            'transition-duration': '0.2s'
+            'text-max-width': 80
         }
     },
     // Group node styles (for index page)
@@ -119,15 +119,10 @@ const cytoscapeStyles = [
             'color': '#1565c0',
             'width': 120,
             'height': 80,
-            'shape': 'roundrectangle',
-            'text-shadow-color': '#ffffff',
-            'text-shadow-opacity': 0.5,
-            'text-shadow-offset-x': 0,
-            'text-shadow-offset-y': 1,
-            'text-shadow-blur': 1
+            'shape': 'roundrectangle'
         }
     },
-    // Edge styles - Clean and readable
+    // Edge styles
     {
         selector: 'edge',
         style: {
@@ -154,13 +149,10 @@ const cytoscapeStyles = [
         style: {
             'line-color': '#1976d2',
             'target-arrow-color': '#1976d2',
-            'width': 3,
-            'label': 'data(label)',
-            'color': '#1976d2',
-            'font-weight': 'bold'
+            'width': 3
         }
     },
-    // Service hover effects - smooth color transitions
+    // Service hover effects
     {
         selector: 'node.service:active',
         style: {
@@ -177,7 +169,6 @@ const cytoscapeStyles = [
             'border-width': 3
         }
     },
-    // Group node hover
     {
         selector: 'node.group-node:active',
         style: {
@@ -188,39 +179,46 @@ const cytoscapeStyles = [
     }
 ];
 
-// Common cytoscape layout configuration - More vertical arrangement
-const cytoscapeLayout = {
+// Layout for index page - simple grid-like vertical layout
+const indexLayout = {
     name: 'cose',
     animate: true,
     animationDuration: 500,
     fit: true,
     padding: 80,
-    componentSpacing: 150,
     nodeRepulsion: 12000,
-    idealEdgeLength: 120,
-    edgeElasticity: 100,
-    nestingFactor: 0.1,
+    idealEdgeLength: 150,
     gravity: 2,
-    numIter: 1500,
-    initialTemp: 200,
-    coolingFactor: 0.95,
-    minTemp: 1.0,
-    randomize: false,
-    avoidOverlap: true
+    numIter: 1000
 };
 
-// Create a cytoscape instance with common configuration
-function createCytoscape(containerId, elements, layoutOptions = {}) {
+// Layout for group page - better compound node layout
+const groupLayout = {
+    name: 'cose',
+    animate: true,
+    animationDuration: 1000,
+    fit: true,
+    padding: 100,
+    componentSpacing: 200,
+    nodeOverlap: 40,
+    nodeRepulsion: 15000,
+    idealEdgeLength: 120,
+    edgeElasticity: 100,
+    nestingFactor: 0.2,  // Important for compound nodes
+    gravity: 1.5,
+    numIter: 2000
+};
+
+// Create a cytoscape instance
+function createCytoscape(containerId, elements, useGroupLayout = false) {
     return cytoscape({
         container: document.getElementById(containerId),
         elements: elements,
         style: cytoscapeStyles,
-        layout: {
-            ...cytoscapeLayout,
-            ...layoutOptions
-        },
-        minZoom: 0.5,
-        maxZoom: 2
+        layout: useGroupLayout ? groupLayout : indexLayout,
+        minZoom: 0.3,
+        maxZoom: 2,
+        wheelSensitivity: 0.2
     });
 }
 

@@ -4,12 +4,11 @@
 <body>
     <h1>Service Groups Overview</h1>
     <div class="info">
-        <p><strong>Instructions:</strong> Click on a group to view its services.</p>
+        <p><strong>Instructions:</strong> Click on a group to view its services. Drag nodes to reposition them.</p>
     </div>
 
     <div style="position: relative;">
         <div id="cy"></div>
-
         <div th:replace="~{fragments :: legend('index')}"></div>
     </div>
 
@@ -29,14 +28,13 @@
             elements.push({
                 data: {
                     id: groupName,
-                    label: groupInfo.name || groupName,
-                    tooltip: `${groupInfo.name || groupName}\n${serviceCount} service(s)`
+                    label: groupInfo.name || groupName
                 },
                 classes: 'group-node'
             });
         });
 
-        // Build edges between groups that have connected services
+        // Build edges between groups
         Object.keys(servicesByGroup).forEach(sourceGroup => {
             const services = servicesByGroup[sourceGroup];
             services.forEach(service => {
@@ -61,23 +59,28 @@
             });
         });
 
-        // Create cytoscape instance
-        const cy = createCytoscape('cy', elements);
+        // Create cytoscape instance with moveable nodes
+        const cy = createCytoscape('cy', elements, false);
 
-        // Handle click to navigate to group page
+        // Enable node dragging
+        cy.nodes().ungrabify(); // First disable
+        cy.nodes().grabify();   // Then enable for all nodes
+
+        // Handle click to navigate
         cy.on('tap', 'node', function(evt) {
             const node = evt.target;
             window.location.href = '/group/' + encodeURIComponent(node.id());
         });
 
-        // Add hover cursor
-        cy.on('mouseover', 'node', function(evt) {
+        // Hover effects
+        cy.on('mouseover', 'node', function() {
             document.body.style.cursor = 'pointer';
         });
-        cy.on('mouseout', 'node', function(evt) {
+        cy.on('mouseout', 'node', function() {
             document.body.style.cursor = 'default';
         });
         /*]]>*/
     </script>
 </body>
 </html>
+
