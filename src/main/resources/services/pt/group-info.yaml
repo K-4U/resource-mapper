@@ -1,0 +1,10 @@
+﻿name: "Platform Group"
+description: |
+  Manages infrastructure and platform services.
+  Responsible for caching layers, message queues,
+  and shared platform components.
+contactInfo: |
+  Team Lead: John Smith
+  Email: platform-group@k4u.nl
+  Slack: #group-platform
+  On-call: +31 20 765 4321

@@ -1,0 +1,12 @@
+friendlyName: "MySQL Database"
+description: |
+  Primary relational database for persistent data storage.
+  
+  Stores all application data including user accounts, content, and transaction
+  records. Configured with automated backups, replication for high availability,
+  and optimized for read-heavy workloads.
+serviceType: ECS
+outgoingConnections:
+  - port: 6379
+    targetIdentifier: "pt/redis"
+    description: "Redis cache connection for sessions"
