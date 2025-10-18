@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Service Groups - Resource Mapper')}"></head>
+<body>
+    <h1>Service Groups Overview</h1>
+    <div class="info">
+        <p><strong>Instructions:</strong> Click on a group to view its services.</p>
+    </div>
+
+    <div style="position: relative;">
+        <div id="cy"></div>
+
+        <div th:replace="~{fragments :: legend('index')}"></div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const groups = /*[[${groups}]]*/ {};
+        const servicesByGroup = /*[[${servicesByGroup}]]*/ {};
+
+        const elements = [];
+        const groupConnections = new Set();
+
+        // Build nodes (one per group)
+        Object.keys(groups).forEach(groupName => {
+            const groupInfo = groups[groupName];
+            const serviceCount = servicesByGroup[groupName] ? servicesByGroup[groupName].length : 0;
+
+            elements.push({
+                data: {
+                    id: groupName,
+                    label: groupInfo.name || groupName,
+                    tooltip: `${groupInfo.name || groupName}\n${serviceCount} service(s)`
+                },
+                classes: 'group-node'
+            });
+        });
+
+        // Build edges between groups that have connected services
+        Object.keys(servicesByGroup).forEach(sourceGroup => {
+            const services = servicesByGroup[sourceGroup];
+            services.forEach(service => {
+                if (service.outgoingConnections) {
+                    service.outgoingConnections.forEach(connection => {
+                        const targetGroup = connection.targetIdentifier.split('/')[0];
+                        if (targetGroup !== sourceGroup) {
+                            const edgeId = `${sourceGroup}-${targetGroup}`;
+                            if (!groupConnections.has(edgeId)) {
+                                groupConnections.add(edgeId);
+                                elements.push({
+                                    data: {
+                                        id: edgeId,
+                                        source: sourceGroup,
+                                        target: targetGroup
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        // Create cytoscape instance
+        const cy = createCytoscape('cy', elements);
+
+        // Handle click to navigate to group page
+        cy.on('tap', 'node', function(evt) {
+            const node = evt.target;
+            window.location.href = '/group/' + encodeURIComponent(node.id());
+        });
+
+        // Add hover cursor
+        cy.on('mouseover', 'node', function(evt) {
+            document.body.style.cursor = 'pointer';
+        });
+        cy.on('mouseout', 'node', function(evt) {
+            document.body.style.cursor = 'default';
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

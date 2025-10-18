@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Resource Mapper</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/cytoscape-common.js}"></script>
+</head>
+
+<div th:fragment="header(title, showBreadcrumb, groupInfo)">
+    <div class="header">
+        <div class="breadcrumb" th:if="${showBreadcrumb}">
+            <a href="/">← Back to All Groups</a>
+        </div>
+        <h1 th:text="${title}">Title</h1>
+        <div class="description"
+             th:if="${groupInfo != null && groupInfo.description != null}"
+             th:text="${groupInfo.description}"></div>
+        <p class="description"
+           th:if="${groupInfo != null && groupInfo.contactInfo != null}">
+            <strong>Contact:</strong> <span th:text="${groupInfo.contactInfo}"></span>
+        </p>
+    </div>
+</div>
+
+<div th:fragment="legend(type)">
+    <div class="legend">
+        <h3>Legend</h3>
+        <div th:if="${type == 'index'}">
+            <div class="legend-item">
+                <div class="legend-box group-node"></div>
+                <span>Service Groups</span>
+            </div>
+        </div>
+        <div th:if="${type == 'group'}">
+            <div class="legend-item">
+                <div class="legend-box current"></div>
+                <span>Current Group Container (large box with label at top-left)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box internal"></div>
+                <span>Services in this group</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box external-group"></div>
+                <span>External group containers</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box external"></div>
+                <span>External services (in their group containers)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>
+

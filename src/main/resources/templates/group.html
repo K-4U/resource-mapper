@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${(groupInfo != null ? groupInfo.name : groupName) + ' - Resource Mapper'})}"></head>
+<body>
+    <div th:replace="~{fragments :: header(${groupInfo != null ? groupInfo.name : groupName}, true, ${groupInfo})}"></div>
+
+    <div style="position: relative;">
+        <div id="cy"></div>
+
+        <div th:replace="~{fragments :: legend('group')}"></div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const groupName = /*[[${groupName}]]*/ '';
+        const services = /*[[${services}]]*/ [];
+        const allServices = /*[[${allServices}]]*/ {};
+
+        const elements = [];
+        const externalGroups = new Set();
+
+        // Add the main group as a parent node
+        elements.push({
+            data: {
+                id: 'group-' + groupName,
+                label: groupName.charAt(0).toUpperCase() + groupName.slice(1).toLowerCase()
+            },
+            classes: 'group'
+        });
+
+        // Add nodes for each service in the current group (children of main group)
+        services.forEach((service) => {
+            const serviceId = service.groupName + '/' + service.identifier;
+
+            let tooltip = service.friendlyName + '\n';
+            tooltip += 'Type: ' + service.serviceType;
+            if (service.description) {
+                tooltip += '\n\n' + service.description;
+            }
+
+            elements.push({
+                data: {
+                    id: serviceId,
+                    parent: 'group-' + groupName,
+                    label: service.friendlyName,
+                    tooltip: tooltip
+                },
+                classes: 'service'
+            });
+
+            // Process outgoing connections to find external services
+            if (service.outgoingConnections) {
+                service.outgoingConnections.forEach(connection => {
+                    const targetId = connection.targetIdentifier;
+                    const targetGroupName = targetId.split('/')[0];
+
+                    // If connection is to external group, track it
+                    if (targetGroupName !== groupName) {
+                        externalGroups.add(targetGroupName);
+
+                        // Find the target service info
+                        let targetServiceName = targetId;
+                        let targetServiceType = '';
+                        if (allServices[targetGroupName]) {
+                            const targetService = allServices[targetGroupName].find(s =>
+                                (s.groupName + '/' + s.identifier) === targetId
+                            );
+                            if (targetService) {
+                                targetServiceName = targetService.friendlyName;
+                                targetServiceType = targetService.serviceType;
+                            }
+                        }
+
+                        // Check if external group container exists, if not add it
+                        const extGroupId = 'group-' + targetGroupName;
+                        if (!elements.find(el => el.data.id === extGroupId)) {
+                            elements.push({
+                                data: {
+                                    id: extGroupId,
+                                    label: targetGroupName.charAt(0).toUpperCase() + targetGroupName.slice(1).toLowerCase()
+                                },
+                                classes: 'external-group'
+                            });
+                        }
+
+                        // Add external service node if not already added (child of external group)
+                        if (!elements.find(el => el.data.id === targetId)) {
+                            elements.push({
+                                data: {
+                                    id: targetId,
+                                    parent: extGroupId,
+                                    label: targetServiceName,
+                                    tooltip: 'External service\nGroup: ' + targetGroupName + '\nType: ' + targetServiceType
+                                },
+                                classes: 'external-service'
+                            });
+                        }
+                    }
+
+                    // Add edge
+                    elements.push({
+                        data: {
+                            id: serviceId + '-' + targetId,
+                            source: serviceId,
+                            target: targetId,
+                            label: 'Port ' + connection.port
+                        }
+                    });
+                });
+            }
+        });
+
+        // Create cytoscape instance with compound nodes
+        const cy = createCytoscape('cy', elements, {
+            name: 'cose',
+            animate: true,
+            animationDuration: 1000,
+            fit: true,
+            padding: 50,
+            componentSpacing: 200,
+            nodeOverlap: 20,
+            nodeRepulsion: 10000,
+            idealEdgeLength: 150,
+            edgeElasticity: 100,
+            nestingFactor: 0.1,
+            gravity: 1,
+            numIter: 2000,
+            initialTemp: 200,
+            coolingFactor: 0.95,
+            minTemp: 1.0
+        });
+
+        // Add tooltips on hover
+        cy.nodes().forEach(node => {
+            node.on('mouseover', function(evt) {
+                const tooltip = evt.target.data('tooltip');
+                if (tooltip) {
+                    evt.target.data('originalLabel', evt.target.data('label'));
+                    // Tooltip shown via browser native title attribute would be better
+                    // but cytoscape doesn't support it directly
+                }
+            });
+        });
+
+        // Handle node clicks
+        cy.on('tap', 'node.service, node.external-service', function(evt) {
+            const nodeId = evt.target.id();
+            console.log('Clicked on service:', nodeId);
+            // Future: navigate to service detail page
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
