@@ -28,8 +28,6 @@
       <Controls />
       <MiniMap :position="minimapPosition" />
     </VueFlow>
-
-    <Legend :type="legendType" />
   </div>
 </template>
 

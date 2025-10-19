@@ -1,17 +1,22 @@
 <template>
   <div class="loading-container">
-    <div style="text-align: center; padding: 40px;">
-      <div style="font-size: 4rem; color: #999;">{{ icon }}</div>
-      <h2 style="color: #666; margin-top: 20px;">{{ title }}</h2>
-      <p style="color: #999;">{{ message }}</p>
-      <button
-        v-if="onAction"
-        @click="onAction"
-        style="margin-top: 20px; padding: 12px 24px; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;"
-      >
-        {{ actionLabel }}
-      </button>
-    </div>
+    <q-card flat bordered class="q-pa-xl" style="max-width: 500px;">
+      <q-card-section class="text-center">
+        <div class="text-h1 text-grey-5">{{ icon }}</div>
+        <div class="text-h5 text-grey-7 q-mt-md">{{ title }}</div>
+        <p class="text-body1 text-grey-6 q-mt-sm">{{ message }}</p>
+      </q-card-section>
+
+      <q-card-actions v-if="onAction" align="center" class="q-pt-md">
+        <q-btn
+          @click="onAction"
+          color="primary"
+          :label="actionLabel"
+          unelevated
+          size="lg"
+        />
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 
@@ -24,11 +29,4 @@ defineProps<{
   onAction?: () => void
 }>()
 </script>
-
-<style scoped>
-button:hover {
-  opacity: 0.9;
-}
-</style>
-
 

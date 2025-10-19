@@ -21,5 +21,13 @@ defineEmits(['updateNodeInternals'])
 </script>
 
 <style scoped>
+/* Style the node resizer to match external group colors */
+:deep(.vue-flow__resize-control.handle) {
+  background-color: var(--q-warning);
+  border-color: var(--q-warning);
+}
 
+:deep(.vue-flow__resize-control.line) {
+  border-color: var(--q-warning);
+}
 </style>

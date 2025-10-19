@@ -13,22 +13,27 @@ export default defineNuxtConfig({
   ssr: false,
 
   modules: [
-    '@primevue/nuxt-module'
+    'nuxt-quasar-ui'
   ],
 
-  primevue: {
-    options: {
-      theme: 'aura',
-      ripple: true
-    },
+  quasar: {
+    plugins: [
+      'Notify',
+      'Loading',
+      'Dialog'
+    ],
+    extras: {
+      font: 'roboto-font',
+      fontIcons: ['material-icons']
+    }
   },
 
   css: [
-    'primeicons/primeicons.css',
     '@vue-flow/core/dist/style.css',
     '@vue-flow/core/dist/theme-default.css',
     '@vue-flow/controls/dist/style.css',
-    '@vue-flow/minimap/dist/style.css'
+    '@vue-flow/minimap/dist/style.css',
+    '~/assets/css/main.css'
   ],
 
   runtimeConfig: {
@@ -43,3 +48,4 @@ export default defineNuxtConfig({
     }
   }
 })
+

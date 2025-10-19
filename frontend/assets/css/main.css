@@ -1,26 +1,5 @@
 :root {
     --group-border-width: 2px;
-    --group-internal-bg: linear-gradient(135deg, rgba(100, 181, 246, 0.9) 0%, rgba(33, 150, 243, 0.8) 100%);
-    --group-internal-border: #1976d2;
-    --group-internal-label-bg: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
-    --group-internal-label-color: #ffffff;
-
-    --group-external-bg: linear-gradient(135deg, rgba(255, 183, 77, 0.9) 0%, rgba(255, 152, 0, 0.8) 100%);
-    --group-external-border: #f57c00;
-    --group-external-label-bg: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
-    --group-external-label-color: #ffffff;
-
-    --service-internal-bg: linear-gradient(135deg, #81c784 0%, #388e3c 100%);
-    --service-internal-border: #2e7d32;
-    --service-internal-color: #ffffff;
-
-    --service-external-bg: linear-gradient(135deg, #ffd54f 0%, #ffa000 100%);
-    --service-external-border: #f57c00;
-    --service-external-color: #ffffff;
-
-    /* Edge colors */
-    --edge-internal-color: #1565c0;
-    --edge-external-color: #d32f2f;
 }
 
 * {
@@ -30,8 +9,8 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f5f5f5;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #fafafa;
 }
 
 /* Vue Flow container */
@@ -55,7 +34,7 @@ body {
     z-index: 10 !important;
 }
 
-/* Group styles */
+/* Group styles using Quasar colors */
 
 .group-content {
     width: 100%;
@@ -65,144 +44,77 @@ body {
 }
 
 .group-parent {
-    border-radius: 0 4px 4px 4px;
+    border-radius: 4px;
     border-width: var(--group-border-width);
     border-style: solid;
 }
 
 .group-parent.internal {
-    border-color: var(--group-internal-border);
-    background: var(--group-internal-bg);
+    border-color: var(--q-primary);
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.2) 0%, rgba(25, 118, 210, 0.15) 100%);
 }
 
 .group-parent.external {
-    border-color: var(--group-external-border);
-    background: var(--group-external-bg);
+    border-color: var(--q-warning);
+    background: linear-gradient(135deg, rgba(242, 192, 55, 0.2) 0%, rgba(242, 192, 55, 0.15) 100%);
 }
 
 .group-label {
     position: absolute;
-    top: -40px;
+    top: calc(-35px + var(--group-border-width));
     left: calc(var(--group-border-width) * -1);
-    padding: 10px 20px;
+    padding: 5px 10px;
     border-radius: 4px 4px 0 0;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 15px;
     z-index: 10;
 }
 
 .group-label.internal {
-    background: var(--group-internal-label-bg);
-    color: var(--group-internal-label-color);
+    background: linear-gradient(135deg, var(--q-primary) 0%, #1565C0 100%);
+    color: white;
 }
 
 .group-label.external {
-    background: var(--group-external-label-bg);
-    color: var(--group-external-label-color);
+    background: linear-gradient(135deg, var(--q-warning) 0%, #F9A825 100%);
+    color: rgba(0, 0, 0, 0.87);
 }
 
-/* Service node styles */
+/* Service node styles using Quasar colors */
 .service-node {
     padding: 10px;
-    border-radius: 3px;
+    border-radius: 4px;
     border: 2px solid;
 }
 
 .service-node.internal {
-    background: var(--service-internal-bg);
-    border-color: var(--service-internal-border);
-    color: var(--service-internal-color);
+    background: linear-gradient(135deg, var(--q-positive) 0%, #1B5E20 100%);
+    border-color: var(--q-positive);
+    color: white;
 }
 
 .service-node.external {
-    background: var(--service-external-bg);
-    border-color: var(--service-external-border);
-    color: var(--service-external-color);
+    background: linear-gradient(135deg, var(--q-warning) 0%, #F57C00 100%);
+    border-color: var(--q-warning);
+    color: rgba(0, 0, 0, 0.87);
 }
 
-/* Edge styles */
+/* Edge styles using Quasar colors */
 .vue-flow__edge-path {
     stroke-width: 2px;
 }
 
 .vue-flow__edge.internal .vue-flow__edge-path {
-    stroke: var(--edge-internal-color);
+    stroke: var(--q-primary);
 }
 
 .vue-flow__edge.external .vue-flow__edge-path {
-    stroke: var(--edge-external-color);
+    stroke: var(--q-negative);
 }
 
 .vue-flow__edge-text {
-    fill: #333;
+    fill: rgba(0, 0, 0, 0.87);
     font-size: 11px;
-}
-
-/* Legend */
-.legend {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    min-width: 200px;
-}
-
-.legend-title {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.legend-color {
-    width: 30px;
-    height: 20px;
-    border-radius: 4px;
-    margin-right: 12px;
-    border: 2px solid;
-}
-
-.legend-label {
-    font-size: 13px;
-    color: #666;
-}
-
-/* Header */
-.app-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-title {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.header-subtitle {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-top: 4px;
 }
 
 /* Loading state */
@@ -211,7 +123,13 @@ body {
     align-items: center;
     justify-content: center;
     height: calc(100vh - 80px);
-    font-size: 18px;
-    color: #666;
+}
+
+/* App header styles */
+.app-header {
+    background: linear-gradient(135deg, var(--q-primary) 0%, #1565C0 100%);
+    color: white;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 

@@ -1,13 +1,11 @@
 <template>
   <div>
-    <header class="app-header">
-      <div class="header-content">
-        <div>
-          <div class="header-title">Resource Mapper</div>
-          <div class="header-subtitle">Service Dependencies Overview</div>
-        </div>
-      </div>
-    </header>
+    <q-toolbar class="app-header">
+      <q-toolbar-title>
+        <div class="text-h5">Resource Mapper</div>
+        <div class="text-caption">Service Dependencies Overview</div>
+      </q-toolbar-title>
+    </q-toolbar>
 
     <LoadingSpinner v-if="pending" message="Loading services..." />
 
@@ -88,6 +86,10 @@ function refreshData() {
 </script>
 
 <style scoped>
-
+.app-header {
+  background: linear-gradient(135deg, var(--q-primary) 0%, #1565C0 100%);
+  color: white;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 </style>
-

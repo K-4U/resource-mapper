@@ -1,8 +1,11 @@
 <template>
   <div class="loading-container">
     <div style="text-align: center;">
-      <div style="font-size: 3rem; color: #1976d2; animation: spin 1s linear infinite;">⟳</div>
-      <p style="margin-top: 20px; font-size: 18px; color: #666;">{{ message }}</p>
+      <q-spinner-dots
+        color="primary"
+        size="80px"
+      />
+      <p class="text-h6 q-mt-md text-grey-7">{{ message }}</p>
     </div>
   </div>
 </template>
@@ -13,9 +16,3 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-</style>
