@@ -1,0 +1,12 @@
+friendlyName: "ECS Notification Service"
+description: |
+  Containerized notification service running on ECS for email and SMS delivery.
+  
+  Processes notification queues and sends alerts to users via multiple channels.
+  Integrates with external services and maintains delivery logs in DynamoDB.
+serviceType: ECS
+outgoingConnections:
+  - port: 443
+    targetIdentifier: "data/dynamodb-notifications"
+    description: "Notification logs and queue"
+

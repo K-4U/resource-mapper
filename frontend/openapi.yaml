@@ -12,7 +12,102 @@ servers:
 tags:
 - name: Services & Groups
   description: Service and group management API
+- name: Teams
+  description: Team information API
 paths:
+  /api/teams:
+    get:
+      tags:
+      - Teams
+      summary: Get all teams
+      description: Retrieves all team information
+      operationId: getAllTeams
+      responses:
+        "200":
+          description: Successfully retrieved all teams
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Team"
+  /api/teams/{teamId}:
+    get:
+      tags:
+      - Teams
+      summary: Get team information by ID
+      description: "Retrieves team information for a specific team ID (e.g., platform-team,\
+        \ web-team)"
+      operationId: getTeamById
+      parameters:
+      - name: teamId
+        in: path
+        description: Team ID (lowercase with dashes)
+        required: true
+        schema:
+          type: string
+        example: platform-team
+      responses:
+        "404":
+          description: Team not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Team"
+        "200":
+          description: Successfully retrieved team info
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Team"
+  /api/teams/{teamId}/services:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all services for a team
+      description: Retrieves all services from groups managed by the specified team
+      operationId: getServicesByTeam
+      parameters:
+      - name: teamId
+        in: path
+        description: Team ID (lowercase with dashes)
+        required: true
+        schema:
+          type: string
+        example: platform-team
+      responses:
+        "200":
+          description: Successfully retrieved services for team
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceDefinition"
+  /api/teams/{teamId}/groups:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all groups for a team
+      description: Retrieves all groups managed by the specified team
+      operationId: getGroupsByTeam
+      parameters:
+      - name: teamId
+        in: path
+        description: Team ID (lowercase with dashes)
+        required: true
+        schema:
+          type: string
+        example: platform-team
+      responses:
+        "200":
+          description: Successfully retrieved groups for team
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroupInfo"
   /api/services:
     get:
       tags:
@@ -168,6 +263,39 @@ paths:
                   $ref: "#/components/schemas/GroupConnection"
 components:
   schemas:
+    Team:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the team
+          example: Platform Team
+        description:
+          type: string
+          description: Multi-line description of the team's responsibilities and scope
+        teamLead:
+          type: string
+          description: Name of the team lead
+          example: John Smith
+        email:
+          type: string
+          description: Team contact email
+          example: platform-team@k4u.nl
+        slackChannel:
+          type: string
+          description: Slack channel for the team
+          example: "#team-platform"
+        oncallPhone:
+          type: string
+          description: On-call phone number
+          example: +31 20 765 4321
+        teamId:
+          type: string
+          description: Team identifier (filename without .yaml)
+          example: platform-team
+      description: Information about a team responsible for managing services
     ServiceConnection:
       required:
       - description
@@ -218,7 +346,7 @@ components:
           - ALB
           - NLB
           - RDS
-          - DNS
+          - ROUTE53
           - LAMBDA
           - S3
           - SQS
@@ -268,17 +396,17 @@ components:
           type: string
           description: "Multi-line description explaining the group's purpose, responsibilities,\
             \ and scope"
-        contactInfo:
+        teamId:
           type: string
-          description: Contact information for the team or person responsible for
-            this group
-          example: webteam@example.com
+          description: Team ID responsible for this group (references a team in the
+            teams folder)
+          example: platform-team
         groupName:
           type: string
           description: Internal group identifier (folder name)
           example: web
-      description: Metadata about a group of services including description and contact
-        information
+      description: Metadata about a group of services including description and team
+        reference
     GroupConnection:
       type: object
       properties:

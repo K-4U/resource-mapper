@@ -1,5 +1,5 @@
-import { ServicesGroupsApi, Configuration } from '~/generated/api/src'
-import type { ServiceDefinition, GroupInfo } from '~/generated/api/src'
+import { ServicesGroupsApi, TeamsApi, Configuration } from '~/generated/api/src'
+import type { ServiceDefinition, GroupInfo, Team } from '~/generated/api/src'
 
 export const useApi = () => {
   const config = useRuntimeConfig()
@@ -11,6 +11,7 @@ export const useApi = () => {
   })
 
   const api = new ServicesGroupsApi(apiConfig)
+  const teamsApi = new TeamsApi(apiConfig)
 
   const getAllServices = async () => {
     try {
@@ -75,6 +76,24 @@ export const useApi = () => {
     }
   }
 
+  const getTeamById = async (teamId: string) => {
+    try {
+      return await teamsApi.getTeamById({ teamId })
+    } catch (error: any) {
+      console.error(`Failed to fetch team ${teamId}:`, error)
+      throw new Error(`API Error: ${error.message || 'Could not connect to backend'}`)
+    }
+  }
+
+  const getAllTeams = async () => {
+    try {
+      return await teamsApi.getAllTeams()
+    } catch (error: any) {
+      console.error('Failed to fetch all teams:', error)
+      throw new Error(`API Error: ${error.message || 'Could not connect to backend'}`)
+    }
+  }
+
   return {
     getAllServices,
     getServicesByGroup,
@@ -82,9 +101,11 @@ export const useApi = () => {
     getServicesConnectedTo,
     getAllGroupInfo,
     getGroupInfo,
-    getAllGroupConnections
+    getAllGroupConnections,
+    getTeamById,
+    getAllTeams
   }
 }
 
 // Re-export types from generated API
-export type { ServiceDefinition, GroupInfo, ServiceConnection } from '~/generated/api/src'
+export type { ServiceDefinition, GroupInfo, ServiceConnection, Team } from '~/generated/api/src'

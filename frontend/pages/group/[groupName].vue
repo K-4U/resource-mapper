@@ -56,6 +56,7 @@
           :connection-count="connectionCount"
           :external-group-count="externalGroupCount"
           :selected-item="selectedItem"
+          :team-id="groupInfo?.teamId"
           @clear-selection="clearSelection"
       />
     </div>
@@ -285,15 +286,17 @@ function handleNodeClick(event: any) {
       type: 'service',
       label: node.data?.label || node.id,
       isExternal: node.data?.isExternal || false,
-      description: serviceData?.friendlyName,
-      connections: connections
+      description: serviceData?.description,
+      connections: connections,
+      groupName: serviceData?.groupName  // Service's group name from the service data
     }
   } else if (node.type === 'group' || node.type === 'external-group') {
     selectedItem.value = {
       type: 'group',
       label: node.data?.label || node.id,
       isExternal: node.type === 'external-group',
-      description: node.type === 'external-group' ? 'External dependency group' : 'Main group'
+      description: node.type === 'external-group' ? 'External dependency group' : 'Main group',
+      groupName: node.data?.groupName  // Group name from the node data (now included)
     }
   } else {
     selectedItem.value = null
@@ -333,4 +336,3 @@ function clearSelection() {
   overflow: hidden;
 }
 </style>
-

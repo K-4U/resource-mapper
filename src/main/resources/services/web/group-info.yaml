@@ -1,6 +1,0 @@
-﻿name: "Web Stack"
-description: |
-  Responsible for web applications and frontend services.
-  This group manages all public-facing web infrastructure
-  including load balancers, web servers, and related databases.
-teamId: "web-team"

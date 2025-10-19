@@ -1,0 +1,15 @@
+friendlyName: "User Management Lambda"
+description: |
+  Lambda function handling user authentication, registration, and profile management.
+  
+  Processes user-related API requests with JWT token validation and session management.
+  Connects to DynamoDB for user data storage and RDS for transactional operations.
+serviceType: LAMBDA
+outgoingConnections:
+  - port: 443
+    targetIdentifier: "data/dynamodb-users"
+    description: "User data storage"
+  - port: 5432
+    targetIdentifier: "data/rds-postgres"
+    description: "User authentication data"
+

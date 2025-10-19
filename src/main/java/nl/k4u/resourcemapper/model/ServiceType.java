@@ -40,7 +40,7 @@ public enum ServiceType {
 
     /** DNS service for domain name resolution and routing */
     @Schema(description = "DNS service (e.g., Route 53)")
-    DNS,
+    ROUTE53,
 
     /** AWS Lambda serverless compute service */
     @Schema(description = "AWS Lambda function")

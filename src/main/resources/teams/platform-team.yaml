@@ -1,9 +1,0 @@
-name: "Platform Team"
-description: |
-  Manages infrastructure and platform services.
-  Responsible for caching layers, message queues,
-  and shared platform components.
-teamLead: "John Smith"
-email: "platform-team@k4u.nl"
-slackChannel: "#team-platform"
-oncallPhone: "+31 20 765 4321"

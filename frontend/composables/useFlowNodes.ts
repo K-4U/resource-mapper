@@ -54,7 +54,7 @@ export class GroupNode implements Partial<Node> {
     public readonly id: string
     public readonly type: string
     public readonly position: { x: number; y: number }
-    public readonly data: { label: string }
+    public readonly data: { label: string; groupName: string }
     public readonly label: string
     public readonly class: string
 
@@ -71,7 +71,7 @@ export class GroupNode implements Partial<Node> {
     ) {
         this.id = `group-${groupName}`
         this.position = {x: positionX, y: positionY}
-        this.data = {label: displayName}
+        this.data = {label: displayName, groupName: groupName}
         this.label = displayName
         this.class = (isExternal ? 'external' : 'internal') + ' group-parent'
 

@@ -1,0 +1,18 @@
+friendlyName: "Order Processing Lambda"
+description: |
+  Lambda function managing order creation, updates, and tracking.
+  
+  Handles complex order workflows including payment processing, inventory checks,
+  and order status updates. Interacts with multiple data stores for reliability.
+serviceType: LAMBDA
+outgoingConnections:
+  - port: 443
+    targetIdentifier: "data/dynamodb-orders"
+    description: "Order data storage"
+  - port: 5432
+    targetIdentifier: "data/rds-postgres"
+    description: "Transactional order processing"
+  - port: 443
+    targetIdentifier: "compute/ecs-inventory"
+    description: "Inventory validation"
+

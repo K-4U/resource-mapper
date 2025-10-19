@@ -1,6 +1,0 @@
-﻿name: "Platform Group"
-description: |
-  Manages infrastructure and platform services.
-  Responsible for caching layers, message queues,
-  and shared platform components.
-teamId: "platform-team"

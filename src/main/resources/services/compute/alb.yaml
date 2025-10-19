@@ -1,0 +1,15 @@
+friendlyName: "Application Load Balancer"
+description: |
+  Application Load Balancer distributing traffic to ECS services across availability zones.
+  
+  Provides health checks, SSL termination, and intelligent routing with path-based rules.
+  Configured with auto-scaling and connection draining for zero-downtime deployments.
+serviceType: ALB
+outgoingConnections:
+  - port: 8080
+    targetIdentifier: "compute/ecs-inventory"
+    description: "Routes to inventory service"
+  - port: 8080
+    targetIdentifier: "compute/ecs-notification"
+    description: "Routes to notification service"
+

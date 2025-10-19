@@ -1,0 +1,7 @@
+name: "API Services"
+description: |
+  Manages serverless API infrastructure with API Gateway and Lambda functions.
+  This group handles RESTful API endpoints, authentication, request routing,
+  and serverless compute for business logic.
+teamId: "interface-architects"
+
