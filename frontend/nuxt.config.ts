@@ -12,6 +12,10 @@ export default defineNuxtConfig({
   // Disable SSR since we're connecting to a local backend API
   ssr: false,
 
+  devServer: {
+    port: 3001
+  },
+
   modules: [
     'nuxt-quasar-ui'
   ],

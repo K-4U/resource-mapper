@@ -7,7 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "nuxt prepare && npm run generate-api",
     "generate-api": "openapi-generator-cli generate -i openapi.yaml -g typescript-fetch -o ./generated/api --additional-properties=supportsES6=true,npmName=@/generated/api,typescriptThreePlus=true",
     "update-api": "curl http://localhost:8080/v3/api-docs.yaml -o openapi.yaml && npm run generate-api"
   },
