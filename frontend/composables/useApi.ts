@@ -66,13 +66,23 @@ export const useApi = () => {
     }
   }
 
+  const getAllGroupConnections = async () => {
+    try {
+      return await api.getAllGroupConnections()
+    } catch (error: any) {
+      console.error('Failed to fetch group connections:', error)
+      throw new Error(`API Error: ${error.message || 'Could not connect to backend'}`)
+    }
+  }
+
   return {
     getAllServices,
     getServicesByGroup,
     getServiceByIdentifier,
     getServicesConnectedTo,
     getAllGroupInfo,
-    getGroupInfo
+    getGroupInfo,
+    getAllGroupConnections
   }
 }
 

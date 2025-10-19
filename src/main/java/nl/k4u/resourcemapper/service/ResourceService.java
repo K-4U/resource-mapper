@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.k4u.resourcemapper.dao.GroupInfoDao;
 import nl.k4u.resourcemapper.dao.ServiceDefinitionDao;
+import nl.k4u.resourcemapper.model.GroupConnection;
 import nl.k4u.resourcemapper.model.GroupInfo;
 import nl.k4u.resourcemapper.model.ServiceDefinition;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ public class ResourceService {
                 for (final var connection : service.getOutgoingConnections()) {
                     if (serviceDefinitionDao.findByIdentifier(connection.getTargetIdentifier()).isEmpty()) {
                         log.warn("Service {} references non-existent target: {}",
-                                 service.getFullIdentifier(),
-                                 connection.getTargetIdentifier());
+                                service.getFullIdentifier(),
+                                connection.getTargetIdentifier());
                     }
                 }
             }
@@ -60,5 +61,36 @@ public class ResourceService {
     public Map<String, GroupInfo> getAllGroupInfo() {
         return groupInfoDao.findAll();
     }
-}
 
+    public List<GroupConnection> getAllGroupConnections() {
+        final Map<String, List<ServiceDefinition>> allServices = serviceDefinitionDao.findAll();
+        final Map<String, GroupInfo> allGroupInfo = groupInfoDao.findAll();
+
+        return allServices.entrySet().stream()
+                .map(entry -> {
+                    final String groupName = entry.getKey();
+                    final List<ServiceDefinition> services = entry.getValue();
+
+                    // Find all groups this group connects to
+                    final java.util.Set<String> connectedToGroups = services.stream()
+                            .filter(service -> service.getOutgoingConnections() != null)
+                            .flatMap(service -> service.getOutgoingConnections().stream())
+                            .map(connection -> connection.getTargetIdentifier().split("/")[0])
+                            .filter(targetGroup -> !targetGroup.equals(groupName))
+                            .collect(java.util.stream.Collectors.toSet());
+
+                    // Get display name and description from GroupInfo if available
+                    final GroupInfo groupInfo = allGroupInfo.get(groupName);
+                    final String description = groupInfo != null ? groupInfo.getDescription() : null;
+
+                    return new GroupConnection(
+                            groupName,
+                            description,
+                            connectedToGroups,
+                            services.size()
+                    );
+                })
+                .sorted(java.util.Comparator.comparing(GroupConnection::getGroupName))
+                .toList();
+    }
+}

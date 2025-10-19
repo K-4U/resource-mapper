@@ -1,5 +1,6 @@
 import type {Node} from '@vue-flow/core'
 import type {ServiceDefinition} from '~/generated/api/src'
+import { NodePositionCalculator, type PositionConfig } from './useNodePositioning'
 
 /**
  * Service node - represents a single service (internal or external)
@@ -58,22 +59,49 @@ export class GroupNode implements Partial<Node> {
     public readonly class: string
 
     private readonly services: ServiceNode[] = []
+    private readonly positionCalculator: NodePositionCalculator
 
     constructor(
         private readonly groupName: string,
         displayName: string,
         positionX: number,
         positionY: number,
-        private readonly isExternal: boolean = false
+        private readonly isExternal: boolean = false,
+        positionConfig?: Partial<PositionConfig>
     ) {
         this.id = `group-${groupName}`
         this.position = {x: positionX, y: positionY}
         this.data = {label: displayName}
         this.label = displayName
-        this.class = (isExternal ? 'external' : 'internal') + ' group-parent';
+        this.class = (isExternal ? 'external' : 'internal') + ' group-parent'
 
         // Use proper node type for parent nodes
         this.type = isExternal ? 'external-group' : 'group'
+
+        // Initialize position calculator with custom config
+        const defaultConfig: Partial<PositionConfig> = {
+            cols: isExternal ? 2 : 3,
+            nodeWidth: 140,
+            nodeHeight: 80,
+            horizontalSpacing: 30,
+            verticalSpacing: 40,
+            groupPadding: 20,
+            connectionDirection: 'vertical',
+            sourceSide: 'bottom',
+            targetSide: 'top'
+        }
+
+        this.positionCalculator = new NodePositionCalculator({
+            ...defaultConfig,
+            ...positionConfig
+        })
+    }
+
+    /**
+     * Register all services first (called before adding individual services)
+     */
+    public registerServices(services: ServiceDefinition[]): void {
+        this.positionCalculator.registerServices(services)
     }
 
     /**
@@ -84,33 +112,11 @@ export class GroupNode implements Partial<Node> {
         index: number,
         external: boolean = false,
     ): ServiceNode {
-        const {x, y} = this.calculateServicePosition(index)
+        const serviceId = `${service.groupName}/${service.identifier}`
+        const {x, y} = this.positionCalculator.calculatePosition(serviceId)
         const serviceNode = new ServiceNode(service, this.id, x, y, external)
         this.services.push(serviceNode)
         return serviceNode
-    }
-
-    /**
-     * Calculate position for a service within this group
-     */
-    private calculateServicePosition(index: number): { x: number; y: number } {
-        // Base grid position
-        const cols = this.isExternal ? 2 : 3
-        const row = Math.floor(index / cols)
-        const col = index % cols
-
-        const baseX = this.isExternal ? 20 + col * 150 : 20 + col * 170
-        const baseY = this.isExternal ? 50 + row * 110 : 60 + row * 120
-
-        // Add deterministic jitter based on index to spread nodes
-        // This prevents straight lines while keeping positions stable
-        const jitterX = ((index * 73) % 50) - 25  // Range: -25 to +25
-        const jitterY = ((index * 97) % 40) - 20  // Range: -20 to +20
-
-        return {
-            x: Math.max(10, baseX + jitterX),
-            y: Math.max(40, baseY + jitterY)
-        }
     }
 
     /**
@@ -147,5 +153,12 @@ export class GroupNode implements Partial<Node> {
             groupNode,
             ...serviceNodes
         ]
+    }
+
+    /**
+     * Update position calculator configuration
+     */
+    public updatePositionConfig(config: Partial<PositionConfig>): void {
+        this.positionCalculator.updateConfig(config)
     }
 }

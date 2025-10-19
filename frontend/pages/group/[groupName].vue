@@ -45,83 +45,48 @@
     />
 
     <div v-else style="position: relative;">
-      <VueFlow
+      <FlowCanvas
         :nodes="nodes"
-        :edges="edges"
-        :node-types="nodeTypes"
-        :edge-types="edgeTypes"
-        class="vue-flow-container"
-        fit-view-on-init
-        :default-viewport="{ zoom: 1 }"
-        :min-zoom="0.2"
-        :max-zoom="4"
-        :nodes-draggable="true"
-        :elements-selectable="true"
-        :auto-connect="false"
-        :snap-to-grid="true"
-        :apply-changes="true"
-        :delete-key-code="null"
-        :only-render-visible-nodes="true"
-        :select-nodes-on-drag="false"
-        :pan-on-drag="true"
+        :edges="renderedEdges"
+        legend-type="group"
         @error="handleError"
-      >
-        <Background pattern-color="#aaa" :gap="16" />
-        <Controls>
-        </Controls>
-        <MiniMap position="bottom-left" />
-      </VueFlow>
-
-      <Legend type="group" />
+        @node-drag-start="onNodeDragStart"
+        @node-drag-stop="onNodeDragStop"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { VueFlow, useVueFlow, VueFlowError } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
-import { MiniMap } from '@vue-flow/minimap'
-import { PathFindingEdge } from '@vue-flow/pathfinding-edge'
+import { useVueFlow, VueFlowError } from '@vue-flow/core'
 import type { Node, Edge } from '@vue-flow/core'
-import GroupNodeVue from '~/components/flow/GroupNode.vue'
-import ExternalGroupNode from '~/components/flow/ExternalGroupNode.vue'
-import ServiceNodeVue from '~/components/flow/ServiceNode.vue'
 import { GroupNode } from '~/composables/useFlowNodes'
 import type { ServiceDefinition, GroupInfo } from '~/generated/api/src'
 
 const route = useRoute()
 const router = useRouter()
 const api = useApi()
-const { onError } = useVueFlow();
+const { onError } = useVueFlow()
 
 const groupName = route.params.groupName as string
 const capitalizedGroupName = computed(() =>
   groupName.charAt(0).toUpperCase() + groupName.slice(1).toLowerCase()
 )
 
-// Define custom node types
-const nodeTypes = {
-  'group': markRaw(GroupNodeVue),
-  'external-group': markRaw(ExternalGroupNode),
-  'service': markRaw(ServiceNodeVue),
-} as any
+onError(handleError)
 
-// Define custom edge types
-const edgeTypes = {
-  'pathfinding': markRaw(PathFindingEdge)
+function handleError(error: VueFlowError) {
+  console.error('Vue Flow Error:', error)
 }
-
-onError(handleError);
-
-function handleError(error:VueFlowError) {
-  console.error('Vue Flow Error:', error);
-}
-
 
 const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])
 const groupInfo = ref<GroupInfo | null>(null)
+const edgeAnimationEnabled = ref(true)
+const renderedEdges = computed(() => {
+  if (edgeAnimationEnabled.value) return edges.value
+  return edges.value.map(e => e.animated ? { ...e, animated: false } : e)
+})
 
 // Fetch data with error handling
 const { pending, error, refresh } = await useAsyncData(
@@ -163,6 +128,9 @@ function buildGraph(services: ServiceDefinition[], allServices: Record<string, S
   )
 
   console.log('Created main group:', mainGroup.id)
+
+  // Register all services first for intelligent positioning
+  mainGroup.registerServices(services)
 
   // Add services to the main group
   services.forEach((service, index) => {
@@ -229,7 +197,8 @@ function processServiceConnections(
         target: targetId,
         label: `Port ${connection.port}`,
         type: 'smoothstep',
-        animated: true
+        animated: true,
+        class: 'external'
       })
     } else {
       // Internal connection
@@ -238,7 +207,8 @@ function processServiceConnections(
         source: serviceId,
         target: targetId,
         label: `Port ${connection.port}`,
-        type: 'smoothstep'
+        type: 'smoothstep',
+        class: 'internal'
       })
     }
   })
@@ -278,6 +248,10 @@ function handleExternalConnection(
       true // is external
     )
 
+    // Register all services from this external group for intelligent positioning
+    const externalGroupServices = allServices[targetGroupName] || []
+    externalGroup.registerServices(externalGroupServices)
+
     externalGroups.set(targetGroupName, externalGroup)
     console.log('Created external group:', externalGroup.id)
   }
@@ -295,7 +269,13 @@ function refreshData() {
   refresh()
 }
 
-
+function setEdgeAnimation(enabled: boolean) { edgeAnimationEnabled.value = enabled }
+function onNodeDragStart() {
+  setEdgeAnimation(false)
+}
+function onNodeDragStop() {
+  setEdgeAnimation(true)
+}
 </script>
 
 <style scoped>

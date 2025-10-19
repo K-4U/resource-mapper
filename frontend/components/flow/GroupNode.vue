@@ -1,7 +1,7 @@
 <template>
   <div class="group-content">
     <div class="group-label internal">{{ data.label }}</div>
-    <NodeResizer min-width="100" min-height="30" />
+    <NodeResizer />
   </div>
 </template>
 

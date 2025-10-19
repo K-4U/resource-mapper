@@ -1,22 +1,26 @@
 :root {
-    --group-border-width: 4px;
-    --group-internal-bg: rgba(227, 242, 253, 0.4);
+    --group-border-width: 2px;
+    --group-internal-bg: linear-gradient(135deg, rgba(100, 181, 246, 0.9) 0%, rgba(33, 150, 243, 0.8) 100%);
     --group-internal-border: #1976d2;
-    --group-internal-label-bg: #1976d2;
+    --group-internal-label-bg: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
     --group-internal-label-color: #ffffff;
 
-    --group-external-bg: rgba(255, 249, 196, 0.4);
+    --group-external-bg: linear-gradient(135deg, rgba(255, 183, 77, 0.9) 0%, rgba(255, 152, 0, 0.8) 100%);
     --group-external-border: #f57c00;
-    --group-external-label-bg: #f57c00;
+    --group-external-label-bg: linear-gradient(135deg, #ff9800 0%, #e65100 100%);
     --group-external-label-color: #ffffff;
 
-    --service-internal-bg: #c8e6c9;
-    --service-internal-border: #388e3c;
-    --service-internal-color: #1b5e20;
+    --service-internal-bg: linear-gradient(135deg, #81c784 0%, #388e3c 100%);
+    --service-internal-border: #2e7d32;
+    --service-internal-color: #ffffff;
 
-    --service-external-bg: #fff9c4;
+    --service-external-bg: linear-gradient(135deg, #ffd54f 0%, #ffa000 100%);
     --service-external-border: #f57c00;
-    --service-external-color: #e65100;
+    --service-external-color: #ffffff;
+
+    /* Edge colors */
+    --edge-internal-color: #1565c0;
+    --edge-external-color: #d32f2f;
 }
 
 * {
@@ -37,12 +41,27 @@ body {
     background-color: #fafafa;
 }
 
+/* Vue Flow layers - ensure edges render above parent nodes */
+.vue-flow .vue-flow__edges {
+    z-index: 5 !important;
+}
+
+.vue-flow .vue-flow__nodes {
+    z-index: 1 !important;
+}
+
+/* But keep child nodes above edges */
+.vue-flow__node:not(.group-parent) {
+    z-index: 10 !important;
+}
+
 /* Group styles */
 
 .group-content {
     width: 100%;
     height: 100%;
     position: relative;
+    padding-right: 30px;
 }
 
 .group-parent {
@@ -53,12 +72,12 @@ body {
 
 .group-parent.internal {
     border-color: var(--group-internal-border);
-    background-color: var(--group-internal-bg);
+    background: var(--group-internal-bg);
 }
 
 .group-parent.external {
     border-color: var(--group-external-border);
-    background-color: var(--group-external-bg);
+    background: var(--group-external-bg);
 }
 
 .group-label {
@@ -90,18 +109,36 @@ body {
 }
 
 .service-node.internal {
-    background-color: var(--service-internal-bg);
+    background: var(--service-internal-bg);
     border-color: var(--service-internal-border);
     color: var(--service-internal-color);
 }
 
 .service-node.external {
-    background-color: var(--service-external-bg);
+    background: var(--service-external-bg);
     border-color: var(--service-external-border);
     color: var(--service-external-color);
 }
 
-    /* Legend */
+/* Edge styles */
+.vue-flow__edge-path {
+    stroke-width: 2px;
+}
+
+.vue-flow__edge.internal .vue-flow__edge-path {
+    stroke: var(--edge-internal-color);
+}
+
+.vue-flow__edge.external .vue-flow__edge-path {
+    stroke: var(--edge-external-color);
+}
+
+.vue-flow__edge-text {
+    fill: #333;
+    font-size: 11px;
+}
+
+/* Legend */
 .legend {
     position: absolute;
     bottom: 20px;
@@ -143,10 +180,10 @@ body {
 
 /* Header */
 .app-header {
-    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 20px 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -177,3 +214,4 @@ body {
     font-size: 18px;
     color: #666;
 }
+

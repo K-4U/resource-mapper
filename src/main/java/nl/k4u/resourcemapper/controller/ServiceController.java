@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import nl.k4u.resourcemapper.model.GroupConnection;
 import nl.k4u.resourcemapper.model.ServiceDefinition;
 import nl.k4u.resourcemapper.model.GroupInfo;
 import nl.k4u.resourcemapper.service.ResourceService;
@@ -95,6 +96,16 @@ public class ServiceController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved all group info")
     public ResponseEntity<Map<String, GroupInfo>> getAllGroupInfo() {
         return ResponseEntity.ok(resourceService.getAllGroupInfo());
+    }
+
+    @GetMapping("/groups/connections")
+    @Operation(
+        summary = "Get all group connections",
+        description = "Retrieves all groups with their inter-group connections for rendering the overview page"
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved group connections")
+    public ResponseEntity<List<GroupConnection>> getAllGroupConnections() {
+        return ResponseEntity.ok(resourceService.getAllGroupConnections());
     }
 }
 

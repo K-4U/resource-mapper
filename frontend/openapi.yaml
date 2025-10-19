@@ -149,6 +149,23 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GroupInfo"
+  /api/groups/connections:
+    get:
+      tags:
+      - Services & Groups
+      summary: Get all group connections
+      description: Retrieves all groups with their inter-group connections for rendering
+        the overview page
+      operationId: getAllGroupConnections
+      responses:
+        "200":
+          description: Successfully retrieved group connections
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroupConnection"
 components:
   schemas:
     ServiceConnection:
@@ -262,3 +279,30 @@ components:
           example: web
       description: Metadata about a group of services including description and contact
         information
+    GroupConnection:
+      type: object
+      properties:
+        groupName:
+          type: string
+          description: Name of the group
+          example: web
+        description:
+          type: string
+          description: Optional description of the group
+        connectedToGroups:
+          uniqueItems: true
+          type: array
+          description: Set of group names that this group has connections to
+          example:
+          - pt
+          - database
+          items:
+            type: string
+            description: Set of group names that this group has connections to
+            example: "[\"pt\",\"database\"]"
+        serviceCount:
+          type: integer
+          description: Number of services in this group
+          format: int32
+          example: 5
+      description: Group with its connections to other groups
