@@ -1,10 +1,16 @@
 <template>
   <div class="group-content">
     <div class="group-label internal">{{ data.label }}</div>
+    <NodeResizer min-width="100" min-height="30" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { NodeResizer } from '@vue-flow/node-resizer'
+
+// make sure to include the necessary styles!
+import '@vue-flow/node-resizer/dist/style.css'
+
 interface Props {
   data: {
     label: string

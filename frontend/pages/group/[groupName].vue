@@ -49,6 +49,7 @@
         :nodes="nodes"
         :edges="edges"
         :node-types="nodeTypes"
+        :edge-types="edgeTypes"
         class="vue-flow-container"
         fit-view-on-init
         :default-viewport="{ zoom: 1 }"
@@ -77,15 +78,15 @@
 </template>
 
 <script setup lang="ts">
-import {useVueFlow, VueFlow, VueFlowError} from '@vue-flow/core'
+import { VueFlow, useVueFlow, VueFlowError } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
+import { PathFindingEdge } from '@vue-flow/pathfinding-edge'
 import type { Node, Edge } from '@vue-flow/core'
 import GroupNodeVue from '~/components/flow/GroupNode.vue'
 import ExternalGroupNode from '~/components/flow/ExternalGroupNode.vue'
 import ServiceNodeVue from '~/components/flow/ServiceNode.vue'
-import ExternalServiceNode from '~/components/flow/ExternalServiceNode.vue'
 import { GroupNode } from '~/composables/useFlowNodes'
 import type { ServiceDefinition, GroupInfo } from '~/generated/api/src'
 
@@ -104,7 +105,11 @@ const nodeTypes = {
   'group': markRaw(GroupNodeVue),
   'external-group': markRaw(ExternalGroupNode),
   'service': markRaw(ServiceNodeVue),
-  'external-service': markRaw(ExternalServiceNode)
+} as any
+
+// Define custom edge types
+const edgeTypes = {
+  'pathfinding': markRaw(PathFindingEdge)
 }
 
 onError(handleError);
@@ -161,7 +166,7 @@ function buildGraph(services: ServiceDefinition[], allServices: Record<string, S
 
   // Add services to the main group
   services.forEach((service, index) => {
-    const serviceNode = mainGroup.addService(service, index, 'service')
+    const serviceNode = mainGroup.addService(service, index, false)
     console.log('Added service:', serviceNode.id)
 
     // Process outgoing connections
@@ -281,7 +286,7 @@ function handleExternalConnection(
   if (!externalServiceMap.has(targetId)) {
     const group = externalGroups.get(targetGroupName)!
     const serviceIndex = group.getServices().length
-    group.addService(targetService, serviceIndex, 'external-service')
+    group.addService(targetService, serviceIndex, true)
     externalServiceMap.set(targetId, targetService)
   }
 }
