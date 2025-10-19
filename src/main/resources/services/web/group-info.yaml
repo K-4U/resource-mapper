@@ -3,6 +3,4 @@ description: |
   Responsible for web applications and frontend services.
   This group manages all public-facing web infrastructure
   including load balancers, web servers, and related databases.
-contactInfo: |
-  Team Lead: Jane Doe
-  Email: web-group@k-4u.nl
+teamId: "web-team"

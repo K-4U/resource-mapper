@@ -1,0 +1,10 @@
+name: "Web Team"
+description: |
+  Responsible for web applications and frontend services.
+  Manages all public-facing web infrastructure including
+  load balancers, web servers, and related databases.
+teamLead: "Jane Doe"
+email: "web-team@k4u.nl"
+slackChannel: "#team-web"
+oncallPhone: "+31 20 123 4567"
+

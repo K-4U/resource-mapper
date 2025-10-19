@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
  * Group information is loaded from 'group-info.yaml' files within each group's directory.
  */
 @Data
-@Schema(description = "Metadata about a group of services including description and contact information")
+@Schema(description = "Metadata about a group of services including description and team reference")
 public class GroupInfo {
 
     @Schema(description = "Display name of the group", example = "Web Services Team")
@@ -21,9 +21,9 @@ public class GroupInfo {
     @Schema(description = "Multi-line description explaining the group's purpose, responsibilities, and scope")
     private String description;
 
-    @Schema(description = "Contact information for the team or person responsible for this group",
-            example = "webteam@example.com")
-    private String contactInfo;
+    @Schema(description = "Team ID responsible for this group (references a team in the teams folder)",
+            example = "platform-team")
+    private String teamId;
 
     // The group folder name (set by loader)
     @Schema(description = "Internal group identifier (folder name)", example = "web")

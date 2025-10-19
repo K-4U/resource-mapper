@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -92,5 +93,30 @@ public class ResourceService {
                 })
                 .sorted(java.util.Comparator.comparing(GroupConnection::getGroupName))
                 .toList();
+    }
+
+    public List<ServiceDefinition> getServicesByTeamId(final String teamId) {
+        log.debug("Retrieving services for team: {}", teamId);
+
+        // Find all groups managed by this team
+        final List<String> teamGroups = groupInfoDao.findAll().entrySet().stream()
+                .filter(entry -> teamId.equals(entry.getValue().getTeamId()))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        log.debug("Found {} groups for team {}: {}", teamGroups.size(), teamId, teamGroups);
+
+        // Get all services from those groups
+        return teamGroups.stream()
+                .flatMap(groupName -> serviceDefinitionDao.findByGroupName(groupName).stream())
+                .collect(Collectors.toList());
+    }
+
+    public List<GroupInfo> getGroupsByTeamId(final String teamId) {
+        log.debug("Retrieving groups for team: {}", teamId);
+
+        return groupInfoDao.findAll().values().stream()
+                .filter(groupInfo -> teamId.equals(groupInfo.getTeamId()))
+                .collect(Collectors.toList());
     }
 }
