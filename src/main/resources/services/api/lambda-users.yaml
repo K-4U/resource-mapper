@@ -6,10 +6,10 @@ description: |
   Connects to DynamoDB for user data storage and RDS for transactional operations.
 serviceType: LAMBDA
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "data/dynamodb-users"
+  - targetIdentifier: "data/dynamodb-users"
     description: "User data storage"
-  - port: 5432
-    targetIdentifier: "data/rds-postgres"
+    connectionType: CALLS
+  - targetIdentifier: "data/rds-postgres"
     description: "User authentication data"
+    connectionType: TCP
 

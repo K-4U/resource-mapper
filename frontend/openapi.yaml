@@ -298,16 +298,20 @@ components:
       description: Information about a team responsible for managing services
     ServiceConnection:
       required:
+      - connectionType
       - description
-      - port
       - targetIdentifier
       type: object
       properties:
-        port:
-          type: integer
-          description: Port number used for the connection
-          format: int32
-          example: 3306
+        connectionType:
+          type: string
+          description: "Type of connection (TCP, PUBLISHES, CALLS, TRIGGERS)"
+          example: TCP
+          enum:
+          - TCP
+          - PUBLISHES
+          - CALLS
+          - TRIGGERS
         targetIdentifier:
           pattern: "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
           type: string
@@ -371,6 +375,12 @@ components:
         outgoingConnections:
           type: array
           description: List of connections this service makes to other services
+          items:
+            $ref: "#/components/schemas/ServiceConnection"
+        incomingConnections:
+          type: array
+          description: List of connections from other services to this service (calculated
+            at load time)
           items:
             $ref: "#/components/schemas/ServiceConnection"
         groupName:

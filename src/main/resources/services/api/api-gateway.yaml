@@ -6,13 +6,13 @@ description: |
   Configured with custom domain, CORS, and request validation.
 serviceType: API_GATEWAY
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "api/lambda-users"
+  - targetIdentifier: "api/lambda-users"
     description: "Routes user management requests"
-  - port: 443
-    targetIdentifier: "api/lambda-orders"
+    connectionType: CALLS
+  - targetIdentifier: "api/lambda-orders"
     description: "Routes order processing requests"
-  - port: 443
-    targetIdentifier: "api/lambda-products"
+    connectionType: CALLS
+  - targetIdentifier: "api/lambda-products"
     description: "Routes product catalog requests"
+    connectionType: CALLS
 

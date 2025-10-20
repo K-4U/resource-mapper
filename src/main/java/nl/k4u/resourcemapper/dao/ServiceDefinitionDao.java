@@ -37,6 +37,8 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
             }
         }
 
+        calculateIncomingConnections();
+
         log.info("Loaded {} services across {} groups", servicesByIdentifier.size(), servicesByGroup.size());
     }
 
@@ -55,7 +57,7 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
             // Validate identifier format
             if (!identifier.matches("^[a-z][a-z0-9-]*$")) {
                 throw new IllegalArgumentException(
-                    "Invalid filename '" + filename + "': must be lowercase and use only dashes (e.g., 'my-service.yaml')"
+                        "Invalid filename '" + filename + "': must be lowercase and use only dashes (e.g., 'my-service.yaml')"
                 );
             }
 
@@ -67,10 +69,10 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
             final Set<ConstraintViolation<ServiceDefinition>> violations = validator.validate(service);
             if (!violations.isEmpty()) {
                 final String errors = violations.stream()
-                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
-                    .collect(Collectors.joining(", "));
+                        .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                        .collect(Collectors.joining(", "));
                 throw new IllegalArgumentException(
-                    "Invalid service definition in " + resource.getFilename() + ": " + errors
+                        "Invalid service definition in " + resource.getFilename() + ": " + errors
                 );
             }
 
@@ -78,7 +80,7 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
             final String fullIdentifier = service.getFullIdentifier();
             if (servicesByIdentifier.containsKey(fullIdentifier)) {
                 throw new IllegalArgumentException(
-                    "Duplicate service identifier: " + fullIdentifier
+                        "Duplicate service identifier: " + fullIdentifier
                 );
             }
 
@@ -93,6 +95,45 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
         }
     }
 
+    private void calculateIncomingConnections() {
+        log.info("Calculating incoming connections for all services...");
+
+        // Clear any existing incoming connections
+        servicesByIdentifier.values().forEach(service ->
+                service.setIncomingConnections(new ArrayList<>())
+        );
+
+        // For each service, process its outgoing connections
+        for (final ServiceDefinition sourceService : servicesByIdentifier.values()) {
+            if (sourceService.getOutgoingConnections() == null) {
+                continue;
+            }
+
+            for (final var outgoingConnection : sourceService.getOutgoingConnections()) {
+                final String targetId = outgoingConnection.getTargetIdentifier();
+                final ServiceDefinition targetService = servicesByIdentifier.get(targetId);
+
+                if (targetService != null) {
+                    // Create an incoming connection for the target service
+                    final var incomingConnection = new nl.k4u.resourcemapper.model.ServiceConnection();
+                    incomingConnection.setConnectionType(outgoingConnection.getConnectionType());
+                    incomingConnection.setTargetIdentifier(sourceService.getFullIdentifier());
+                    incomingConnection.setDescription(outgoingConnection.getDescription());
+
+                    targetService.getIncomingConnections().add(incomingConnection);
+                } else {
+                    log.warn("Service {} has connection to non-existent service: {}",
+                            sourceService.getFullIdentifier(), targetId);
+                }
+            }
+        }
+
+        final long servicesWithIncoming = servicesByIdentifier.values().stream()
+                .filter(s -> s.getIncomingConnections() != null && !s.getIncomingConnections().isEmpty())
+                .count();
+        log.info("Calculated incoming connections: {} services have incoming connections", servicesWithIncoming);
+    }
+
     public List<ServiceDefinition> findByGroupName(final String groupName) {
         return servicesByGroup.getOrDefault(groupName, Collections.emptyList());
     }
@@ -103,10 +144,10 @@ public class ServiceDefinitionDao extends AbstractYamlDao<ServiceDefinition> {
 
     public List<ServiceDefinition> findByTargetIdentifier(final String targetIdentifier) {
         return servicesByIdentifier.values().stream()
-            .filter(service -> service.getOutgoingConnections() != null &&
-                             service.getOutgoingConnections().stream()
-                                 .anyMatch(conn -> conn.getTargetIdentifier().equals(targetIdentifier)))
-            .toList();
+                .filter(service -> service.getOutgoingConnections() != null &&
+                        service.getOutgoingConnections().stream()
+                                .anyMatch(conn -> conn.getTargetIdentifier().equals(targetIdentifier)))
+                .toList();
     }
 
     public Map<String, List<ServiceDefinition>> findAll() {

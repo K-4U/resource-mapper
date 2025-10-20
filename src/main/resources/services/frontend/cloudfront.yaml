@@ -6,7 +6,7 @@ description: |
   cache behaviors. Improves website performance and reduces S3 costs by caching content at edge locations.
 serviceType: CLOUDFRONT
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "frontend/s3-website"
+  - targetIdentifier: "frontend/s3-website"
     description: "Origin - S3 static website bucket"
+    connectionType: TCP
 

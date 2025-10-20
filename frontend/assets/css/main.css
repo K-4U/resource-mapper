@@ -88,7 +88,7 @@ body {
 }
 
 .service-node.internal {
-    background: linear-gradient(135deg, var(--q-positive) 0%, #1B5E20 100%);
+    background: linear-gradient(135deg, var(--q-positive) 0%, var(--q-dark) 100%);
     border-color: var(--q-positive);
     color: white;
 }
@@ -97,6 +97,17 @@ body {
     background: linear-gradient(135deg, var(--q-warning) 0%, #F57C00 100%);
     border-color: var(--q-warning);
     color: rgba(0, 0, 0, 0.87);
+}
+
+/* Selected service node states - just a standout border */
+.service-node.internal.selected {
+    border-color: var(--q-accent);
+    border-width: 4px;
+}
+
+.service-node.external.selected {
+    border-color: var(--q-accent);
+    border-width: 4px;
 }
 
 /* Edge styles using Quasar colors */
@@ -110,6 +121,12 @@ body {
 
 .vue-flow__edge.external .vue-flow__edge-path {
     stroke: var(--q-negative);
+}
+
+/* Highlighted edges for selected node connections */
+.vue-flow__edge.highlighted .vue-flow__edge-path {
+    stroke-width: 4px;
+    stroke: var(--q-accent) !important;
 }
 
 .vue-flow__edge-text {
@@ -132,4 +149,3 @@ body {
     padding: 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-

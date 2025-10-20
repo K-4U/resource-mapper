@@ -6,10 +6,10 @@ description: |
   Configured with alias records pointing to CloudFront and ALB endpoints.
 serviceType: ROUTE53
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "frontend/cloudfront"
+  - targetIdentifier: "frontend/cloudfront"
     description: "DNS resolution to CloudFront distribution"
-  - port: 443
-    targetIdentifier: "compute/alb"
+    connectionType: TCP
+  - targetIdentifier: "compute/alb"
     description: "DNS resolution to Application Load Balancer"
+    connectionType: TCP
 

@@ -6,10 +6,10 @@ description: |
   Configured with auto-scaling and connection draining for zero-downtime deployments.
 serviceType: ALB
 outgoingConnections:
-  - port: 8080
-    targetIdentifier: "compute/ecs-inventory"
+  - targetIdentifier: "compute/ecs-inventory"
     description: "Routes to inventory service"
-  - port: 8080
-    targetIdentifier: "compute/ecs-notification"
+    connectionType: TCP
+  - targetIdentifier: "compute/ecs-notification"
     description: "Routes to notification service"
+    connectionType: TCP
 

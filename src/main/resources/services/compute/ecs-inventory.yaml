@@ -7,9 +7,10 @@ description: |
   and automated reorder alerts. Auto-scales based on CPU and memory metrics.
 serviceType: ECS
 outgoingConnections:
-  - port: 5432
-    targetIdentifier: "data/rds-postgres"
+  - targetIdentifier: "data/rds-postgres"
     description: "PostgreSQL database for inventory persistence"
-  - port: 6379
-    targetIdentifier: "data/redis"
+    connectionType: TCP
+  - targetIdentifier: "data/redis"
     description: "Redis cache for high-frequency inventory lookups"
+    connectionType: TCP
+

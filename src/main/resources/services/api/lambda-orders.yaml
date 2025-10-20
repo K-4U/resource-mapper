@@ -6,13 +6,13 @@ description: |
   and order status updates. Interacts with multiple data stores for reliability.
 serviceType: LAMBDA
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "data/dynamodb-orders"
+  - targetIdentifier: "data/dynamodb-orders"
     description: "Order data storage"
-  - port: 5432
-    targetIdentifier: "data/rds-postgres"
+    connectionType: CALLS
+  - targetIdentifier: "data/rds-postgres"
     description: "Transactional order processing"
-  - port: 443
-    targetIdentifier: "compute/ecs-inventory"
+    connectionType: TCP
+  - targetIdentifier: "compute/ecs-inventory"
     description: "Inventory validation"
+    connectionType: TCP
 

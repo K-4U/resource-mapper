@@ -40,6 +40,10 @@ public class ServiceDefinition {
     @Valid
     private List<ServiceConnection> outgoingConnections;
 
+    @Schema(description = "List of connections from other services to this service (calculated at load time)")
+    @Valid
+    private List<ServiceConnection> incomingConnections;
+
     // Set by the loader from folder structure
     @Schema(description = "Name of the group (folder) this service belongs to", example = "web")
     private String groupName;

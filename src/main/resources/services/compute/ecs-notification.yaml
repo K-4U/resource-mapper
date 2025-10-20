@@ -6,7 +6,7 @@ description: |
   Integrates with external services and maintains delivery logs in DynamoDB.
 serviceType: ECS
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "data/dynamodb-notifications"
+  - targetIdentifier: "data/dynamodb-notifications"
     description: "Notification logs and queue"
+    connectionType: CALLS
 

@@ -189,20 +189,6 @@
           <q-skeleton type="text" width="50%" />
         </q-card-section>
 
-        <q-separator v-if="selectedItem.type === 'service' && selectedItem.connections" />
-
-        <q-card-section v-if="selectedItem.type === 'service' && selectedItem.connections">
-          <div class="text-weight-medium q-mb-sm">Connections</div>
-          <q-list dense bordered separator>
-            <q-item v-for="conn in selectedItem.connections" :key="conn.target">
-              <q-item-section>
-                <q-item-label>{{ conn.target }}</q-item-label>
-                <q-item-label caption>Port: {{ conn.port }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-
         <q-card-actions>
           <q-btn
             flat

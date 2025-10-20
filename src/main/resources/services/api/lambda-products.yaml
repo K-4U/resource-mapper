@@ -6,9 +6,10 @@ description: |
   Uses DynamoDB for quick reads and Redis cache for frequently accessed data.
 serviceType: LAMBDA
 outgoingConnections:
-  - port: 443
-    targetIdentifier: "data/dynamodb-products"
+  - targetIdentifier: "data/dynamodb-products"
     description: "Product catalog data"
-  - port: 6379
-    targetIdentifier: "data/redis"
+    connectionType: CALLS
+  - targetIdentifier: "data/redis"
     description: "Product cache for performance"
+    connectionType: TCP
+
