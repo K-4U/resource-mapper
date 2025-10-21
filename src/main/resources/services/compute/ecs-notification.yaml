@@ -9,4 +9,7 @@ outgoingConnections:
   - targetIdentifier: "data/dynamodb-notifications"
     description: "Notification logs and queue"
     connectionType: CALLS
+  - targetIdentifier: "data/redis"
+    description: "Redis cache for high-frequency inventory lookups"
+    connectionType: TCP
 
