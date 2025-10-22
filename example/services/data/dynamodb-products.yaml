@@ -1,0 +1,9 @@
+friendlyName: "DynamoDB Products Table"
+description: |
+  DynamoDB table managing product catalog with full-text search capabilities.
+  
+  Stores product details, pricing, and inventory levels with global tables for multi-region access.
+  Integrated with ElastiCache for frequently accessed product data.
+serviceType: DYNAMODB
+outgoingConnections: []
+

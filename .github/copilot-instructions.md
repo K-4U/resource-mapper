@@ -1,0 +1,3 @@
+Don't overcomplicate it, keep it simple, stupid. The simple solutions are often the best.
+When writing code, focus on clarity and maintainability. Avoid unnecessary complexity and strive for straightforward solutions that are easy to understand and modify. Remember, the goal is to create code that works well and can be easily maintained by others (or yourself) in the future.
+When in doubt, choose the simpler option. Simple code is less prone to bugs and easier to test. Always aim for simplicity in your coding practices.
