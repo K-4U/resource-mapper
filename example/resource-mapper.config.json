@@ -1,6 +1,0 @@
-{
-  "title": "Example Service Architecture",
-  "description": "Documentation for our example microservices architecture",
-  "servicesDir": "./services",
-  "teamsDir": "./teams"
-}

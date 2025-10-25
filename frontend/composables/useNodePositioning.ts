@@ -1,4 +1,4 @@
-import type { ServiceDefinition } from '~/generated/api/src'
+import type { ServiceDefinition } from '~/types'
 
 export type ConnectionDirection = 'vertical' | 'horizontal'
 export type NodeSide = 'top' | 'bottom' | 'left' | 'right'
@@ -35,8 +35,8 @@ export class NodePositionCalculator {
       targetSide: config.targetSide ?? 'top',
       nodeWidth: config.nodeWidth ?? 140,
       nodeHeight: config.nodeHeight ?? 80,
-      horizontalSpacing: config.horizontalSpacing ?? 30,
-      verticalSpacing: config.verticalSpacing ?? 40,
+      horizontalSpacing: config.horizontalSpacing ?? 40,
+      verticalSpacing: config.verticalSpacing ?? 30,
       groupPadding: config.groupPadding ?? 20,
       cols: config.cols ?? 3
     }
@@ -48,34 +48,21 @@ export class NodePositionCalculator {
   public registerServices(services: ServiceDefinition[]): void {
     this.nodeInfoMap.clear()
 
-    // Build connection map
-    const incomingMap = new Map<string, string[]>()
-
     services.forEach((service, index) => {
       const serviceId = `${service.groupName}/${service.identifier}`
 
       const outgoing = service.outgoingConnections?.map(conn => conn.targetIdentifier) ?? []
-
+      
+      // Use the actual incoming connections from the service definition, but filter to only internal ones
+      const incoming = service.incomingConnections?.map(conn => conn.targetIdentifier) ?? []
+      
       this.nodeInfoMap.set(serviceId, {
         id: serviceId,
         service,
         index,
         outgoingConnections: outgoing,
-        incomingConnections: []
+        incomingConnections: incoming // Will be filtered later in calculateLayer
       })
-
-      // Track incoming connections
-      outgoing.forEach(targetId => {
-        if (!incomingMap.has(targetId)) {
-          incomingMap.set(targetId, [])
-        }
-        incomingMap.get(targetId)!.push(serviceId)
-      })
-    })
-
-    // Update incoming connections
-    this.nodeInfoMap.forEach((info, id) => {
-      info.incomingConnections = incomingMap.get(id) ?? []
     })
   }
 
@@ -116,7 +103,7 @@ export class NodePositionCalculator {
     const column = this.calculateColumn(nodeInfo, layer)
 
     const x = this.config.groupPadding + column * (this.config.nodeWidth + this.config.horizontalSpacing)
-    const y = this.config.groupPadding + 40 + layer * (this.config.nodeHeight + this.config.verticalSpacing)
+    const y = this.config.groupPadding + 20 + layer * (this.config.nodeHeight + this.config.verticalSpacing)
 
     return { x, y }
   }
@@ -129,7 +116,7 @@ export class NodePositionCalculator {
     const row = this.calculateColumn(nodeInfo, layer)
 
     const x = this.config.groupPadding + layer * (this.config.nodeWidth + this.config.horizontalSpacing)
-    const y = this.config.groupPadding + 40 + row * (this.config.nodeHeight + this.config.verticalSpacing)
+    const y = this.config.groupPadding + 20 + row * (this.config.nodeHeight + this.config.verticalSpacing)
 
     return { x, y }
   }
@@ -218,11 +205,17 @@ export class NodePositionCalculator {
         break
       }
 
-      // Try moving right first, then down
-      if (attempts % 2 === 0) {
-        adjustedPos.x += this.config.nodeWidth + this.config.horizontalSpacing
-      } else {
+      // For horizontal layout, prefer moving down (vertical stacking) over moving right (different layers)
+      if (this.config.connectionDirection === 'horizontal') {
+        // Move down first for horizontal layout (services in same layer stack vertically)
         adjustedPos.y += this.config.nodeHeight + this.config.verticalSpacing
+      } else {
+        // For vertical layout, move right first  
+        if (attempts % 2 === 0) {
+          adjustedPos.x += this.config.nodeWidth + this.config.horizontalSpacing
+        } else {
+          adjustedPos.y += this.config.nodeHeight + this.config.verticalSpacing
+        }
       }
 
       attempts++
@@ -230,7 +223,7 @@ export class NodePositionCalculator {
 
     // Ensure minimum position
     adjustedPos.x = Math.max(this.config.groupPadding, adjustedPos.x)
-    adjustedPos.y = Math.max(this.config.groupPadding + 40, adjustedPos.y)
+    adjustedPos.y = Math.max(this.config.groupPadding + 20, adjustedPos.y)
 
     return adjustedPos
   }
@@ -263,7 +256,7 @@ export class NodePositionCalculator {
 
     return {
       x: this.config.groupPadding + col * (this.config.nodeWidth + this.config.horizontalSpacing),
-      y: this.config.groupPadding + 40 + row * (this.config.nodeHeight + this.config.verticalSpacing)
+      y: this.config.groupPadding + 20 + row * (this.config.nodeHeight + this.config.verticalSpacing)
     }
   }
 

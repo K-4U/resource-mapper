@@ -201,58 +201,13 @@
         </q-card-actions>
       </q-card>
 
-      <!-- Legend -->
-      <q-card flat bordered class="q-ma-md">
-        <q-card-section>
-          <div class="text-subtitle2 q-mb-sm">Legend</div>
-        </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <q-list dense>
-            <q-item class="q-px-none">
-              <q-item-section avatar class="min-width-auto">
-                <div class="legend-color" style="background: rgba(25, 118, 210, 0.2); border-color: var(--q-primary);"></div>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="text-body2">Internal Group</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none">
-              <q-item-section avatar class="min-width-auto">
-                <div class="legend-color" style="background: rgba(242, 192, 55, 0.2); border-color: var(--q-warning);"></div>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="text-body2">External Group</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none">
-              <q-item-section avatar class="min-width-auto">
-                <div class="legend-color" style="background: linear-gradient(135deg, var(--q-positive) 0%, #1B5E20 100%); border-color: var(--q-positive);"></div>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="text-body2">Internal Service</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none">
-              <q-item-section avatar class="min-width-auto">
-                <div class="legend-color" style="background: linear-gradient(135deg, var(--q-warning) 0%, #F57C00 100%); border-color: var(--q-warning);"></div>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label class="text-body2">External Service</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-      </q-card>
     </q-scroll-area>
   </aside>
 </template>
 
 <script setup lang="ts">
-import type { Team } from '~/generated/api/src'
+import type { Team } from '~/types'
 
 interface SelectedItem {
   type: 'group' | 'service'
@@ -335,14 +290,6 @@ watch(() => props.selectedItem, async (newSelectedItem) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.legend-color {
-  width: 30px;
-  height: 20px;
-  border-radius: 4px;
-  border: 2px solid;
-  flex-shrink: 0;
 }
 
 .min-width-auto {

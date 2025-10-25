@@ -40,7 +40,6 @@ body {
     width: 100%;
     height: 100%;
     position: relative;
-    padding-right: 30px;
 }
 
 .group-parent {
@@ -110,18 +109,36 @@ body {
     border-width: 4px;
 }
 
-/* Edge styles using Quasar colors */
+/* Edge styles with distinct colors for connection types */
 .vue-flow__edge-path {
     stroke-width: 2px;
 }
 
-.vue-flow__edge.internal .vue-flow__edge-path {
-    stroke: var(--q-primary);
+/* Internal connections (within current group) - Blue */
+.vue-flow__edge.internal-connection .vue-flow__edge-path {
+    stroke: #1976D2; /* Blue */
+    stroke-width: 2px;
 }
 
-.vue-flow__edge.external .vue-flow__edge-path {
-    stroke: var(--q-negative);
+/* Incoming connections (from external groups to current group) - Green */
+.vue-flow__edge.incoming-connection .vue-flow__edge-path {
+    stroke: #388E3C; /* Green */
+    stroke-width: 2px;
 }
+
+/* Outgoing connections (from current group to external groups) - Orange */
+.vue-flow__edge.outgoing-connection .vue-flow__edge-path {
+    stroke: #F57C00; /* Orange */
+    stroke-width: 2px;
+}
+
+/* External-to-external connections (between external groups) - Purple */
+.vue-flow__edge.external-to-external .vue-flow__edge-path {
+    stroke: #7B1FA2; /* Purple */
+    stroke-width: 2px;
+}
+
+/* Legacy fallback styles - removed to prevent override of specific connection types */
 
 /* Highlighted edges for selected node connections */
 .vue-flow__edge.highlighted .vue-flow__edge-path {
@@ -142,10 +159,4 @@ body {
     height: calc(100vh - 80px);
 }
 
-/* App header styles */
-.app-header {
-    background: linear-gradient(135deg, var(--q-primary) 0%, #1565C0 100%);
-    color: white;
-    padding: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+/* App header styles removed - no longer used */

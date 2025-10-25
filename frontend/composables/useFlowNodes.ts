@@ -1,5 +1,5 @@
-import type {Node} from '@vue-flow/core'
-import type {ServiceDefinition} from '~/generated/api/src'
+import {type Node} from '@vue-flow/core'
+import type {ServiceDefinition} from '~/types'
 import { NodePositionCalculator, type PositionConfig } from './useNodePositioning'
 
 /**
@@ -14,20 +14,34 @@ export class ServiceNode implements Partial<Node> {
     public readonly expandParent = true
     public readonly data: { label: string; service: ServiceDefinition, isExternal: boolean }
     public readonly class: string
+    public width: number = 140 // Default, will be updated from DOM
+    public height: number = 80 // Default, will be updated from DOM
 
     constructor(
         private readonly service: ServiceDefinition,
         parentGroupId: string,
         positionX: number,
         positionY: number,
-        private readonly isExternal: boolean = false
+        private readonly isExternal: boolean = false,
+        private readonly isIncomingOnly: boolean = false
     ) {
         this.id = `${service.groupName}/${service.identifier}`
         this.type = 'service'
         this.position = {x: positionX, y: positionY}
         this.parentNode = parentGroupId
         this.data = {label: service.friendlyName, service: service, isExternal: isExternal}
-        this.class = (isExternal ? 'external' : 'internal') + ' service-node';
+        
+        const classes = ['service-node']
+        if (isExternal) {
+            classes.push('external', 'external-service')
+            if (isIncomingOnly) {
+                classes.push('incoming-only-service')
+            }
+        } else {
+            classes.push('internal')
+        }
+        
+        this.class = classes.join(' ')
     }
 
     /**
@@ -83,8 +97,8 @@ export class GroupNode implements Partial<Node> {
             cols: isExternal ? 2 : 3,
             nodeWidth: 140,
             nodeHeight: 80,
-            horizontalSpacing: 30,
-            verticalSpacing: 40,
+            horizontalSpacing: 40,
+            verticalSpacing: 30,
             groupPadding: 20,
             connectionDirection: 'vertical',
             sourceSide: 'bottom',
@@ -111,10 +125,11 @@ export class GroupNode implements Partial<Node> {
         service: ServiceDefinition,
         index: number,
         external: boolean = false,
+        incomingOnly: boolean = false
     ): ServiceNode {
         const serviceId = `${service.groupName}/${service.identifier}`
         const {x, y} = this.positionCalculator.calculatePosition(serviceId)
-        const serviceNode = new ServiceNode(service, this.id, x, y, external)
+        const serviceNode = new ServiceNode(service, this.id, x, y, external, incomingOnly)
         this.services.push(serviceNode)
         return serviceNode
     }
@@ -127,16 +142,46 @@ export class GroupNode implements Partial<Node> {
     }
 
     /**
+     * Check if this external group should be hidden (all services are incoming-only)
+     */
+    public hasOnlyIncomingOnlyServices(): boolean {
+        if (!this.isExternal || this.services.length === 0) {
+            return false
+        }
+        
+        return this.services.every(service => 
+            service.class.includes('incoming-only-service')
+        )
+    }
+
+
+
+    /**
      * Convert to Vue Flow Node format
      */
     public toNode(): Node {
+        let nodeClass = this.class
+        
+        // Add empty-external-group class if this group has only incoming-only services
+        if (this.hasOnlyIncomingOnlyServices()) {
+            nodeClass += ' empty-external-group'
+        }
+
+        // Use default dimensions - actual dimensions will be calculated from DOM
+        const defaultWidth = this.services.length === 0 ? 200 : 300
+        const defaultHeight = this.services.length === 0 ? 150 : 200
+        
         return {
             id: this.id,
             type: this.type,
             position: this.position,
             data: this.data,
             label: this.label,
-            class: this.class
+            class: nodeClass,
+            style: {
+                width: `${defaultWidth}px`,
+                height: `${defaultHeight}px`
+            }
         }
     }
 
@@ -161,4 +206,6 @@ export class GroupNode implements Partial<Node> {
     public updatePositionConfig(config: Partial<PositionConfig>): void {
         this.positionCalculator.updateConfig(config)
     }
+
+
 }
