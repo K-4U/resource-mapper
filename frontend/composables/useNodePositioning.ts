@@ -1,4 +1,4 @@
-import type { ServiceDefinition } from '~/types'
+import type { ServiceDefinition, GroupConnection } from '~/types'
 
 export type ConnectionDirection = 'vertical' | 'horizontal'
 export type NodeSide = 'top' | 'bottom' | 'left' | 'right'
@@ -290,5 +290,164 @@ export class NodePositionCalculator {
     // Clear positions when config changes
     this.positions.clear()
   }
+}
+
+/**
+ * Group positioning calculator for overview mode
+ * Positions groups based on their incoming/outgoing connections
+ */
+export class GroupPositionCalculator {
+  private readonly positions: Map<string, { x: number; y: number }> = new Map()
+  private readonly groupInfoMap: Map<string, GroupConnectionInfo> = new Map()
+
+  constructor(
+    private readonly groupWidth = 200,
+    private readonly groupHeight = 150,
+    private readonly horizontalSpacing = 100,
+    private readonly verticalSpacing = 80,
+    private readonly padding = 50
+  ) {}
+
+  /**
+   * Register all groups and calculate their connection weights
+   */
+  public registerGroups(groupConnections: GroupConnection[]): void {
+    this.groupInfoMap.clear()
+    
+    // First pass: create basic group info
+    const allGroups = new Set<string>()
+    groupConnections.forEach(group => {
+      allGroups.add(group.groupName)
+      if (group.connectedToGroups) {
+        group.connectedToGroups.forEach(target => allGroups.add(target))
+      }
+    })
+
+    // Initialize group info
+    Array.from(allGroups).forEach(groupName => {
+      this.groupInfoMap.set(groupName, {
+        name: groupName,
+        outgoingCount: 0,
+        incomingCount: 0,
+        outgoingTo: new Set(),
+        incomingFrom: new Set(),
+        serviceCount: 0
+      })
+    })
+
+    // Second pass: calculate connection counts
+    groupConnections.forEach(group => {
+      const groupInfo = this.groupInfoMap.get(group.groupName)!
+      groupInfo.serviceCount = group.serviceCount || 0
+      
+      if (group.connectedToGroups) {
+        group.connectedToGroups.forEach(targetGroup => {
+          if (this.groupInfoMap.has(targetGroup)) {
+            // This group has outgoing connection
+            groupInfo.outgoingTo.add(targetGroup)
+            groupInfo.outgoingCount++
+            
+            // Target group has incoming connection
+            const targetInfo = this.groupInfoMap.get(targetGroup)!
+            targetInfo.incomingFrom.add(group.groupName)
+            targetInfo.incomingCount++
+          }
+        })
+      }
+    })
+  }
+
+  /**
+   * Calculate optimal positions for all groups
+   */
+  public calculateAllPositions(): Map<string, { x: number; y: number }> {
+    this.positions.clear()
+    
+    // Sort groups by dependency order (least incoming first, most outgoing last)
+    const sortedGroups = this.sortGroupsByDependencies()
+    
+    // Place groups in layers from left to right
+    this.placeGroupsInLayers(sortedGroups)
+    
+    return new Map(this.positions)
+  }
+
+  /**
+   * Sort groups by their connection patterns
+   * Groups with fewer incoming connections come first (source-like)
+   * Groups with more incoming connections come later (sink-like)
+   */
+  private sortGroupsByDependencies(): string[] {
+    const groups = Array.from(this.groupInfoMap.keys())
+    
+    return groups.sort((a, b) => {
+      const groupA = this.groupInfoMap.get(a)!
+      const groupB = this.groupInfoMap.get(b)!
+      
+      // Primary sort: fewer incoming connections first (sources on left)
+      if (groupA.incomingCount !== groupB.incomingCount) {
+        return groupA.incomingCount - groupB.incomingCount
+      }
+      
+      // Secondary sort: more outgoing connections first (within same incoming level)
+      if (groupA.outgoingCount !== groupB.outgoingCount) {
+        return groupB.outgoingCount - groupA.outgoingCount
+      }
+      
+      // Tertiary sort: alphabetical for consistency
+      return a.localeCompare(b)
+    })
+  }
+
+  /**
+   * Place groups in columns based on dependency level, stacked vertically within each column
+   */
+  private placeGroupsInLayers(sortedGroups: string[]): void {
+    // Group by dependency score (incoming connection count)
+    const groupsByLevel = new Map<number, string[]>()
+    
+    sortedGroups.forEach(groupName => {
+      const groupInfo = this.groupInfoMap.get(groupName)!
+      const level = groupInfo.incomingCount
+      
+      if (!groupsByLevel.has(level)) {
+        groupsByLevel.set(level, [])
+      }
+      groupsByLevel.get(level)!.push(groupName)
+    })
+    
+    // Sort levels and position groups
+    const sortedLevels = Array.from(groupsByLevel.keys()).sort((a, b) => a - b)
+    
+    sortedLevels.forEach((level, columnIndex) => {
+      const groupsInLevel = groupsByLevel.get(level)!
+      const x = this.padding + columnIndex * (this.groupWidth + this.horizontalSpacing)
+      
+      // Stack groups vertically within this column
+      groupsInLevel.forEach((groupName, rowIndex) => {
+        const y = this.padding + rowIndex * (this.groupHeight + this.verticalSpacing)
+        this.positions.set(groupName, { x, y })
+      })
+    })
+  }
+
+
+
+  /**
+   * Reset the calculator
+   */
+  public reset(): void {
+    this.positions.clear()
+    this.groupInfoMap.clear()
+  }
+}
+
+interface GroupConnectionInfo {
+  name: string
+  outgoingCount: number
+  incomingCount: number
+  outgoingTo: Set<string>
+  incomingFrom: Set<string>
+  serviceCount: number
 }
 

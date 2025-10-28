@@ -25,7 +25,7 @@
       @node-drag-start="onNodeDragStart"
       @node-drag-stop="onNodeDragStop"
     >
-      <Background :pattern-color="backgroundPatternColor" :gap="backgroundGap" />
+      <Background :pattern-color="dynamicPatternColor" :gap="backgroundGap" />
       <Controls position="top-left">
         <!-- Navigation buttons -->
         <ControlButton
@@ -80,6 +80,17 @@
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
           </svg>
         </ControlButton>
+        
+        <!-- Dark mode toggle -->
+        <ControlButton
+          @click="toggleDarkMode"
+          :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path v-if="isDarkMode" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+            <path v-else d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+          </svg>
+        </ControlButton>
       </Controls>
       <MiniMap :position="minimapPosition" />
     </VueFlow>
@@ -92,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { VueFlow } from '@vue-flow/core'
+import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
@@ -101,7 +112,7 @@ import type { Node, Edge } from '@vue-flow/core'
 import GroupNodeVue from '~/components/flow/GroupNode.vue'
 import ExternalGroupNode from '~/components/flow/ExternalGroupNode.vue'
 import ServiceNodeVue from '~/components/flow/ServiceNode.vue'
-import GroupNodeItem from '~/components/flow/GroupNodeItem.vue'
+import OverviewGroupNode from '~/components/flow/OverviewGroupNode.vue'
 import Legend from '~/components/Legend.vue'
 
 interface Props {
@@ -174,12 +185,56 @@ const emit = defineEmits<{
 // Legend visibility state
 const showLegend = ref(true)
 
+// Vue Flow instance reference for auto-zoom
+const { fitView } = useVueFlow()
+
+// Dark mode functionality
+const { $q } = useNuxtApp()
+const isDarkMode = computed(() => $q.dark.isActive)
+
+function toggleDarkMode() {
+  $q.dark.toggle()
+  // Persist dark mode preference
+  if (import.meta.client) {
+    localStorage.setItem('darkMode', $q.dark.isActive.toString())
+  }
+}
+
+// Dynamic background pattern color based on dark mode
+const dynamicPatternColor = computed(() => {
+  return isDarkMode.value ? '#666' : (props.backgroundPatternColor || '#aaa')
+})
+
+// Auto-zoom functionality: fit view when nodes change
+watch(() => props.nodes, () => {
+  if (props.nodes.length > 0) {
+    nextTick(() => {
+      fitView({ 
+        padding: 0.15, // 15% padding around all nodes
+        duration: 300,  // Smooth transition
+        minZoom: props.minZoom,
+        maxZoom: props.maxZoom
+      })
+    })
+  }
+}, { deep: true })
+
+// Initialize dark mode from localStorage on client side
+onMounted(() => {
+  if (import.meta.client) {
+    const savedDarkMode = localStorage.getItem('darkMode')
+    if (savedDarkMode !== null) {
+      $q.dark.set(savedDarkMode === 'true')
+    }
+  }
+})
+
 // Define internal node and edge types
 const defaultNodeTypes = {
   'group': markRaw(GroupNodeVue) as any,
   'external-group': markRaw(ExternalGroupNode) as any,
   'service': markRaw(ServiceNodeVue) as any,
-  'group-node': markRaw(GroupNodeItem) as any
+  'overview-group': markRaw(OverviewGroupNode) as any
 }
 
 const defaultEdgeTypes = {
@@ -224,13 +279,14 @@ function onNodeDragStop(event: any) {
   bottom: 20px;
   right: 20px;
   z-index: 1000;
-  background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   max-width: 300px;
   min-width: 250px;
   animation: slideInFromBottom 0.3s ease-out;
 }
+
+/* The legend uses Quasar q-card which handles dark mode automatically */
 
 @keyframes slideInFromBottom {
   from {

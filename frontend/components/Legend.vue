@@ -39,19 +39,19 @@
 </template>
 
 <script setup lang="ts">
-// No props needed - legend always shows the same items
+// No props needed - legend uses Quasar color system
 const legendItems = [
   // Groups
-  { label: 'Internal Group', bg: 'rgba(227, 242, 253, 0.4)', border: 'var(--q-primary)', type: 'group' },
-  { label: 'External Group', bg: 'rgba(255, 249, 196, 0.4)', border: 'var(--q-warning)', type: 'group' },
-  // Services
-  { label: 'Internal Service', bg: '#c8e6c9', border: 'var(--q-positive)', type: 'service' },
-  { label: 'External Service', bg: '#fff9c4', border: 'var(--q-warning)', type: 'service' },
-  // Connections
-  { label: 'Internal Connection', color: '#1976D2', type: 'connection' },
-  { label: 'Incoming Connection', color: '#388E3C', type: 'connection' },
-  { label: 'Outgoing Connection', color: '#F57C00', type: 'connection' },
-  { label: 'External-to-External', color: '#7B1FA2', type: 'connection' }
+  { label: 'Internal Group', bg: 'rgba(var(--q-primary-rgb), 0.1)', border: 'var(--q-primary)', type: 'group' },
+  { label: 'External Group', bg: 'rgba(var(--q-warning-rgb), 0.1)', border: 'var(--q-warning)', type: 'group' },
+  // Services  
+  { label: 'Internal Service', bg: 'var(--q-grey-2)', border: 'var(--q-grey-5)', type: 'service' },
+  { label: 'External Service', bg: 'var(--q-warning)', border: 'var(--q-warning)', type: 'service' },
+  // Connections using Quasar semantic colors
+  { label: 'Internal Connection', color: 'var(--q-primary)', type: 'connection' },
+  { label: 'Incoming Connection', color: 'var(--q-positive)', type: 'connection' },
+  { label: 'Outgoing Connection', color: 'var(--q-info)', type: 'connection' },
+  { label: 'External-to-External', color: 'var(--q-secondary)', type: 'connection' }
 ]
 </script>
 

@@ -1,6 +1,13 @@
 import {type Edge, MarkerType, type Node} from '@vue-flow/core'
 import {GroupNode} from '~/composables/useFlowNodes'
-import type {ServiceDefinition, GroupConnection} from '~/types'
+import type { 
+  ServiceDefinition, 
+  GroupInfo, 
+  Team, 
+  GroupConnection,
+  ServiceConnection
+} from '~/types'
+import { GroupPositionCalculator } from './useNodePositioning'
 
 export function useGroupGraph() {
 
@@ -17,12 +24,86 @@ export function useGroupGraph() {
         const externalGroups = new Map<string, GroupNode>()
         const externalServiceMap = new Map<string, ServiceDefinition>()
 
-        // Track target handle assignment for each service
+        // Enhanced handle assignment - track connections with positions
+        const sourceHandleAssignments = new Map<string, Map<string, string>>() // sourceId -> targetId -> handleId
+        const targetHandleAssignments = new Map<string, Map<string, string>>() // targetId -> sourceId -> handleId
+        
+        // Legacy counters for backward compatibility during transition
         const targetHandleCounters = new Map<string, number>()
         
         // Track service relationship types
         const outgoingTargets = new Set<string>() // Services we connect TO
         const incomingSources = new Set<string>() // Services that connect TO us
+        
+        // Helper function to get position-based handle assignment
+        function getPositionBasedHandles(sourceId: string, targetId: string, allNodes: Node[]): {sourceHandle: string, targetHandle: string} {
+            const sourceNode = allNodes.find(n => n.id === sourceId)
+            const targetNode = allNodes.find(n => n.id === targetId)
+            
+            if (!sourceNode || !targetNode) {
+                // Fallback to sequential assignment if positions not available
+                const currentHandleIndex = targetHandleCounters.get(targetId) || 0
+                targetHandleCounters.set(targetId, currentHandleIndex + 1)
+                return {
+                    sourceHandle: 'output',
+                    targetHandle: `input-${currentHandleIndex}`
+                }
+            }
+            
+            // Get or create handle assignment maps
+            if (!sourceHandleAssignments.has(sourceId)) {
+                sourceHandleAssignments.set(sourceId, new Map())
+            }
+            if (!targetHandleAssignments.has(targetId)) {
+                targetHandleAssignments.set(targetId, new Map())
+            }
+            
+            const sourceMap = sourceHandleAssignments.get(sourceId)!
+            const targetMap = targetHandleAssignments.get(targetId)!
+            
+            // Check if handles already assigned for this connection pair
+            if (sourceMap.has(targetId) && targetMap.has(sourceId)) {
+                return {
+                    sourceHandle: sourceMap.get(targetId)!,
+                    targetHandle: targetMap.get(sourceId)!
+                }
+            }
+            
+            // Calculate relative position for handle assignment
+            const sourcePos = sourceNode.position
+            const targetPos = targetNode.position
+            
+            // Count existing connections to determine handle indices
+            const sourceConnectionCount = sourceMap.size
+            const targetConnectionCount = targetMap.size
+            
+            // Assign handles based on position and connection count
+            let sourceHandle: string
+            let targetHandle: string
+            
+            // Use different handle types based on node type
+            if (sourceNode.type === 'external-group' || sourceNode.type === 'group' || sourceNode.type === 'overview-group') {
+                // Group nodes use left/right handles (overview mode style)
+                sourceHandle = `output-right-${sourceConnectionCount}`
+            } else {
+                // Service nodes use top/bottom handles (detail mode style)
+                sourceHandle = `output-bottom-${sourceConnectionCount}`
+            }
+            
+            if (targetNode.type === 'external-group' || targetNode.type === 'group' || targetNode.type === 'overview-group') {
+                // Group nodes use left/right handles (overview mode style)
+                targetHandle = `input-left-${targetConnectionCount}`
+            } else {
+                // Service nodes use top/bottom handles (detail mode style)
+                targetHandle = `input-top-${targetConnectionCount}`
+            }
+            
+            // Store the assignments
+            sourceMap.set(targetId, sourceHandle)
+            targetMap.set(sourceId, targetHandle)
+            
+            return { sourceHandle, targetHandle }
+        }
 
         // Position main group in the center
         const mainGroup = new GroupNode(
@@ -153,6 +234,15 @@ export function useGroupGraph() {
             tempNodes.push(...group.getAllNodes())
         })
 
+        // Apply position-based handle assignment now that all nodes are positioned
+        tempEdges.forEach(edge => {
+            if (edge.sourceHandle === 'output-temp' || edge.targetHandle === 'input-temp') {
+                const handles = getPositionBasedHandles(edge.source, edge.target, tempNodes)
+                edge.sourceHandle = handles.sourceHandle
+                edge.targetHandle = handles.targetHandle
+            }
+        })
+
         return {nodes: tempNodes, edges: tempEdges}
     }
 
@@ -190,10 +280,8 @@ export function useGroupGraph() {
                 )
             }
 
-            // Assign target handle for incoming connection
-            const currentHandleIndex = targetHandleCounters.get(targetId) || 0
-            const targetHandle = `input-${currentHandleIndex}`
-            targetHandleCounters.set(targetId, currentHandleIndex + 1)
+            // Defer handle assignment until all nodes are created
+            const targetHandle = 'input-temp' // Temporary placeholder
 
             // Determine edge classes based on source and target groups
             const sourceGroupName = serviceId.split('/')[0]
@@ -226,11 +314,13 @@ export function useGroupGraph() {
                 edgeClasses.push('incoming-only-connection')
             }
 
+            // Store edge info for later processing with position-based handles
             edges.push({
                 id: `${serviceId}-${targetId}`,
                 source: serviceId,
                 target: targetId,
-                targetHandle: targetHandle,
+                targetHandle: targetHandle, // Will be updated later
+                sourceHandle: 'output-temp', // Will be updated later
                 label: connection.connectionType,
                 type: 'smoothstep',
                 animated: isTargetExternal || isSourceExternal,
@@ -289,9 +379,8 @@ export function useGroupGraph() {
                 
                 // Only add if edge doesn't already exist
                 if (!edges.some(e => e.id === edgeId)) {
-                    const currentHandleIndex = targetHandleCounters.get(serviceId) || 0
-                    const targetHandle = `input-${currentHandleIndex}`
-                    targetHandleCounters.set(serviceId, currentHandleIndex + 1)
+                    // Defer handle assignment until all nodes are created
+                    const targetHandle = 'input-temp' // Temporary placeholder
 
                     // Determine connection type for proper styling
                     const targetGroupName = serviceId.split('/')[0]
@@ -327,7 +416,8 @@ export function useGroupGraph() {
                         id: edgeId,
                         source: sourceId,
                         target: serviceId,
-                        targetHandle: targetHandle,
+                        targetHandle: targetHandle, // Will be updated later
+                        sourceHandle: 'output-temp', // Will be updated later
                         label: incomingConnection.connectionType,
                         type: 'smoothstep',
                         animated: true, // External connections are animated
@@ -453,52 +543,126 @@ export function useGroupGraph() {
         const nodes: Node[] = []
         const edges: Edge[] = []
         
-        // Create nodes for each group
-        groupConnections.forEach((group, index) => {
-            const x = (index % 3) * 300 + 100  // 3 columns layout
-            const y = Math.floor(index / 3) * 200 + 100
+        // Use intelligent group positioning
+        const positionCalculator = new GroupPositionCalculator()
+        
+        positionCalculator.registerGroups(groupConnections)
+        const positions = positionCalculator.calculateAllPositions()
+        
+        console.log('Groups positioned left-to-right by dependency:', 
+          groupConnections.map(g => `${g.groupName}: ${positions.get(g.groupName)?.x}`).join(', '))
+        
+        // Calculate connection counts for each group
+        const connectionCounts = new Map<string, { incoming: number, outgoing: number }>()
+        
+        // Initialize counts
+        groupConnections.forEach(group => {
+            connectionCounts.set(group.groupName, { 
+                incoming: 0, 
+                outgoing: group.connectedToGroups?.size || 0
+            })
+        })
+        
+        // Count incoming connections
+        groupConnections.forEach(group => {
+            if (group.connectedToGroups) {
+                group.connectedToGroups.forEach(targetGroup => {
+                    const targetCounts = connectionCounts.get(targetGroup)
+                    if (targetCounts) {
+                        targetCounts.incoming++
+                    }
+                })
+            }
+        })
+        
+        // Create nodes for each group with calculated positions
+        groupConnections.forEach((group) => {
+            const position = positions.get(group.groupName) || { x: 100, y: 100 }
+            const counts = connectionCounts.get(group.groupName) || { incoming: 0, outgoing: 0 }
             
             nodes.push({
                 id: group.groupName,
-                type: 'default',
-                position: { x, y },
+                type: 'overview-group',
+                position,
                 data: {
                     label: group.groupName,
-                    description: group.description,
-                    serviceCount: group.serviceCount
-                },
-                style: {
-                    background: '#ffffff',
-                    border: '2px solid #1976d2',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    minWidth: '150px',
-                    textAlign: 'center'
+                    totalIncomingCount: counts.incoming,
+                    totalOutgoingCount: counts.outgoing
                 }
             })
         })
         
-        // Create edges for connections between groups
+        // Create edges for connections between groups with smart handle selection
+        // First, build a map of all connections for each group to determine handle assignments
+        const groupConnectionMap = new Map<string, Array<{targetGroup: string, targetPos: {x: number, y: number}, sourcePos: {x: number, y: number}}>>()
+        const incomingConnectionMap = new Map<string, Array<{sourceGroup: string, sourcePos: {x: number, y: number}, targetPos: {x: number, y: number}}>>()
+        
+        // Build connection maps
         groupConnections.forEach(group => {
             if (group.connectedToGroups) {
+                const outgoingConnections: Array<{targetGroup: string, targetPos: {x: number, y: number}, sourcePos: {x: number, y: number}}> = []
+                
                 Array.from(group.connectedToGroups).forEach(targetGroup => {
-                    // Only create edge if target group exists in our nodes
                     if (groupConnections.some(g => g.groupName === targetGroup)) {
-                        edges.push({
-                            id: `${group.groupName}-${targetGroup}`,
-                            source: group.groupName,
-                            target: targetGroup,
-                            type: 'smoothstep',
-                            animated: true,
-                            markerEnd: MarkerType.ArrowClosed,
-                            style: {
-                                stroke: '#1976d2',
-                                strokeWidth: 2
-                            }
+                        const sourcePos = positions.get(group.groupName)!
+                        const targetPos = positions.get(targetGroup)!
+                        
+                        outgoingConnections.push({
+                            targetGroup,
+                            targetPos,
+                            sourcePos
+                        })
+                        
+                        // Also track incoming connections for target
+                        if (!incomingConnectionMap.has(targetGroup)) {
+                            incomingConnectionMap.set(targetGroup, [])
+                        }
+                        incomingConnectionMap.get(targetGroup)!.push({
+                            sourceGroup: group.groupName,
+                            sourcePos,
+                            targetPos
                         })
                     }
                 })
+                
+                // Sort outgoing connections by target Y position (top to bottom)
+                outgoingConnections.sort((a, b) => a.targetPos.y - b.targetPos.y)
+                groupConnectionMap.set(group.groupName, outgoingConnections)
             }
+        })
+        
+        // Sort incoming connections for each target group by source X position (right to left)
+        incomingConnectionMap.forEach((connections, targetGroup) => {
+            connections.sort((a, b) => b.sourcePos.x - a.sourcePos.x)
+        })
+        
+        // Now create edges with proper handle assignments
+        groupConnectionMap.forEach((connections, sourceGroup) => {
+            connections.forEach((connection, index) => {
+                const targetGroup = connection.targetGroup
+                
+                // Find the index of this connection in the target's incoming connections
+                const targetConnections = incomingConnectionMap.get(targetGroup) || []
+                const targetIndex = targetConnections.findIndex(conn => conn.sourceGroup === sourceGroup)
+                
+                const sourceHandle = `output-right-${index}`
+                const targetHandle = `input-left-${targetIndex}`
+                        
+                edges.push({
+                    id: `${sourceGroup}-${targetGroup}`,
+                    source: sourceGroup,
+                    target: targetGroup,
+                    sourceHandle,
+                    targetHandle,
+                    type: 'pathfinding', // Use pathfinding for smart routing
+                    animated: true,
+                    markerEnd: MarkerType.ArrowClosed,
+                    style: {
+                        stroke: '#1976d2',
+                        strokeWidth: 2
+                    }
+                })
+            })
         })
         
         return { nodes, edges }

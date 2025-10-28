@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { NodePositionCalculator } from '~/composables/useNodePositioning'
+import { useGroupGraph } from '~/composables/useGroupGraph'
 import type { ServiceDefinition } from '~/types'
 import { ConnectionType, ServiceType } from '~/types'
 
@@ -86,29 +87,47 @@ describe('Service Positioning Debug', () => {
     expect(lambdaPosition.x).toBe(20) // Should be at groupPadding, not pushed to the right
   })
 })
+
+// Mock data for testing
+const computeServices: ServiceDefinition[] = [
+  {
+        groupName: 'compute',
+        identifier: 'alb',
+        friendlyName: 'Application Load Balancer',
+        serviceType: ServiceType.ALB,
+        outgoingConnections: [
+          { targetIdentifier: 'compute/ecs-inventory', connectionType: ConnectionType.CALLS, description: 'Routes to inventory' },
+          { targetIdentifier: 'compute/ecs-notification', connectionType: ConnectionType.CALLS, description: 'Routes to notification' }
+        ],
+        incomingConnections: [
+          { targetIdentifier: 'api/lambda-orders', connectionType: ConnectionType.CALLS, description: 'Lambda to ALB' }
+        ]
+      },
       {
         groupName: 'compute',
         identifier: 'ecs-inventory',
         friendlyName: 'ECS Inventory Service',
+        serviceType: ServiceType.ECS,
         outgoingConnections: [
-          { targetIdentifier: 'data/dynamodb-products', connectionType: 'dynamodb' },
-          { targetIdentifier: 'data/redis', connectionType: 'redis' }
+          { targetIdentifier: 'data/dynamodb-products', connectionType: ConnectionType.CALLS, description: 'Products DB' },
+          { targetIdentifier: 'data/redis', connectionType: ConnectionType.CALLS, description: 'Redis cache' }
         ],
         incomingConnections: [
-          { targetIdentifier: 'compute/alb', connectionType: 'http' }
+          { targetIdentifier: 'compute/alb', connectionType: ConnectionType.CALLS, description: 'ALB routes' }
         ]
       },
       {
         groupName: 'compute',
         identifier: 'ecs-notification',
         friendlyName: 'ECS Notification Service',
+        serviceType: ServiceType.ECS,
         outgoingConnections: [
-          { targetIdentifier: 'data/dynamodb-notifications', connectionType: 'dynamodb' }
+          { targetIdentifier: 'data/dynamodb-notifications', connectionType: ConnectionType.CALLS, description: 'Notifications DB' }
         ],
         incomingConnections: [
-          { targetIdentifier: 'compute/alb', connectionType: 'http' }
+          { targetIdentifier: 'compute/alb', connectionType: ConnectionType.CALLS, description: 'ALB routes' }
         ]
-      }
+      },
     ]
 
     // Mock external services that connect to compute group
@@ -117,9 +136,10 @@ describe('Service Positioning Debug', () => {
         groupName: 'api',
         identifier: 'lambda-orders',
         friendlyName: 'Order Processing Lambda',
+        serviceType: ServiceType.LAMBDA,
         outgoingConnections: [
-          { targetIdentifier: 'compute/alb', connectionType: 'http' },
-          { targetIdentifier: 'data/dynamodb-orders', connectionType: 'dynamodb' }
+          { targetIdentifier: 'compute/alb', connectionType: ConnectionType.CALLS, description: 'ALB calls' },
+          { targetIdentifier: 'data/dynamodb-orders', connectionType: ConnectionType.CALLS, description: 'Orders DB' }
         ],
         incomingConnections: []
       },
@@ -127,8 +147,9 @@ describe('Service Positioning Debug', () => {
         groupName: 'api',
         identifier: 'api-gateway',
         friendlyName: 'API Gateway',
+        serviceType: ServiceType.API_GATEWAY,
         outgoingConnections: [
-          { targetIdentifier: 'api/lambda-orders', connectionType: 'http' }
+          { targetIdentifier: 'api/lambda-orders', connectionType: ConnectionType.CALLS, description: 'Lambda calls' }
         ],
         incomingConnections: []
       }
@@ -139,31 +160,38 @@ describe('Service Positioning Debug', () => {
         groupName: 'data',
         identifier: 'dynamodb-products',
         friendlyName: 'DynamoDB Products Table',
+        serviceType: ServiceType.DYNAMODB,
         outgoingConnections: [],
         incomingConnections: [
-          { targetIdentifier: 'compute/ecs-inventory', connectionType: 'dynamodb' }
+          { targetIdentifier: 'compute/ecs-inventory', connectionType: ConnectionType.CALLS, description: 'ECS inventory access' }
         ]
       },
       {
         groupName: 'data',
         identifier: 'redis',
         friendlyName: 'Redis Cache',
+        serviceType: ServiceType.VALKEY,  // VALKEY is the Redis equivalent in the enum
         outgoingConnections: [],
         incomingConnections: [
-          { targetIdentifier: 'compute/ecs-inventory', connectionType: 'redis' }
+          { targetIdentifier: 'compute/ecs-inventory', connectionType: ConnectionType.CALLS, description: 'ECS inventory caching' }
         ]
       },
       {
         groupName: 'data',
         identifier: 'dynamodb-notifications',
         friendlyName: 'DynamoDB Notifications Table',
+        serviceType: ServiceType.DYNAMODB,
         outgoingConnections: [],
         incomingConnections: [
-          { targetIdentifier: 'compute/ecs-notification', connectionType: 'dynamodb' }
+          { targetIdentifier: 'compute/ecs-notification', connectionType: ConnectionType.CALLS, description: 'ECS notification storage' }
         ]
       }
     ]
 
+let allServices: Record<string, ServiceDefinition[]>
+
+describe('Additional Compute Group Tests', () => {
+  beforeEach(() => {
     allServices = {
       compute: computeServices,
       api: apiServices,
@@ -268,8 +296,9 @@ describe('Service Positioning Debug', () => {
     expect(computeServiceNodes).toHaveLength(3)
 
     // Check that services are properly spaced in columns
-    const positions = computeServiceNodes.map(n => ({ id: n.id, x: n.position.x, y: n.position.y }))
-    console.log('Compute service positions:', positions)
+    console.log('Compute service positions:', computeServiceNodes.map(n => ({ id: n.id, x: n.position.x, y: n.position.y })))
+
+    expect(computeServiceNodes).toHaveLength(3)
 
     // ALB should be in first column (layer 0 - no incoming internal connections)
     const alb = computeServiceNodes.find(n => n.id === 'compute/alb')

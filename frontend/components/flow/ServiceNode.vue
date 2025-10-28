@@ -1,21 +1,43 @@
 <template>
   <div class="node-wrapper">
-    <!-- Dynamic input handles based on incoming connection count - positioned at top -->
+    <!-- Dynamic input handles based on incoming connection count - positioned on top -->
     <Handle
       v-for="index in incomingConnectionCount"
-      :key="`input-${index - 1}`"
-      :id="`input-${index - 1}`"
+      :key="`input-top-${index - 1}`"
+      :id="`input-top-${index - 1}`"
       type="target"
       :position="Position.Top"
-      :style="getHandleStyle(index - 1, incomingConnectionCount)"
+      :style="getTopHandleStyle(index - 1, incomingConnectionCount)"
+      class="service-handle input-handle"
     />
 
-    <div class="service-content">
-      <div class="name" :title="data.service.identifier">{{ data.label }}</div>
-    </div>
+    <!-- Use Quasar card for consistent styling -->
+    <q-card 
+      :class="{
+        'service-card': true,
+        'external-service': isExternal,
+        'selected': data.selected
+      }"
+      :flat="false"
+      bordered
+    >
+      <q-card-section class="q-pa-sm text-center">
+        <div class="service-name" :title="data.service.identifier">
+          {{ data.label }}
+        </div>
+      </q-card-section>
+    </q-card>
 
-    <!-- Single output handle - positioned at bottom -->
-    <Handle type="source" :position="Position.Bottom" />
+    <!-- Dynamic output handles based on outgoing connection count - positioned on bottom -->
+    <Handle
+      v-for="index in outgoingConnectionCount"
+      :key="`output-bottom-${index - 1}`"
+      :id="`output-bottom-${index - 1}`"
+      type="source"
+      :position="Position.Bottom"
+      :style="getBottomHandleStyle(index - 1, outgoingConnectionCount)"
+      class="service-handle output-handle"
+    />
   </div>
 </template>
 
@@ -27,42 +49,94 @@ const props = defineProps<NodeProps>()
 
 // Calculate incoming connection count directly from the service data
 const incomingConnectionCount = computed(() => {
-  return props.data?.service?.incomingConnections?.length || 0
+  return Math.max(1, props.data?.incomingConnectionCount || 0)
 })
 
-// Calculate handle position based on index and total count
-function getHandleStyle(index: number, total: number) {
-  if (total <= 1) {
-    return { left: '50%' }
-  }
+// Calculate outgoing connection count
+const outgoingConnectionCount = computed(() => {
+  return Math.max(1, props.data?.outgoingConnectionCount || 0)
+})
 
-  // Distribute handles evenly along the top side
-  const spacing = 80 / (total + 1) // Use 80% of the width
-  const leftOffset = 10 + spacing * (index + 1) // Start at 10% from left
+// Determine if this is an external service (based on parent node context or data)
+const isExternal = computed(() => {
+  return props.data?.isExternal || false
+})
 
+// Calculate top handle positions
+function getTopHandleStyle(index: number, total: number): Record<string, string> {
+  // Distribute handles evenly across the top edge
+  const position = (index + 1) / (total + 1)
   return {
-    left: `${leftOffset}%`
+    left: `${position * 100}%`,
+    transform: 'translateX(-50%)',
+  }
+}
+
+// Calculate bottom handle positions
+function getBottomHandleStyle(index: number, total: number): Record<string, string> {
+  // Distribute handles evenly across the bottom edge
+  const position = (index + 1) / (total + 1)
+  return {
+    left: `${position * 100}%`,
+    transform: 'translateX(-50%)',
   }
 }
 </script>
 
 <style scoped>
-.service-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: center;
+.node-wrapper {
+  position: relative;
+  min-height: 60px; /* Ensure minimum height for multiple handles */
 }
 
-.name {
+.service-card {
+  min-width: 120px;
+  min-height: 50px;
+  transition: all 0.2s ease;
+}
+
+/* Handle styling */
+.service-handle {
+  width: 8px;
+  height: 8px;
+  background: var(--q-primary);
+  border: 2px solid var(--q-primary);
+  border-radius: 50%;
+}
+
+.service-handle.input-handle {
+  background: var(--q-secondary);
+  border-color: var(--q-secondary);
+}
+
+.service-handle.output-handle {
+  background: var(--q-primary);
+  border-color: var(--q-primary);
+}
+
+/* External services get warning theme */
+.service-card.external-service {
+  background-color: var(--q-warning);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.service-card.external-service :deep(.q-card__section) {
+  background-color: var(--q-warning);
+}
+
+/* Selected state using Quasar accent color */
+.service-card.selected {
+  border-color: var(--q-accent) !important;
+  border-width: 3px !important;
+  box-shadow: 0 0 10px rgba(var(--q-accent-rgb), 0.3);
+}
+
+.service-name {
+  font-size: 0.875rem;
+  font-weight: 500;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.node-wrapper {
-  position: relative;
-  min-height: 60px; /* Ensure minimum height for multiple handles */
 }
 </style>

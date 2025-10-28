@@ -61,9 +61,8 @@
 <script setup lang="ts">
 import type { Node, Edge } from '@vue-flow/core'
 import { useGroupGraph } from '~/composables/useGroupGraph'
+import { resourceService } from '~/services/ResourceService'
 import type { GroupInfo, ServiceDefinition } from '~/types'
-
-const api = useApi()
 const { buildGraphFromConnections, buildGraph } = useGroupGraph()
 
 // App state
@@ -116,7 +115,7 @@ const { data: groupConnections, pending, error, refresh } = await useAsyncData(
   'group-connections',
   async () => {
     console.log('Fetching group connections from API...')
-    const connections = await api.getAllGroupConnections()
+    const connections = await resourceService.getAllGroupConnections()
     console.log('Group connections loaded:', connections)
     return connections
   },
@@ -141,14 +140,14 @@ async function loadGroupData(groupName: string) {
   
   try {
     // Get all services first and cache them
-    const allServices = await api.getAllServices()
+    const allServices = await resourceService.getAllServices()
     allServicesCache.value = allServices
     
     // Get services for current group
-    const servicesWithIncoming = await api.getServicesByGroup(groupName)
+    const servicesWithIncoming = await resourceService.getServicesByGroup(groupName)
     
     // Get group info
-    const info = await api.getGroupInfo(groupName).catch(() => null)
+    const info = await resourceService.getGroupInfo(groupName).catch(() => null)
     groupInfo.value = info
 
     console.log(`Data loaded for group ${groupName}:`, { services: servicesWithIncoming, allServices, info })
@@ -268,7 +267,7 @@ function handleNodeDoubleClick(event: any) {
 
 async function loadGroupInfo(groupName: string) {
   try {
-    const info = await api.getGroupInfo(groupName)
+    const info = await resourceService.getGroupInfo(groupName)
     if (selectedGroup.value === groupName) {
       groupInfo.value = info
     }

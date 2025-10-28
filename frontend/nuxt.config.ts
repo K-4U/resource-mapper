@@ -24,11 +24,24 @@ export default defineNuxtConfig({
     plugins: [
       'Notify',
       'Loading',
-      'Dialog'
+      'Dialog',
+      'Dark'
     ],
     extras: {
       font: 'roboto-font',
       fontIcons: ['material-icons']
+    },
+    config: {
+      brand: {
+        // Use Quasar's Material Design colors
+        primary: '#1976D2',    // Blue
+        secondary: '#26A69A',  // Teal  
+        accent: '#9C27B0',     // Purple
+        positive: '#21BA45',   // Green
+        negative: '#C10015',   // Red
+        info: '#31CCEC',       // Light Blue
+        warning: '#F2C037'     // Amber
+      }
     }
   },
 

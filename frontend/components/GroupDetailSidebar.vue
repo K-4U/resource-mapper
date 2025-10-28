@@ -208,6 +208,7 @@
 
 <script setup lang="ts">
 import type { Team } from '~/types'
+import { resourceService } from '~/services/ResourceService'
 
 interface SelectedItem {
   type: 'group' | 'service'
@@ -234,7 +235,7 @@ defineEmits<{
   'clear-selection': []
 }>()
 
-const api = useApi()
+
 const teamInfo = ref<Team | null>(null)
 const loadingTeam = ref(false)
 const selectedTeamInfo = ref<Team | null>(null)
@@ -245,7 +246,7 @@ watch(() => props.teamId, async (newTeamId) => {
   if (newTeamId) {
     loadingTeam.value = true
     try {
-      teamInfo.value = await api.getTeamById(newTeamId)
+      teamInfo.value = await resourceService.getTeamById(newTeamId)
     } catch (error) {
       console.error('Failed to fetch team info:', error)
       teamInfo.value = null
@@ -263,9 +264,9 @@ watch(() => props.selectedItem, async (newSelectedItem) => {
     loadingSelectedTeam.value = true
     try {
       // Fetch group info to get the teamId
-      const groupInfo = await api.getGroupInfo(newSelectedItem.groupName)
+      const groupInfo = await resourceService.getGroupInfo(newSelectedItem.groupName)
       if (groupInfo?.teamId) {
-        selectedTeamInfo.value = await api.getTeamById(groupInfo.teamId)
+        selectedTeamInfo.value = await resourceService.getTeamById(groupInfo.teamId)
       } else {
         selectedTeamInfo.value = null
       }

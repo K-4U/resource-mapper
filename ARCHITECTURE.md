@@ -21,7 +21,7 @@ The main npm package that will be published.
   - **index.ts** - Package exports
 - **templates/** - Nuxt frontend templates
   - Frontend code (components, composables, pages, etc.)
-  - **composables/useApi.ts** - Modified to load from static JSON instead of REST API
+  - **services/ResourceService.ts** - Direct data loading and business logic
   - **nuxt.config.ts** - Configured for static site generation
   - **package.json** - Template dependencies (Nuxt, Vue Flow, Quasar, etc.)
 
@@ -81,16 +81,12 @@ The generated site can be deployed to any static hosting (Netlify, Vercel, GitHu
 
 ## Frontend Modifications
 
-### `composables/useApi.ts`
-**Before:**
-- Used OpenAPI-generated client
-- Made HTTP requests to Spring Boot backend
-- Runtime API calls
-
-**After:**
-- Loads from static `/data/services.json`, `/data/groups.json`, `/data/teams.json`
-- Computes group connections client-side
-- No external dependencies at runtime
+### `services/ResourceService.ts`
+**Direct Data Loading:**
+- Loads YAML files directly from `/services/` and `/teams/` directories
+- Performs all business logic client-side (connections, contextual incoming)
+- Singleton service with comprehensive caching and data processing
+- No API wrapper layer - components use ResourceService directly
 
 ### `nuxt.config.ts`
 **Before:**
