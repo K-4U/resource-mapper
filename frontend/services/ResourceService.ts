@@ -37,6 +37,7 @@ class ResourceService {
     console.log('Loading all YAML data...')
     
     // Service groups to load
+    //TODO: Dynamically discover groups
     const serviceGroups = ['api', 'compute', 'data', 'frontend']
     
     // Load services from each group

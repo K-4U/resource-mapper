@@ -42,3 +42,7 @@ coverage
 
 # Generated API client (regenerate with npm run generate-api)
 generated/
+
+# AWS icons (downloaded during postinstall)
+public/icons/
+assets/icons/

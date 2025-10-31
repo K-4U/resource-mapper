@@ -21,9 +21,16 @@
       :flat="false"
       bordered
     >
-      <q-card-section class="q-pa-sm text-center">
-        <div class="service-name" :title="data.service.identifier">
-          {{ data.label }}
+      <q-card-section class="q-pa-sm">
+        <div class="service-content">
+          <AwsServiceIcon 
+            :service-type="data.service.serviceType" 
+            :size="32"
+            class="service-icon"
+          />
+          <div class="service-name" :title="data.service.identifier">
+            {{ data.label }}
+          </div>
         </div>
       </q-card-section>
     </q-card>
@@ -90,9 +97,19 @@ function getBottomHandleStyle(index: number, total: number): Record<string, stri
 }
 
 .service-card {
-  min-width: 120px;
-  min-height: 50px;
+  min-width: 140px;
+  min-height: 60px;
   transition: all 0.2s ease;
+}
+
+.service-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.service-icon {
+  flex-shrink: 0;
 }
 
 /* Handle styling */

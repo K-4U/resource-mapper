@@ -7,7 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "node scripts/download-aws-icons.js && nuxt prepare",
     "test": "vitest"
   },
   "dependencies": {
@@ -30,6 +30,7 @@
     "@types/node": "^24.9.1",
     "happy-dom": "^20.0.8",
     "typescript": "^5.9.3",
+    "unzipper": "^0.12.3",
     "vitest": "^4.0.1"
   }
 }
