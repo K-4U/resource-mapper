@@ -95,10 +95,11 @@ export class GroupNode implements Partial<Node> {
         // Initialize position calculator with custom config
         const defaultConfig: Partial<PositionConfig> = {
             cols: isExternal ? 2 : 3,
-            nodeWidth: 140,
-            nodeHeight: 80,
+            nodeWidth: 180,  // Increased from 140 to account for actual rendered width
+            nodeHeight: 100, // Increased from 80 to account for actual rendered height + padding
             horizontalSpacing: 40,
             verticalSpacing: 30,
+            nodeMargin: 20,  // Increased margin for better spacing
             groupPadding: 20,
             connectionDirection: 'vertical',
             sourceSide: 'bottom',

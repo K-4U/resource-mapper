@@ -23,6 +23,7 @@
       @node-double-click="onNodeDoubleClick"
       @error="onError"
       @node-drag-start="onNodeDragStart"
+      @node-drag="onNodeDrag"
       @node-drag-stop="onNodeDragStop"
     >
       <Background :pattern-color="dynamicPatternColor" :gap="backgroundGap" />
@@ -175,6 +176,7 @@ const emit = defineEmits<{
   nodeDoubleClick: [event: any]
   error: [error: any]
   nodeDragStart: [event: any]
+  nodeDrag: [event: any]
   nodeDragStop: [event: any]
   goHome: []
   goBack: []
@@ -266,6 +268,10 @@ function onError(error: any) {
 
 function onNodeDragStart(event: any) {
   emit('nodeDragStart', event)
+}
+
+function onNodeDrag(event: any) {
+  emit('nodeDrag', event)
 }
 
 function onNodeDragStop(event: any) {

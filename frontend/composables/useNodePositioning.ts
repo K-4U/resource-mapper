@@ -1,4 +1,5 @@
 import type { ServiceDefinition, GroupConnection } from '~/types'
+import { detectCollision, findNearestValidPosition, type NodeBounds } from '~/utils/collisionDetection'
 
 export type ConnectionDirection = 'vertical' | 'horizontal'
 export type NodeSide = 'top' | 'bottom' | 'left' | 'right'
@@ -12,6 +13,7 @@ export interface PositionConfig {
   horizontalSpacing: number
   verticalSpacing: number
   groupPadding: number
+  nodeMargin: number // Minimum space between service nodes
   cols?: number
 }
 
@@ -38,6 +40,7 @@ export class NodePositionCalculator {
       horizontalSpacing: config.horizontalSpacing ?? 40,
       verticalSpacing: config.verticalSpacing ?? 30,
       groupPadding: config.groupPadding ?? 20,
+      nodeMargin: config.nodeMargin ?? 10,
       cols: config.cols ?? 3
     }
   }
@@ -193,52 +196,65 @@ export class NodePositionCalculator {
    * Ensure the position doesn't overlap with existing nodes
    */
   private ensureNoOverlap(position: { x: number; y: number }, currentId: string): { x: number; y: number } {
-    const buffer = 10 // Extra spacing buffer
-    let adjustedPos = { ...position }
-    let attempts = 0
-    const maxAttempts = 50
-
-    while (attempts < maxAttempts) {
-      const overlap = this.findOverlap(adjustedPos, currentId, buffer)
-
-      if (!overlap) {
-        break
+    // Get existing nodes as bounds (excluding current node)
+    const existingNodes: NodeBounds[] = []
+    for (const [id, pos] of this.positions.entries()) {
+      if (id !== currentId) {
+        existingNodes.push({
+          x: pos.x,
+          y: pos.y,
+          width: this.config.nodeWidth,
+          height: this.config.nodeHeight
+        })
       }
-
-      // For horizontal layout, prefer moving down (vertical stacking) over moving right (different layers)
-      if (this.config.connectionDirection === 'horizontal') {
-        // Move down first for horizontal layout (services in same layer stack vertically)
-        adjustedPos.y += this.config.nodeHeight + this.config.verticalSpacing
-      } else {
-        // For vertical layout, move right first  
-        if (attempts % 2 === 0) {
-          adjustedPos.x += this.config.nodeWidth + this.config.horizontalSpacing
-        } else {
-          adjustedPos.y += this.config.nodeHeight + this.config.verticalSpacing
-        }
-      }
-
-      attempts++
     }
 
-    // Ensure minimum position
-    adjustedPos.x = Math.max(this.config.groupPadding, adjustedPos.x)
-    adjustedPos.y = Math.max(this.config.groupPadding + 20, adjustedPos.y)
+    // Use the collision detection utility to find a valid position
+    const validPosition = findNearestValidPosition(
+      position,
+      {
+        width: this.config.nodeWidth,
+        height: this.config.nodeHeight
+      },
+      existingNodes,
+      { margin: this.config.nodeMargin },
+      {
+        maxAttempts: 50,
+        stepX: this.config.nodeWidth + this.config.horizontalSpacing,
+        stepY: this.config.nodeHeight + this.config.verticalSpacing,
+        preferredDirection: this.config.connectionDirection === 'vertical' ? 'horizontal' : 'vertical'
+      }
+    )
 
-    return adjustedPos
+    // Ensure minimum position
+    validPosition.x = Math.max(this.config.groupPadding, validPosition.x)
+    validPosition.y = Math.max(this.config.groupPadding + 20, validPosition.y)
+
+    return validPosition
   }
 
   /**
    * Check if position overlaps with existing nodes
    */
-  private findOverlap(position: { x: number; y: number }, currentId: string, buffer: number): boolean {
+  private findOverlap(position: { x: number; y: number }, currentId: string): boolean {
+    const testNode: NodeBounds = {
+      x: position.x,
+      y: position.y,
+      width: this.config.nodeWidth,
+      height: this.config.nodeHeight
+    }
+
     for (const [id, existingPos] of this.positions.entries()) {
       if (id === currentId) continue
 
-      const xOverlap = Math.abs(position.x - existingPos.x) < (this.config.nodeWidth + buffer)
-      const yOverlap = Math.abs(position.y - existingPos.y) < (this.config.nodeHeight + buffer)
+      const existingNode: NodeBounds = {
+        x: existingPos.x,
+        y: existingPos.y,
+        width: this.config.nodeWidth,
+        height: this.config.nodeHeight
+      }
 
-      if (xOverlap && yOverlap) {
+      if (detectCollision(testNode, existingNode, { margin: this.config.nodeMargin })) {
         return true
       }
     }
