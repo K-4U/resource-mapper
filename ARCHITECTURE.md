@@ -209,3 +209,7 @@ For existing users:
 3. Run generate command
 4. Deploy static output
 5. Decommission Spring Boot backend
+
+## Hosting Constraint
+
+The generated application must remain a fully static site (HTML/JS/CSS + JSON data) so it can be deployed straight to S3 or any static host. All service and team data needs to be transformed at build time; no runtime backend, serverless functions, or APIs will be available once deployed.

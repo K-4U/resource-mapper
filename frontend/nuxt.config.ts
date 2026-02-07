@@ -46,10 +46,6 @@ export default defineNuxtConfig({
   },
 
   css: [
-    '@vue-flow/core/dist/style.css',
-    '@vue-flow/core/dist/theme-default.css',
-    '@vue-flow/controls/dist/style.css',
-    '@vue-flow/minimap/dist/style.css',
     '~/assets/css/main.css'
   ],
 
@@ -59,10 +55,5 @@ export default defineNuxtConfig({
     }
   },
 
-  vite: {
-    optimizeDeps: {
-      include: ['@vue-flow/core', '@vue-flow/background', '@vue-flow/controls', '@vue-flow/minimap']
-    }
-  }
+  vite: {}
 })
-

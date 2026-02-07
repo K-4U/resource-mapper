@@ -10,176 +10,60 @@
 
 body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    background-color: var(--q-grey-1); /* Use Quasar's light grey background */
+    background-color: var(--q-grey-1);
 }
 
-/* Dark mode support */
 body.body--dark {
     background-color: var(--q-dark);
 }
 
-/* Vue Flow container */
-.vue-flow-container {
+.diagram-container,
+.diagram-surface {
     width: 100%;
-    height: calc(100vh - 80px);
-    background-color: var(--q-grey-1);
+    height: 100%;
 }
 
-.body--dark .vue-flow-container {
-    background-color: var(--q-dark);
+.diagram-surface .mermaid {
+    width: 100%;
+    min-height: 400px;
 }
 
-/* Vue Flow layers - ensure edges render above parent nodes */
-.vue-flow .vue-flow__edges {
-    z-index: 5 !important;
+.diagram-surface .mermaid svg {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    background-color: transparent;
 }
 
-.vue-flow .vue-flow__nodes {
-    z-index: 1 !important;
+.diagram-surface .mermaid .node rect,
+.diagram-surface .mermaid .node polygon,
+.diagram-surface .mermaid .node circle {
+    rx: 6px;
+    ry: 6px;
+    stroke-width: var(--group-border-width);
 }
 
-/* But keep child nodes above edges */
-.vue-flow__node:not(.group-parent) {
-    z-index: 10 !important;
-}
-
-/* Group styles using Quasar theming */
-
-.group-parent {
-    border-radius: 6px; /* Quasar standard border radius */
-    border-width: var(--group-border-width);
-    border-style: solid;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12); /* Quasar card shadow */
-}
-
-.group-parent.internal {
-    border-color: var(--q-primary);
-    background-color: rgba(var(--q-primary-rgb), 0.1);
-}
-
-.group-parent.external {
-    border-color: var(--q-warning);
-    background-color: rgba(var(--q-warning-rgb), 0.1);
-}
-
-/* Dark mode group styles */
-.body--dark .group-parent.internal {
-    background-color: rgba(var(--q-primary-rgb), 0.2);
-    border-color: var(--q-primary);
-}
-
-.body--dark .group-parent.external {
-    background-color: rgba(var(--q-warning-rgb), 0.2);
-    border-color: var(--q-warning);
-}
-
-/* Service nodes now use Quasar cards - minimal overrides needed */
-
-/* Edge styles using Quasar color system */
-.vue-flow__edge-path {
-    stroke-width: 2px;
-}
-
-/* Internal connections - Primary color */
-.vue-flow__edge.internal-connection .vue-flow__edge-path {
-    stroke: var(--q-primary);
-    stroke-width: 2px;
-}
-
-/* Incoming connections - Positive color */
-.vue-flow__edge.incoming-connection .vue-flow__edge-path {
-    stroke: var(--q-positive);
-    stroke-width: 2px;
-}
-
-/* Outgoing connections - Info color */
-.vue-flow__edge.outgoing-connection .vue-flow__edge-path {
-    stroke: var(--q-info);
-    stroke-width: 2px;
-}
-
-/* External-to-external connections - Secondary color */
-.vue-flow__edge.external-to-external .vue-flow__edge-path {
-    stroke: var(--q-secondary);
-    stroke-width: 2px;
-}
-
-/* Legacy fallback styles - removed to prevent override of specific connection types */
-
-/* Highlighted edges for selected node connections */
-.vue-flow__edge.highlighted .vue-flow__edge-path {
-    stroke-width: 4px;
-    stroke: var(--q-accent) !important;
-    filter: drop-shadow(0 0 4px rgba(var(--q-accent-rgb), 0.5));
-}
-
-.vue-flow__edge-text {
-    fill: var(--q-dark);
-    font-size: 11px;
+.diagram-surface .mermaid .label {
     font-family: 'Roboto', sans-serif;
+    font-size: 14px;
 }
 
-/* Dark mode edge text */
-.body--dark .vue-flow__edge-text {
+.diagram-surface .mermaid .edgeLabel {
+    font-size: 12px;
+    fill: var(--q-dark);
+}
+
+.body--dark .diagram-surface .mermaid .edgeLabel {
     fill: var(--q-grey-4);
 }
 
-/* Vue Flow selection box styling for dark mode */
-.body--dark .vue-flow .vue-flow__selection {
-    background: rgba(var(--q-primary-rgb), 0.1);
-    border-color: var(--q-primary);
+.diagram-placeholder {
+    color: var(--q-grey-7);
 }
 
-/* Loading state */
 .loading-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: calc(100vh - 80px);
+    height: 100%;
 }
-
-/* Vue Flow controls styling to match Quasar */
-.vue-flow .vue-flow__controls {
-    box-shadow: 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12);
-    border-radius: 4px;
-}
-
-.vue-flow .vue-flow__controls button {
-    background: white;
-    border: none;
-    color: var(--q-dark);
-    border-radius: 4px;
-    font-family: 'Roboto', sans-serif;
-    transition: all 0.2s ease;
-}
-
-.vue-flow .vue-flow__controls button:hover {
-    background: var(--q-grey-2);
-    color: var(--q-primary);
-}
-
-/* Dark mode controls */
-.body--dark .vue-flow .vue-flow__controls button {
-    background: var(--q-dark-page);
-    color: var(--q-grey-4);
-}
-
-.body--dark .vue-flow .vue-flow__controls button:hover {
-    background: var(--q-grey-9);
-    color: var(--q-primary);
-}
-
-/* Vue Flow minimap styling */
-.vue-flow .vue-flow__minimap {
-    box-shadow: 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12);
-    border-radius: 4px;
-    border: 1px solid var(--q-grey-4);
-}
-
-/* Dark mode minimap */
-.body--dark .vue-flow .vue-flow__minimap {
-    border-color: var(--q-grey-8);
-    background: var(--q-dark-page);
-}
-
-/* App header styles removed - no longer used */
