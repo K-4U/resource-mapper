@@ -48,7 +48,6 @@ import type { MermaidConfig } from 'mermaid'
 import mermaid from 'mermaid'
 import Legend from '~/components/Legend.vue'
 import DiagramToolbar from '~/components/DiagramToolbar.vue'
-import awsIcons from "~/assets/icons/aws-icons-mermaid.json";
 
 interface Props {
   diagram: string
@@ -72,6 +71,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   nodeClick: [nodeId: string]
+  nodeDoubleClick: [nodeId: string]
   goHome: []
   goBack: []
   toggleIncomingConnections: []
@@ -136,6 +136,10 @@ try {
 
 
 
+const DOUBLE_CLICK_THRESHOLD_MS = 400
+let lastClickedNode: string | null = null
+let lastClickTimestamp = 0
+
 function toggleDarkMode() {
   $q.dark.toggle()
   if (import.meta.client) {
@@ -144,7 +148,15 @@ function toggleDarkMode() {
 }
 
 function onMermaidNodeClick(nodeId: string) {
-  console.log('Node clicked:', nodeId)
+  const now = Date.now()
+  if (lastClickedNode === nodeId && now - lastClickTimestamp <= DOUBLE_CLICK_THRESHOLD_MS) {
+    emit('nodeDoubleClick', nodeId)
+    lastClickedNode = null
+    lastClickTimestamp = 0
+    return
+  }
+  lastClickedNode = nodeId
+  lastClickTimestamp = now
   emit('nodeClick', nodeId)
 }
 

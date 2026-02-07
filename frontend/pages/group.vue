@@ -35,6 +35,7 @@
         :pending="pending"
         :show-toolbar="true"
         @node-click="handleNodeClick"
+        @go-home="navigateHome"
       />
       <ServiceDetailSidebar
         :group="groupInfo"
@@ -47,7 +48,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute } from '#app'
+import { useRoute, useRouter } from '#app'
 import { useGroups } from '~/composables/useGroups'
 import { useServices } from '~/composables/useServices'
 import LoadingSpinner from '~/components/LoadingSpinner.vue'
@@ -59,6 +60,7 @@ import { buildGroupServicesDiagram, getServiceNodeId } from '~/utils/mermaid/gro
 import type { GroupInfo, ServiceDefinition } from '~/types'
 
 const route = useRoute()
+const router = useRouter()
 const groupId = computed(() => {
   const value = route.query.groupId
   if (Array.isArray(value)) {
@@ -123,6 +125,10 @@ function handleNodeClick(nodeId: string) {
   } else {
     selectedServiceId.value = null
   }
+}
+
+function navigateHome() {
+  router.push({ path: '/' })
 }
 </script>
 

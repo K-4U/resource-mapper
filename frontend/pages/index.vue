@@ -28,6 +28,7 @@
         :pending="pending"
         :show-toolbar="false"
         @node-click="handleNodeClick"
+        @node-double-click="handleNodeDoubleClick"
       />
       <GroupDetailSidebar
         v-if="selectedGroupId"
@@ -41,11 +42,13 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useRouter } from '#app'
 import { useGroups } from '~/composables/useGroups'
 import { useAllGroupConnections } from '~/composables/useAllGroupConnections'
 import { buildGroupOverviewDiagram } from '~/utils/mermaid/groupDiagram'
 import GroupDetailSidebar from '~/components/GroupDetailSidebar.vue'
 
+const router = useRouter()
 const diagramDefinition = ref('')
 const nodeGroupMap = ref<Record<string, string>>({})
 const selectedGroupId = ref<string | null>(null)
@@ -96,6 +99,14 @@ function handleNodeClick(nodeId: string) {
 
 function clearSelection() {
   selectedGroupId.value = null
+}
+
+function handleNodeDoubleClick(nodeId: string) {
+  const groupId = nodeGroupMap.value[nodeId]
+  if (!groupId) {
+    return
+  }
+  router.push({ path: '/group', query: { groupId } })
 }
 </script>
 
