@@ -64,6 +64,10 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
     return result
   }
 
+  async getAllServices(): Promise<Record<string, ServiceDefinition>> {
+    return this.fetchAllEntities()
+  }
+
   __setServiceFileMocks(files: Record<string, string>) {
     this.setFileMocks(files)
   }

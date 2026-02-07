@@ -141,7 +141,7 @@ export enum ServiceType {
 }
 
 // Models matching Java models exactly
-export interface ServiceConnection {
+export interface ServiceLink {
   connectionType: ConnectionType
   targetIdentifier: string  // Format: 'group/service-id'
   description: string
@@ -152,8 +152,8 @@ export interface ServiceDefinition {
   description?: string
   serviceType: ServiceType
   identifier: string  // Set from filename by loader
-  outgoingConnections?: ServiceConnection[]
-  incomingConnections?: ServiceConnection[]  // Calculated at load time
+  outgoingConnections?: ServiceLink[]
+  incomingConnections?: ServiceLink[]  // Calculated at load time
   groupName: string  // Set from folder structure by loader
 }
 
@@ -179,6 +179,13 @@ export interface GroupConnection {
   description?: string
   connectedToGroups: Set<string>
   serviceCount: number
+}
+
+export interface ServiceConnection {
+  startService: string
+  targetService: string
+  connectionType: ConnectionType
+  description: string
 }
 
 // Validation functions to ensure YAML matches expected structure
