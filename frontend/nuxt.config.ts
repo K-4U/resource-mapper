@@ -27,10 +27,7 @@ export default defineNuxtConfig({
       'Dialog',
       'Dark'
     ],
-    extras: {
-      font: 'roboto-font',
-      fontIcons: ['material-icons']
-    },
+    cssAddon: true,
     config: {
       brand: {
         // Use Quasar's Material Design colors
@@ -46,6 +43,7 @@ export default defineNuxtConfig({
   },
 
   css: [
+    'quasar/dist/quasar.css',
     '~/assets/css/main.css'
   ],
 

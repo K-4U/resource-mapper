@@ -17,9 +17,10 @@ export function buildServiceNodeLines(
     const indent = options.indent ?? DEFAULT_INDENT
     const nodeId = getServiceNodeIdFromDefinition(service)
     const label = escapeLabel(service.friendlyName)
+    const nodeClass = options.kind === 'external' ? 'externalService' : 'internalService'
     return {
         nodeId,
-        lines: [`${indent}${nodeId}["${label}"]`, `${indent}click ${nodeId}`]
+        lines: [`${indent}${nodeId}["${label}"]`, `${indent}click ${nodeId}`, `${indent}class ${nodeId} ${nodeClass}`]
     }
 }
 

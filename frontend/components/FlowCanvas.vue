@@ -201,6 +201,34 @@ function logCurrentDiagram() {
   flex-direction: column;
 }
 
+:deep(.internalService > rect) {
+  fill: var(--q-grey-2) !important;
+  stroke: var(--q-grey-2) !important;
+  stroke-width: 2px !important;
+  rx: 6px;
+  ry: 6px;
+}
+
+:deep(.body--dark .internalService > rect),
+.body--dark :deep(.internalService > rect) {
+  fill: var(--q-dark) !important;
+  stroke: var(--q-grey-6) !important;
+}
+
+:deep(.externalService > rect) {
+  fill: rgba(var(--q-warning-rgb), 0.15) !important;
+  stroke: var(--q-warning) !important;
+  stroke-width: 2px !important;
+  rx: 6px;
+  ry: 6px;
+}
+
+:deep(.body--dark .externalService > rect),
+.body--dark :deep(.externalService > rect) {
+  fill: rgba(var(--q-warning-rgb), 0.35) !important;
+  stroke: var(--q-warning) !important;
+}
+
 .diagram-toolbar {
   display: flex;
   align-items: center;
