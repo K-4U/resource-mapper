@@ -45,6 +45,16 @@
     <q-separator vertical inset class="q-mx-sm" />
     <q-btn
       size="sm"
+      icon="bug_report"
+      color="secondary"
+      flat
+      dense
+      @click="$emit('log-diagram')"
+      :disable="pending"
+      title="Log Mermaid UML"
+    />
+    <q-btn
+      size="sm"
       :icon="showLegend ? 'receipt_long' : 'menu'"
       color="secondary"
       flat
@@ -90,6 +100,7 @@ defineEmits<{
   'toggle-external-to-external': []
   'toggle-legend': []
   'toggle-dark-mode': []
+  'log-diagram': []
 }>()
 </script>
 

@@ -1,5 +1,4 @@
-import type { GroupInfo } from '~/types'
-import type { GroupConnection } from '~/types'
+import type { GroupInfo, GroupConnection} from '~/types'
 
 const sanitize = (value: string) => (value || 'group').replace(/[^a-zA-Z0-9_]/g, '_')
 
@@ -30,7 +29,8 @@ export function buildGroupOverviewDiagram(
     connections.forEach(({ sourceGroup, targetGroup, connectionCount }) => {
         const sourceNode = ensureNode(sourceGroup)
         const targetNode = ensureNode(targetGroup)
-        lines.push(`  ${sourceNode} -->|${connectionCount}| ${targetNode}`)
+        const label = connectionCount > 1 ? `${connectionCount} connections` : '1 connection'
+        lines.push(`  ${sourceNode} -->|${label}| ${targetNode}`)
     })
     return {diagram: lines.join('\n'), nodeToGroupMap}
 }

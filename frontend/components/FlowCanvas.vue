@@ -13,6 +13,7 @@
       @toggle-external-to-external="emit('toggleExternalToExternal')"
       @toggle-legend="showLegend = !showLegend"
       @toggle-dark-mode="toggleDarkMode"
+      @log-diagram="logCurrentDiagram"
     />
 
     <div class="diagram-surface" :class="{ 'is-loading': pending }" ref="diagramSurfaceRef">
@@ -132,6 +133,20 @@ function handleParseError(error: unknown) {
     parseError.value = error.message
   } else {
     parseError.value = 'Failed to render diagram.'
+  }
+}
+
+function logCurrentDiagram() {
+  const diagram = renderableDiagram.value
+  if (!import.meta.client) {
+    return
+  }
+  if (!diagram?.trim()) {
+    console.info('[Mermaid UML] No diagram available yet')
+  } else if (diagram === PLACEHOLDER_DIAGRAM) {
+    console.info('[Mermaid UML] Placeholder diagram rendered')
+  } else {
+    console.info('[Mermaid UML]', '\n' + diagram)
   }
 }
 </script>
