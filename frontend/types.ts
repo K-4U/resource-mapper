@@ -174,11 +174,11 @@ export interface Team {
   teamId: string  // Set from filename by loader
 }
 
+
 export interface GroupConnection {
-  groupName: string
-  description?: string
-  connectedToGroups: Set<string>
-  serviceCount: number
+  sourceGroup: string
+  targetGroup: string
+  connectionCount: number
 }
 
 export interface ServiceConnection {

@@ -8,6 +8,16 @@ const baseMocks: Record<string, string> = {
   '../public/services/frontend/site.yaml': `\nfriendlyName: Frontend\nserviceType: LAMBDA\n`
 }
 
+const selfLoopMocks: Record<string, string> = {
+  ...baseMocks,
+  '../public/services/frontend/site.yaml': `\nfriendlyName: Frontend\nserviceType: LAMBDA\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: frontend/site\n    description: Self ping\n`
+}
+
+const multiCountMocks: Record<string, string> = {
+  ...baseMocks,
+  '../public/services/api/processor.yaml': `\nfriendlyName: API Processor\nserviceType: LAMBDA\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: frontend/site\n    description: Secondary path\n`
+}
+
 function resetMocks(mocks = baseMocks) {
   __setServiceFileMocks(mocks)
   connectionsService.__reset()
@@ -49,5 +59,28 @@ describe('ConnectionsService', () => {
     expect(new Set(connections.map(conn => conn.targetService))).toEqual(
       new Set(['frontend/site'])
     )
+  })
+
+  it('filters self-loop connections by default but can include them when requested', async () => {
+    resetMocks(selfLoopMocks)
+    const withoutSelf = await connectionsService.getConnectionsFromGroup('frontend')
+    expect(withoutSelf).toHaveLength(0)
+
+    const withSelf = await connectionsService.getConnectionsFromGroup('frontend', true)
+    expect(withSelf).toHaveLength(1)
+    expect(withSelf[0]?.targetService).toBe('frontend/site')
+  })
+
+  it('aggregates group connections with accurate counts', async () => {
+    resetMocks(multiCountMocks)
+    const summary = await connectionsService.getAllGroupConnections()
+    const lookup = summary.reduce<Record<string, number>>((acc, edge) => {
+      acc[`${edge.sourceGroup}->${edge.targetGroup}`] = edge.connectionCount
+      return acc
+    }, {})
+
+    expect(lookup['api->data']).toBe(1)
+    expect(lookup['api->frontend']).toBe(2)
+    expect(lookup['data->frontend']).toBe(1)
   })
 })

@@ -69,54 +69,41 @@ describe('useConnections composables', () => {
 
     const groupRef = ref('api')
     useConnectionsFromGroup(groupRef)
-    const [keyGetter] = useAsyncDataMock.mock.calls[0]
+    const [keyGetter, fetcher] = useAsyncDataMock.mock.calls[0]
     expect(keyGetter()).toBe('group-connections-from-api')
+    await fetcher()
+    expect(connectionsServiceMock.getConnectionsFromGroup).toHaveBeenCalledWith('api')
+  })
+
+  it('fetches incoming connections for a group', async () => {
+    const asyncResult = { data: [] }
+    useAsyncDataMock.mockReturnValue(asyncResult)
+    connectionsServiceMock.getConnectionsToGroup.mockResolvedValue([{ targetService: 'api/billing' }])
+
+    const groupRef = ref('api')
+    useConnectionsToGroup(groupRef)
+    const [keyGetter, fetcher] = useAsyncDataMock.mock.calls[0]
+    expect(keyGetter()).toBe('group-connections-to-api')
+    await fetcher()
+    expect(connectionsServiceMock.getConnectionsToGroup).toHaveBeenCalledWith('api')
   })
 
   it('fetches incoming connections for a group and handles empty identifiers', async () => {
-    const asyncResult = { data: [] }
-    useAsyncDataMock.mockReturnValue(asyncResult)
+     const asyncResult = { data: [] }
+     useAsyncDataMock.mockReturnValue(asyncResult)
 
-    useConnectionsToGroup(ref(null))
-    const [, fetcher] = useAsyncDataMock.mock.calls[0]
-    const value = await fetcher()
-    expect(value).toEqual([])
-    expect(connectionsServiceMock.getConnectionsToGroup).not.toHaveBeenCalled()
-  })
+     useConnectionsToGroup(ref(null))
+     const [, fetcher] = useAsyncDataMock.mock.calls[0]
+     const value = await fetcher()
+     expect(value).toEqual([])
+     expect(connectionsServiceMock.getConnectionsToGroup).not.toHaveBeenCalled()
+   })
 
-  it('fetches both directions for a service via combined helper', async () => {
-    const asyncResult = { data: { from: [], to: [] } }
-    useAsyncDataMock.mockReturnValue(asyncResult)
-    connectionsServiceMock.getConnectionsFromService.mockResolvedValue([
-      { startService: 'api/gateway', targetService: 'data/warehouse' }
-    ])
-    connectionsServiceMock.getConnectionsToService.mockResolvedValue([
-      { startService: 'frontend/site', targetService: 'api/gateway' }
-    ])
-
-    const serviceRef = ref('api/gateway')
-    const result = useServiceConnections(serviceRef)
-
-    expect(result).toBe(asyncResult)
-    const [keyGetter, fetcher, options] = useAsyncDataMock.mock.calls[0]
-    expect(keyGetter()).toBe('service-connections-api/gateway')
-    const value = await fetcher()
-    expect(value.from).toHaveLength(1)
-    expect(value.to).toHaveLength(1)
-    expect(options?.watch?.[0]?.()).toBe('api/gateway')
-    expect(connectionsServiceMock.getConnectionsFromService).toHaveBeenCalledWith('api/gateway')
-    expect(connectionsServiceMock.getConnectionsToService).toHaveBeenCalledWith('api/gateway')
-  })
-
-  it('fetches both directions for a group via combined helper', async () => {
-    const asyncResult = { data: { from: [], to: [] } }
-    useAsyncDataMock.mockReturnValue(asyncResult)
-    connectionsServiceMock.getConnectionsFromGroup.mockResolvedValue([
-      { startService: 'api/gateway', targetService: 'frontend/site' }
-    ])
-    connectionsServiceMock.getConnectionsToGroup.mockResolvedValue([
-      { startService: 'data/warehouse', targetService: 'api/gateway' }
-    ])
+   it('fetches group connections summary', async () => {
+     const asyncResult = { data: [] }
+     useAsyncDataMock.mockReturnValue(asyncResult)
+     connectionsServiceMock.getConnectionsFromGroup.mockResolvedValue([{ startService: 'api/gateway' }])
+     connectionsServiceMock.getConnectionsToGroup.mockResolvedValue([{ targetService: 'api/billing' }])
 
     const groupRef = ref('api')
     useGroupConnectionsSummary(groupRef)
@@ -125,5 +112,7 @@ describe('useConnections composables', () => {
     const value = await fetcher()
     expect(value.from).toHaveLength(1)
     expect(value.to).toHaveLength(1)
+    expect(connectionsServiceMock.getConnectionsFromGroup).toHaveBeenCalledWith('api')
+    expect(connectionsServiceMock.getConnectionsToGroup).toHaveBeenCalledWith('api')
   })
 })

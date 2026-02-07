@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useGroups } from '~/composables/useGroups'
+import { useAllGroupConnections } from '~/composables/useAllGroupConnections'
 import { buildGroupOverviewDiagram } from '~/utils/mermaid/groupDiagram'
 import GroupDetailSidebar from '~/components/GroupDetailSidebar.vue'
 
@@ -56,21 +57,28 @@ const {
   refresh: refreshGroups
 } = await useGroups()
 
-const pending = computed(() => groupsPending.value)
-const error = computed(() => groupsError.value)
+const {
+  data: groupConnections,
+  pending: connectionsPending,
+  error: connectionsError,
+  refresh: refreshConnections
+} = await useAllGroupConnections()
+
+const pending = computed(() => groupsPending.value || connectionsPending.value)
+const error = computed(() => groupsError.value || connectionsError.value)
 const loadingMessage = computed(() => 'Loading group overview...')
 const hasDiagramContent = computed(() => diagramDefinition.value.trim().length > 0)
 
 watch(
-  groupsData,
-  groups => {
-    if (!groups) {
+  [groupsData, groupConnections],
+  ([groups, connections]) => {
+    if (!groups || !connections) {
       diagramDefinition.value = ''
       nodeGroupMap.value = {}
       selectedGroupId.value = null
       return
     }
-    const { diagram, nodeToGroupMap } = buildGroupOverviewDiagram(groups)
+    const { diagram, nodeToGroupMap } = buildGroupOverviewDiagram(groups, connections)
     diagramDefinition.value = diagram
     nodeGroupMap.value = nodeToGroupMap
   },
@@ -79,6 +87,7 @@ watch(
 
 function refreshData() {
   refreshGroups()
+  refreshConnections()
 }
 
 function handleNodeClick(nodeId: string) {
