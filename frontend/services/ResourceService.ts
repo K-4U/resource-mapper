@@ -190,15 +190,24 @@ class ResourceService {
   }
 
   // Get services for a group with contextual incoming connections
-  async getServicesByGroupWithContext(groupName: string, allServices: Record<string, ServiceDefinition[]>): Promise<ServiceDefinition[]> {
+  async getServicesByGroupWithContext(groupName: string, allServices?: Record<string, ServiceDefinition[]>): Promise<ServiceDefinition[]> {
     await this.loadAllData()
     const services = this.servicesByGroup.get(groupName) || []
-    
+
+    // Use provided allServices when present; otherwise derive from internal state
+    const sourceAllServices: Record<string, ServiceDefinition[]> = allServices && Object.keys(allServices).length > 0
+      ? allServices
+      : (() => {
+          const obj: Record<string, ServiceDefinition[]> = {}
+          this.servicesByGroup.forEach((svcs, grp) => { obj[grp] = svcs })
+          return obj
+        })()
+
     // Determine which groups are visible (current group + groups that connect to it)
     const visibleGroups = new Set<string>([groupName])
-    
+
     // Add groups that have outgoing connections to the current group
-    Object.entries(allServices).forEach(([otherGroupName, otherServices]) => {
+    Object.entries(sourceAllServices).forEach(([otherGroupName, otherServices]) => {
       if (otherGroupName !== groupName) {
         const hasConnectionToCurrentGroup = otherServices.some(service =>
           service.outgoingConnections?.some(conn =>
@@ -210,15 +219,15 @@ class ResourceService {
         }
       }
     })
-    
+
     // Calculate contextual incoming connections
     const contextualIncoming = this.calculateContextualIncomingConnections(groupName, visibleGroups)
-    
+
     // Return services with contextual incoming connections
     return services.map(service => {
       const serviceId = `${service.groupName}/${service.identifier}`
       const contextualIncomingConnections = contextualIncoming.get(serviceId) || []
-      
+
       return {
         ...service,
         incomingConnections: contextualIncomingConnections

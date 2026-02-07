@@ -458,6 +458,104 @@ export class GroupPositionCalculator {
   }
 }
 
+/**
+ * Contextual group positioning for Group mode
+ * Positions external groups to the left/right of the main group
+ */
+export class ContextualGroupPositioner {
+  private readonly groupSpacing = 40
+  private readonly groupHeight = 300
+  private readonly groupWidth = 400
+
+  constructor(
+    private readonly mainGroupBounds: { x: number; y: number; width: number; height: number }
+  ) {}
+
+  public calculatePosition(
+    groupName: string,
+    side: 'left' | 'right' | 'top' | 'bottom',
+    existingGroups: { id: string; position: { x: number; y: number } }[]
+  ): { x: number; y: number } {
+    const groupSpacing = this.groupSpacing
+    const groupWidth = this.groupWidth
+    const groupHeight = this.groupHeight
+    const mainGroupBounds = this.mainGroupBounds
+
+    let baseX: number
+    let baseY: number
+
+    if (side === 'left') {
+      baseX = mainGroupBounds.x - groupWidth - groupSpacing * 2
+      baseY = mainGroupBounds.y
+    } else if (side === 'right') {
+      baseX = mainGroupBounds.x + mainGroupBounds.width + groupSpacing * 2
+      baseY = mainGroupBounds.y
+    } else if (side === 'top') {
+      baseX = mainGroupBounds.x + (mainGroupBounds.width - groupWidth) / 2
+      baseY = mainGroupBounds.y - groupHeight - groupSpacing * 2
+    } else { // bottom
+      baseX = mainGroupBounds.x + (mainGroupBounds.width - groupWidth) / 2
+      baseY = mainGroupBounds.y + mainGroupBounds.height + groupSpacing * 2
+    }
+    
+    // Get existing groups on the same side/area to avoid overlap
+    const existingGroupsOnSide = existingGroups
+      .filter(g => {
+        if (side === 'left') return g.position.x < mainGroupBounds.x && Math.abs(g.position.x - baseX) < groupWidth
+        if (side === 'right') return g.position.x > mainGroupBounds.x && Math.abs(g.position.x - baseX) < groupWidth
+        if (side === 'top') return g.position.y < mainGroupBounds.y && Math.abs(g.position.y - baseY) < groupHeight
+        if (side === 'bottom') return g.position.y > mainGroupBounds.y && Math.abs(g.position.y - baseY) < groupHeight
+        return false
+      })
+      .sort((a, b) => {
+        if (side === 'left' || side === 'right') return a.position.y - b.position.y
+        return a.position.x - b.position.x
+      })
+    
+    let xPosition = baseX
+    let yPosition = baseY
+    
+    let attempts = 0
+    const maxAttempts = 20
+    
+    while (attempts < maxAttempts) {
+      let hasCollision = false
+      
+      for (const existingGroup of existingGroupsOnSide) {
+        const existingBounds = {
+          x: existingGroup.position.x,
+          y: existingGroup.position.y,
+          width: groupWidth,
+          height: groupHeight
+        }
+        
+        // Check for overlap
+        const collision = !(
+          xPosition + groupWidth + groupSpacing <= existingBounds.x ||
+          xPosition >= existingBounds.x + existingBounds.width + groupSpacing ||
+          yPosition + groupHeight + groupSpacing <= existingBounds.y ||
+          yPosition >= existingBounds.y + existingBounds.height + groupSpacing
+        )
+        
+        if (collision) {
+          hasCollision = true
+          if (side === 'left' || side === 'right') {
+            yPosition = existingBounds.y + existingBounds.height + groupSpacing
+          } else {
+            xPosition = existingBounds.x + existingBounds.width + groupSpacing
+          }
+          break
+        }
+      }
+      
+      if (!hasCollision) break
+      attempts++
+    }
+
+    return { x: xPosition, y: yPosition }
+  }
+}
+
 interface GroupConnectionInfo {
   name: string
   outgoingCount: number

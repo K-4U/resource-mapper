@@ -65,6 +65,9 @@ import { resourceService } from '~/services/ResourceService'
 import type { GroupInfo, ServiceDefinition } from '~/types'
 const { buildGraphFromConnections, buildGraph } = useGroupGraph()
 
+const route = useRoute()
+const router = useRouter()
+
 // App state
 const currentMode = ref<'overview' | 'group'>('overview')
 const currentGroup = ref<string>('')
@@ -124,15 +127,36 @@ const { data: groupConnections, pending, error, refresh } = await useAsyncData(
   }
 )
 
-// Build graph when data is loaded
+// Build graph when data is loaded (only if in overview mode and no group in route)
 watch(groupConnections, (connections) => {
-  if (connections && currentMode.value === 'overview') {
+  if (connections && currentMode.value === 'overview' && !route.query.group) {
     console.log('Building overview graph with connections:', connections)
     const { nodes: graphNodes, edges: graphEdges } = buildGraphFromConnections(connections)
     nodes.value = graphNodes
     edges.value = graphEdges
   }
 }, { immediate: true })
+
+// Handle route changes - load group if group parameter is present
+watch(() => route.query.group, async (groupName, oldGroupName) => {
+  if (groupName && typeof groupName === 'string') {
+    if (currentGroup.value !== groupName) {
+      console.log(`Route changed to group: ${groupName}`)
+      await loadGroupServices(groupName, false, false) // Don't update URL, we're already there
+    }
+  } else if (currentMode.value === 'group' && !groupName) {
+    goHome()
+  }
+}, { immediate: true })
+
+// Ensure route is checked on mount (backup for initial load)
+onMounted(async () => {
+  const groupParam = route.query.group
+  if (groupParam && typeof groupParam === 'string' && currentGroup.value !== groupParam) {
+    console.log(`Initial mount: loading group from route: ${groupParam}`)
+    await loadGroupServices(groupParam, false, false)
+  }
+})
 
 // Load group details (services)
 async function loadGroupData(groupName: string) {
@@ -144,7 +168,7 @@ async function loadGroupData(groupName: string) {
     allServicesCache.value = allServices
     
     // Get services for current group
-    const servicesWithIncoming = await resourceService.getServicesByGroup(groupName)
+    const servicesWithIncoming = await resourceService.getServicesByGroupWithContext(groupName)
     
     // Get group info
     const info = await resourceService.getGroupInfo(groupName).catch(() => null)
@@ -175,6 +199,7 @@ async function loadGroupData(groupName: string) {
 // Navigation functions
 function goHome() {
   console.log('Going home - switching to overview mode')
+  router.push('/')
   currentMode.value = 'overview'
   currentGroup.value = ''
   selectedGroup.value = null
@@ -201,13 +226,19 @@ function goBack() {
 }
 
 // Load group services (double-click behavior)
-async function loadGroupServices(groupName: string, addToHistory: boolean = true) {
+async function loadGroupServices(groupName: string, addToHistory: boolean = true, updateUrl: boolean = true) {
   console.log(`Loading services for group: ${groupName}`)
   
   if (addToHistory && currentMode.value === 'group' && currentGroup.value) {
     navigationHistory.value.push(currentGroup.value)
   }
   
+  // Update URL only if requested (not when called from route watch)
+  if (updateUrl && route.query.group !== groupName) {
+    router.push(`/?group=${groupName}`)
+  }
+  
+  // Set mode and group immediately
   currentMode.value = 'group'
   currentGroup.value = groupName
   selectedGroup.value = groupName

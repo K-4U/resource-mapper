@@ -7,7 +7,7 @@ import type {
   GroupConnection,
   ServiceConnection
 } from '~/types'
-import { GroupPositionCalculator } from './useNodePositioning'
+import { GroupPositionCalculator, ContextualGroupPositioner } from './useNodePositioning'
 
 export function useGroupGraph() {
 
@@ -106,11 +106,14 @@ export function useGroupGraph() {
         }
 
         // Position main group in the center
+        const mainGroupX = 1000
+        const mainGroupY = 400
+        
         const mainGroup = new GroupNode(
             groupName,
             capitalizedGroupName,
-            500, // Center position
-            200,
+            mainGroupX,
+            mainGroupY,
             false
         )
 
@@ -182,7 +185,10 @@ export function useGroupGraph() {
                 outgoingTargets,
                 incomingSources,
                 hideIncomingConnections,
-                hideExternalToExternal
+                hideExternalToExternal,
+                mainGroupX,
+                mainGroupY,
+                mainGroup
             )
 
             // Process incoming connections (but only from visible external groups)
@@ -196,7 +202,12 @@ export function useGroupGraph() {
                 tempEdges,
                 targetHandleCounters,
                 outgoingTargets,
-                incomingSources
+                incomingSources,
+                mainGroupX,
+                mainGroupY,
+                hideIncomingConnections,
+                hideExternalToExternal,
+                mainGroup
             )
         })
 
@@ -222,8 +233,11 @@ export function useGroupGraph() {
                         targetHandleCounters,
                         outgoingTargets,
                         incomingSources,
+                        mainGroupX,
+                        mainGroupY,
                         hideIncomingConnections,
-                        hideExternalToExternal
+                        hideExternalToExternal,
+                        mainGroup
                     )
                 }
             })
@@ -258,7 +272,10 @@ export function useGroupGraph() {
         outgoingTargets: Set<string>,
         incomingSources: Set<string>,
         hideIncomingConnections: boolean = false,
-        hideExternalToExternal: boolean = false
+        hideExternalToExternal: boolean = false,
+        mainGroupX: number,
+        mainGroupY: number,
+        mainGroup: any
     ) {
         if (!service.outgoingConnections) return
 
@@ -276,7 +293,10 @@ export function useGroupGraph() {
                     outgoingTargets,
                     incomingSources,
                     hideIncomingConnections,
-                    hideExternalToExternal
+                    hideExternalToExternal,
+                    mainGroupX,
+                    mainGroupY,
+                    mainGroup
                 )
             }
 
@@ -322,7 +342,7 @@ export function useGroupGraph() {
                 targetHandle: targetHandle, // Will be updated later
                 sourceHandle: 'output-temp', // Will be updated later
                 label: connection.connectionType,
-                type: 'smoothstep',
+                // type: 'smoothstep',
                 animated: isTargetExternal || isSourceExternal,
                 class: edgeClasses.join(' '),
                 markerEnd: MarkerType.ArrowClosed
@@ -341,8 +361,11 @@ export function useGroupGraph() {
         targetHandleCounters: Map<string, number>,
         outgoingTargets: Set<string>,
         incomingSources: Set<string>,
+        mainGroupX: number,
+        mainGroupY: number,
         hideIncomingConnections: boolean = false,
-        hideExternalToExternal: boolean = false
+        hideExternalToExternal: boolean = false,
+        mainGroup?: any
     ) {
         // Use the pre-calculated incoming connections from the service
         if (!service.incomingConnections || service.incomingConnections.length === 0) {
@@ -370,7 +393,10 @@ export function useGroupGraph() {
                 outgoingTargets,
                 incomingSources,
                 hideIncomingConnections,
-                hideExternalToExternal
+                hideExternalToExternal,
+                mainGroupX,
+                mainGroupY,
+                mainGroup
             )
             
             // Now the source service should be in externalServiceMap
@@ -404,9 +430,6 @@ export function useGroupGraph() {
                         edgeClasses.push('internal-connection')
                     }
                     
-                    // Add legacy classes for backward compatibility
-                    edgeClasses.push('external')
-                    
                     // Mark connections involving incoming-only services
                     if (incomingSources.has(sourceId) && !outgoingTargets.has(sourceId)) {
                         edgeClasses.push('incoming-only-connection')
@@ -419,7 +442,7 @@ export function useGroupGraph() {
                         targetHandle: targetHandle, // Will be updated later
                         sourceHandle: 'output-temp', // Will be updated later
                         label: incomingConnection.connectionType,
-                        type: 'smoothstep',
+                        // type: 'smoothstep',
                         animated: true, // External connections are animated
                         class: edgeClasses.join(' '),
                         markerEnd: MarkerType.ArrowClosed
@@ -440,7 +463,10 @@ export function useGroupGraph() {
         outgoingTargets: Set<string>,
         incomingSources: Set<string>,
         hideIncomingConnections: boolean = false,
-        hideExternalToExternal: boolean = false
+        hideExternalToExternal: boolean = false,
+        mainGroupX: number,
+        mainGroupY: number,
+        mainGroup?: any
     ) {
         // Only process services that are directly relevant to the current group
         if (!outgoingTargets.has(targetId) && !incomingSources.has(targetId)) {
@@ -469,47 +495,67 @@ export function useGroupGraph() {
                 outgoingTargets.has(`${service.groupName}/${service.identifier}`)
             )
 
-            // Position based on relationship type
-            let xPosition: number
-            if (hasIncomingSources && !hasOutgoingTargets) {
-                // Pure incoming sources go to the left
-                xPosition = 50
-            } else if (hasOutgoingTargets && !hasIncomingSources) {
-                // Pure outgoing targets go to the right  
-                xPosition = 950
-            } else {
-                // Mixed relationship - place based on which is more dominant
-                const incomingCount = groupServices.filter(service => 
-                    incomingSources.has(`${service.groupName}/${service.identifier}`)
-                ).length
-                const outgoingCount = groupServices.filter(service => 
-                    outgoingTargets.has(`${service.groupName}/${service.identifier}`)  
-                ).length
-                
-                if (incomingCount > outgoingCount) {
-                    xPosition = 50  // More incoming - place left
-                } else {
-                    xPosition = 950 // More outgoing or equal - place right
-                }
-            }
+        const mainGroupBounds = {
+            x: mainGroupX,
+            y: mainGroupY,
+            width: mainGroup?.width || 400, 
+            height: mainGroup?.height || 300
+        }
+        
+        const contextualPositioner = new ContextualGroupPositioner(mainGroupBounds)
 
-            // Stack groups vertically based on existing groups in the same position
-            const existingGroupsAtPosition = Array.from(externalGroups.values())
-                .filter(group => Math.abs(group.position.x - xPosition) < 50)
-            const yOffset = existingGroupsAtPosition.length * 250
-
-            const externalGroup = new GroupNode(
-                targetGroupName,
-                capitalizedExtGroupName,
-                xPosition,
-                200 + yOffset, // Align with main group vertically
-                true,
-                {
-                    connectionDirection: 'horizontal',
-                    sourceSide: xPosition < 500 ? 'right' : 'left', // Left groups connect from right, right groups from left
-                    targetSide: xPosition < 500 ? 'left' : 'right'  // Opposite for target side
-                }
+        // Determine side: incoming sources on left/top, outgoing targets on right/bottom
+        let side: 'left' | 'right' | 'top' | 'bottom'
+        
+        // Dynamic side selection based on connection patterns
+        // 1. Strictly source-like groups (only outgoing TO main group) -> TOP
+        // 2. Strictly sink-like groups (only incoming FROM main group) -> BOTTOM
+        // 3. Otherwise, use connection dominance (LEFT for sources, RIGHT for targets)
+        
+        if (hasIncomingSources && !hasOutgoingTargets) {
+            // Strictly a source for us.
+            // Check if it's ONLY a source (no connections from us)
+            const isStrictlySource = !groupServices.some(service => 
+                outgoingTargets.has(`${service.groupName}/${service.identifier}`)
             )
+            side = isStrictlySource ? 'top' : 'left'
+        } else if (hasOutgoingTargets && !hasIncomingSources) {
+            // Strictly a target for us.
+            // Check if it's ONLY a target (no connections from it to us)
+            const isStrictlyTarget = !groupServices.some(service => 
+                incomingSources.has(`${service.groupName}/${service.identifier}`)
+            )
+            side = isStrictlyTarget ? 'bottom' : 'right'
+        } else {
+            // Mixed relationship - place based on which is more dominant
+            const incomingCount = groupServices.filter(service => 
+                incomingSources.has(`${service.groupName}/${service.identifier}`)
+            ).length
+            const outgoingCount = groupServices.filter(service => 
+                outgoingTargets.has(`${service.groupName}/${service.identifier}`)  
+            ).length
+            
+            side = incomingCount > outgoingCount ? 'left' : 'right'
+        }
+
+        const position = contextualPositioner.calculatePosition(
+            targetGroupName,
+            side,
+            Array.from(externalGroups.entries()).map(([id, group]) => ({ id, position: group.position }))
+        )
+
+        const externalGroup = new GroupNode(
+            targetGroupName,
+            capitalizedExtGroupName,
+            position.x,
+            position.y,
+            true,
+            {
+                connectionDirection: (side === 'top' || side === 'bottom') ? 'vertical' : 'horizontal',
+                sourceSide: side === 'left' ? 'right' : (side === 'right' ? 'left' : (side === 'top' ? 'bottom' : 'top')),
+                targetSide: side === 'left' ? 'left' : (side === 'right' ? 'right' : (side === 'top' ? 'top' : 'bottom'))
+            }
+        )
 
             const externalGroupServices = allServices[targetGroupName] || []
             // Clean external services of global incoming connections to avoid extra target handles

@@ -75,6 +75,9 @@ export class GroupNode implements Partial<Node> {
     private readonly services: ServiceNode[] = []
     private readonly positionCalculator: NodePositionCalculator
 
+    public width: number = 400
+    public height: number = 300
+
     constructor(
         private readonly groupName: string,
         displayName: string,
@@ -169,8 +172,8 @@ export class GroupNode implements Partial<Node> {
         }
 
         // Use default dimensions - actual dimensions will be calculated from DOM
-        const defaultWidth = this.services.length === 0 ? 200 : 300
-        const defaultHeight = this.services.length === 0 ? 150 : 200
+        const defaultWidth = this.width
+        const defaultHeight = this.height
         
         return {
             id: this.id,

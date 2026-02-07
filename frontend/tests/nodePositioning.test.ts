@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { NodePositionCalculator, type ServiceNodeInfo } from '../composables/useNodePositioning'
+import { NodePositionCalculator, type ServiceNodeInfo, ContextualGroupPositioner } from '../composables/useNodePositioning'
 import { detectCollision, type NodeBounds } from '../utils/collisionDetection'
 import type { ServiceDefinition } from '../types'
 
@@ -230,6 +230,94 @@ describe('NodePositionCalculator', () => {
       
       const config = calculator.getConfig()
       verifyNoOverlaps(positions, config)
+    })
+  })
+
+  describe('ContextualGroupPositioner', () => {
+    const mainGroupBounds = { x: 1000, y: 400, width: 400, height: 300 }
+    let positioner: ContextualGroupPositioner
+
+    beforeEach(() => {
+      positioner = new ContextualGroupPositioner(mainGroupBounds)
+    })
+
+    it('should position a group on the left side', () => {
+      const pos = positioner.calculatePosition('group1', 'left', [])
+      expect(pos.x).toBeLessThan(mainGroupBounds.x)
+      expect(pos.y).toBe(mainGroupBounds.y)
+    })
+
+    it('should position a group on the right side', () => {
+      const pos = positioner.calculatePosition('group1', 'right', [])
+      expect(pos.x).toBeGreaterThan(mainGroupBounds.x + mainGroupBounds.width)
+      expect(pos.y).toBe(mainGroupBounds.y)
+    })
+
+    it('should avoid overlaps when multiple groups are on the same side', () => {
+      const existingGroups = [
+        { id: 'group1', position: positioner.calculatePosition('group1', 'left', []) }
+      ]
+      
+      const pos2 = positioner.calculatePosition('group2', 'left', existingGroups)
+      
+      expect(pos2.y).not.toBe(existingGroups[0]!.position.y)
+      
+      // Verify no vertical overlap
+      const h = 300 // groupHeight from class
+      const overlap = !(pos2.y + h < existingGroups[0]!.position.y || pos2.y > existingGroups[0]!.position.y + h)
+      expect(overlap).toBe(false)
+    })
+
+    it('should stack multiple groups correctly on the same side', () => {
+      const existingGroups: { id: string; position: { x: number; y: number } }[] = []
+      
+      const pos1 = positioner.calculatePosition('group1', 'left', existingGroups)
+      existingGroups.push({ id: 'group1', position: pos1 })
+      
+      const pos2 = positioner.calculatePosition('group2', 'left', existingGroups)
+      existingGroups.push({ id: 'group2', position: pos2 })
+      
+      const pos3 = positioner.calculatePosition('group3', 'left', existingGroups)
+      existingGroups.push({ id: 'group3', position: pos3 })
+      
+      // pos1.y should be 400 (baseY)
+      // pos2.y should be 400 + 300 + 40 = 740
+      // pos3.y should be 740 + 300 + 40 = 1080
+      
+      expect(pos1.y).toBe(400)
+      expect(pos2.y).toBe(740)
+      expect(pos3.y).toBe(1080)
+      
+      // Check if it handles 'right' side correctly too
+      const rightGroups: { id: string; position: { x: number; y: number } }[] = []
+      const posR1 = positioner.calculatePosition('groupR1', 'right', rightGroups)
+      rightGroups.push({ id: 'groupR1', position: posR1 })
+      const posR2 = positioner.calculatePosition('groupR2', 'right', rightGroups)
+      
+      expect(posR1.y).toBe(400)
+      expect(posR2.y).toBe(740)
+    })
+
+    it('should position groups correctly on top and bottom', () => {
+      const posTop = positioner.calculatePosition('frontend', 'top', [])
+      expect(posTop.y).toBeLessThan(mainGroupBounds.y)
+      expect(posTop.x).toBe(mainGroupBounds.x + (mainGroupBounds.width - 400) / 2)
+
+      const posBottom = positioner.calculatePosition('data', 'bottom', [])
+      expect(posBottom.y).toBeGreaterThan(mainGroupBounds.y + mainGroupBounds.height)
+      expect(posBottom.x).toBe(mainGroupBounds.x + (mainGroupBounds.width - 400) / 2)
+    })
+
+    it('should stack multiple groups horizontally when on top/bottom', () => {
+      const existingGroups: { id: string; position: { x: number; y: number } }[] = []
+      
+      const pos1 = positioner.calculatePosition('top1', 'top', existingGroups)
+      existingGroups.push({ id: 'top1', position: pos1 })
+      
+      const pos2 = positioner.calculatePosition('top2', 'top', existingGroups)
+      
+      expect(pos2.x).toBe(pos1.x + 400 + 40)
+      expect(pos2.y).toBe(pos1.y)
     })
   })
 })
