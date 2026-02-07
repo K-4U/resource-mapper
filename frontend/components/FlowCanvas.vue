@@ -45,8 +45,10 @@
 <script setup lang="ts">
 import VueMermaidString from 'vue-mermaid-string'
 import type { MermaidConfig } from 'mermaid'
+import mermaid from 'mermaid'
 import Legend from '~/components/Legend.vue'
 import DiagramToolbar from '~/components/DiagramToolbar.vue'
+import awsIcons from "~/assets/icons/aws-icons-mermaid.json";
 
 interface Props {
   diagram: string
@@ -114,6 +116,24 @@ onMounted(() => {
     }
   }
 })
+
+
+console.debug('[Mermaid Icons] Registering Mermaid icon packs for current view')
+try {
+  mermaid.registerIconPacks([
+    {
+      name: 'logos',
+      loader: () => {
+        console.debug("[Mermaid Icons] Loading 'logos' icon pack from unpkg.com");
+        return import('@iconify-json/logos').then((module) => module.icons);
+      }
+    }
+  ])
+  console.debug('[Mermaid Icons] Icon packs ready')
+} catch (error) {
+  console.warn('Unable to register AWS icon pack for mermaid:', error)
+}
+
 
 
 function toggleDarkMode() {

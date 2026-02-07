@@ -21,7 +21,7 @@ export function buildGroupServicesDiagram(group: GroupInfo, services: ServiceDef
   services.forEach(service => {
     const nodeId = getServiceNodeId(service.identifier)
     const label = escapeLabel(service.friendlyName)
-    lines.push(`service ${nodeId}(server)[${label}] in ${groupNodeId}`)
+    lines.push(`service ${nodeId}(logos:aws-lambda)[${label}] in ${groupNodeId}`)
   })
 
   return lines.join('\n')

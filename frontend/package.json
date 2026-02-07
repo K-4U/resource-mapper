@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@iconify-json/logos": "^1.2.10",
     "@quasar/extras": "^1.17.0",
     "adm-zip": "^0.5.16",
     "js-yaml": "^4.1.0",

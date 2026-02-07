@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    'nuxt-quasar-ui'
+    'nuxt-quasar-ui',
   ],
 
   quasar: {
