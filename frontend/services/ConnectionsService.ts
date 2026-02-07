@@ -1,13 +1,29 @@
-import type { ServiceConnection } from '~/types'
+import type { ServiceConnection, ServiceIdentifier } from '~/types'
 import type { GroupConnection } from '~/types'
 import { servicesService } from './ServicesService'
 
-function getGroupFromServiceIdentifier(identifier: string) {
-  return identifier?.split('/')?.[0] ?? ''
+const SERVICE_KEY_SEPARATOR = '/'
+
+const toServiceKey = (identifier: ServiceIdentifier) => `${identifier.groupId}${SERVICE_KEY_SEPARATOR}${identifier.serviceId}`
+
+function getGroupFromServiceIdentifier(identifier: ServiceIdentifier | string) {
+  if (typeof identifier === 'string') {
+    return identifier.split(SERVICE_KEY_SEPARATOR)?.[0] ?? ''
+  }
+  return identifier?.groupId ?? ''
+}
+
+function cloneConnection(edge: ServiceConnection): ServiceConnection {
+  return {
+    startService: { ...edge.startService },
+    targetService: { ...edge.targetService },
+    connectionType: edge.connectionType,
+    description: edge.description
+  }
 }
 
 function cloneEdges(edges: ServiceConnection[]): ServiceConnection[] {
-  return edges.map(edge => ({ ...edge }))
+  return edges.map(cloneConnection)
 }
 
 class ConnectionsService {
@@ -17,27 +33,28 @@ class ConnectionsService {
   private groupConnectionCounts = new Map<string, Map<string, number>>()
   private loaded = false
 
-  private addServiceToGroup(groupId: string, serviceId: string) {
+  private addServiceToGroup(groupId: string, serviceKey: string) {
     if (!this.servicesByGroup.has(groupId)) {
       this.servicesByGroup.set(groupId, new Set())
     }
-    this.servicesByGroup.get(groupId)!.add(serviceId)
+    this.servicesByGroup.get(groupId)!.add(serviceKey)
   }
 
-  private addEdge(source: string, edge: ServiceConnection) {
-    if (!this.connectionsFromService.has(source)) {
-      this.connectionsFromService.set(source, [])
+  private addEdge(sourceKey: string, edge: ServiceConnection) {
+    if (!this.connectionsFromService.has(sourceKey)) {
+      this.connectionsFromService.set(sourceKey, [])
     }
-    this.connectionsFromService.get(source)!.push(edge)
+    this.connectionsFromService.get(sourceKey)!.push(edge)
 
-    if (!this.connectionsToService.has(edge.targetService)) {
-      this.connectionsToService.set(edge.targetService, [])
+    const targetKey = toServiceKey(edge.targetService)
+    if (!this.connectionsToService.has(targetKey)) {
+      this.connectionsToService.set(targetKey, [])
     }
-    this.connectionsToService.get(edge.targetService)!.push(edge)
-    this.recordGroupConnection(source, edge.targetService)
+    this.connectionsToService.get(targetKey)!.push(edge)
+    this.recordGroupConnection(edge.startService, edge.targetService)
   }
 
-  private recordGroupConnection(sourceService: string, targetService: string) {
+  private recordGroupConnection(sourceService: ServiceIdentifier, targetService: ServiceIdentifier) {
     const sourceGroup = getGroupFromServiceIdentifier(sourceService)
     const targetGroup = getGroupFromServiceIdentifier(targetService)
     if (!this.groupConnectionCounts.has(sourceGroup)) {
@@ -52,17 +69,19 @@ class ConnectionsService {
       return
     }
     const services = await servicesService.getAllServices()
-    Object.entries(services).forEach(([identifier, service]) => {
-      const startService = `${service.groupName}/${service.identifier}`
-      this.addServiceToGroup(service.groupName, startService)
+    Object.values(services).forEach(service => {
+      const startServiceKey = `${service.groupName}/${service.identifier}`
+      const startTemplate: ServiceIdentifier = { groupId: service.groupName, serviceId: service.identifier }
+      this.addServiceToGroup(service.groupName, startServiceKey)
+
       service.outgoingConnections?.forEach(connection => {
         const edge: ServiceConnection = {
-          startService,
+          startService: { ...startTemplate },
           connectionType: connection.connectionType,
-          targetService: connection.targetIdentifier,
+          targetService: { ...connection.targetIdentifier },
           description: connection.description
         }
-        this.addEdge(startService, edge)
+        this.addEdge(startServiceKey, edge)
       })
     })
     this.loaded = true
@@ -85,13 +104,13 @@ class ConnectionsService {
       return []
     }
     const results: ServiceConnection[] = []
-    serviceIds.forEach(serviceId => {
-      const edges = this.connectionsFromService.get(serviceId)
+    serviceIds.forEach(serviceKey => {
+      const edges = this.connectionsFromService.get(serviceKey)
       if (!edges) {
         return
       }
       edges.forEach(edge => {
-        const targetGroup = getGroupFromServiceIdentifier(edge.targetService)
+        const targetGroup = edge.targetService.groupId
         if (!includeSelfConnections && targetGroup === groupId) {
           return
         }
@@ -109,12 +128,12 @@ class ConnectionsService {
     }
     const prefix = `${groupId}/`
     const results: ServiceConnection[] = []
-    this.connectionsToService.forEach((edges, targetService) => {
-      if (!targetService.startsWith(prefix)) {
+    this.connectionsToService.forEach((edges, targetKey) => {
+      if (!targetKey.startsWith(prefix)) {
         return
       }
       edges.forEach(edge => {
-        const startGroup = getGroupFromServiceIdentifier(edge.startService)
+        const startGroup = edge.startService.groupId
         if (!includeSelfConnections && startGroup === groupId) {
           return
         }

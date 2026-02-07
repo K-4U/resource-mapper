@@ -31,34 +31,38 @@ describe('ConnectionsService', () => {
   it('returns outgoing connections for a service', async () => {
     const connections = await connectionsService.getConnectionsFromService('api/gateway')
     expect(connections).toHaveLength(2)
-    expect(connections.map(conn => conn.targetService).sort()).toEqual([
-      'data/warehouse',
-      'frontend/site'
-    ])
+    expect(
+      connections
+        .map(conn => `${conn.targetService.groupId}/${conn.targetService.serviceId}`)
+        .sort()
+    ).toEqual(['data/warehouse', 'frontend/site'])
     expect(connections[0].description).toBe('Calls warehouse')
   })
 
   it('returns incoming connections for a service', async () => {
     const connections = await connectionsService.getConnectionsToService('frontend/site')
     expect(connections).toHaveLength(2)
-    expect(connections.map(conn => conn.startService).sort()).toEqual([
-      'api/gateway',
-      'data/warehouse'
-    ])
+    expect(
+      connections
+        .map(conn => `${conn.startService.groupId}/${conn.startService.serviceId}`)
+        .sort()
+    ).toEqual(['api/gateway', 'data/warehouse'])
   })
 
   it('returns outgoing connections for a group', async () => {
     const connections = await connectionsService.getConnectionsFromGroup('api')
     expect(connections).toHaveLength(2)
-    expect(new Set(connections.map(conn => conn.startService))).toEqual(new Set(['api/gateway']))
+    expect(
+      new Set(connections.map(conn => `${conn.startService.groupId}/${conn.startService.serviceId}`))
+    ).toEqual(new Set(['api/gateway']))
   })
 
   it('returns incoming connections for a group', async () => {
     const connections = await connectionsService.getConnectionsToGroup('frontend')
     expect(connections).toHaveLength(2)
-    expect(new Set(connections.map(conn => conn.targetService))).toEqual(
-      new Set(['frontend/site'])
-    )
+    expect(
+      new Set(connections.map(conn => `${conn.targetService.groupId}/${conn.targetService.serviceId}`))
+    ).toEqual(new Set(['frontend/site']))
   })
 
   it('filters self-loop connections by default but can include them when requested', async () => {
@@ -68,7 +72,9 @@ describe('ConnectionsService', () => {
 
     const withSelf = await connectionsService.getConnectionsFromGroup('frontend', true)
     expect(withSelf).toHaveLength(1)
-    expect(withSelf[0]?.targetService).toBe('frontend/site')
+    expect(`${withSelf[0]?.targetService.groupId}/${withSelf[0]?.targetService.serviceId}`).toBe(
+      'frontend/site'
+    )
   })
 
   it('aggregates group connections with accurate counts', async () => {

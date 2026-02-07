@@ -1,23 +1,48 @@
 <template>
   <aside class="sidebar">
-    <q-toolbar class="bg-primary text-white">
-      <q-toolbar-title>Service Details</q-toolbar-title>
-      <q-btn icon="close" flat dense round @click="$emit('close')" />
-    </q-toolbar>
-
     <q-scroll-area class="fit">
       <q-card flat bordered class="q-ma-md">
-        <q-card-section>
-          <div class="text-h6 q-mb-xs">{{ service.friendlyName }}</div>
-          <div class="text-caption text-grey-7">{{ service.identifier }}</div>
+        <q-card-section class="bg-primary text-white">
+          <div class="text-caption text-uppercase">Group</div>
+          <div class="text-h6">{{ group.name }}</div>
+          <div class="text-body2 q-mt-sm" v-if="group.description">{{ group.description }}</div>
+          <div class="text-caption text-white-7 q-mt-sm">ID: {{ group.groupName }}</div>
+          <div v-if="group.teamId" class="text-caption text-white-7">Team: {{ group.teamId }}</div>
+        </q-card-section>
+      </q-card>
+
+      <q-card flat bordered class="q-ma-md">
+        <q-card-section class="row items-center justify-between">
+          <div>
+            <div class="text-caption text-uppercase">Service</div>
+            <div class="text-h6 q-mt-xs">
+              {{ service ? service.friendlyName : 'Select a service' }}
+            </div>
+          </div>
+          <q-btn
+            v-if="service"
+            icon="clear"
+            flat
+            dense
+            round
+            @click="$emit('clear-service')"
+            :aria-label="'Clear selected service'"
+          />
         </q-card-section>
 
         <q-separator />
 
-        <q-card-section>
-          <q-chip square color="accent" text-color="white">{{ service.serviceType }}</q-chip>
+        <q-card-section v-if="service">
+          <div class="text-caption text-grey-7">{{ service.identifier }}</div>
+          <q-chip square color="accent" text-color="white" class="q-mt-sm">
+            {{ service.serviceType }}
+          </q-chip>
           <p v-if="service.description" class="q-mt-md text-body2">{{ service.description }}</p>
-          <div v-else class="text-caption text-grey-7">No description provided.</div>
+          <div v-else class="text-caption text-grey-7 q-mt-md">No description provided.</div>
+        </q-card-section>
+
+        <q-card-section v-else class="text-caption text-grey-7">
+          Click a service node in the diagram to see its details here.
         </q-card-section>
       </q-card>
     </q-scroll-area>
@@ -25,15 +50,16 @@
 </template>
 
 <script setup lang="ts">
-import type { ServiceDefinition } from '~/types'
+import type { GroupInfo, ServiceDefinition } from '~/types'
 
 interface Props {
-  service: ServiceDefinition
+  group: GroupInfo
+  service?: ServiceDefinition | null
 }
 
 defineProps<Props>()
 
-defineEmits<{ close: [] }>()
+defineEmits<{ 'clear-service': [] }>()
 </script>
 
 <style scoped>
@@ -47,4 +73,3 @@ defineEmits<{ close: [] }>()
   flex-direction: column;
 }
 </style>
-

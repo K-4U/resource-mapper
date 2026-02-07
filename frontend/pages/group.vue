@@ -37,9 +37,9 @@
         @node-click="handleNodeClick"
       />
       <ServiceDetailSidebar
-        v-if="selectedService"
+        :group="groupInfo"
         :service="selectedService"
-        @close="selectedServiceId = null"
+        @clear-service="selectedServiceId = null"
       />
     </div>
   </div>
@@ -94,8 +94,12 @@ const services = computed<ServiceDefinition[]>(() => servicesData.value || [])
 const selectedServiceId = ref<string | null>(null)
 const serviceNodeLookup = computed<Record<string, ServiceDefinition>>(() => {
   const map: Record<string, ServiceDefinition> = {}
+  const currentGroupId = groupId.value
+  if (!currentGroupId) {
+    return map
+  }
   services.value.forEach(service => {
-    map[getServiceNodeId(service.identifier)] = service
+    map[getServiceNodeId(currentGroupId, service.identifier)] = service
   })
   return map
 })

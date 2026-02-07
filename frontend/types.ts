@@ -143,8 +143,13 @@ export enum ServiceType {
 // Models matching Java models exactly
 export interface ServiceLink {
   connectionType: ConnectionType
-  targetIdentifier: string  // Format: 'group/service-id'
+  targetIdentifier: ServiceIdentifier
   description: string
+}
+
+export interface ServiceIdentifier {
+    groupId: string
+    serviceId: string
 }
 
 export interface ServiceDefinition {
@@ -182,13 +187,37 @@ export interface GroupConnection {
 }
 
 export interface ServiceConnection {
-  startService: string
-  targetService: string
+  startService: ServiceIdentifier
+  targetService: ServiceIdentifier
   connectionType: ConnectionType
   description: string
 }
 
-// Validation functions to ensure YAML matches expected structure
+export function parseServiceIdentifier(value: unknown, contextLabel: string): ServiceIdentifier {
+   if (typeof value === 'string') {
+     const braceIndex = value.indexOf('{')
+     if (braceIndex !== -1 && value.endsWith('}')) {
+       const serviceId = value.slice(0, braceIndex)
+       const groupId = value.slice(braceIndex + 1, -1)
+       if (groupId && serviceId) {
+         return { groupId, serviceId }
+       }
+     }
+     const [groupId, serviceId] = value.split('/')
+     if (!groupId || !serviceId) {
+       throw new Error(`Invalid targetIdentifier for ${contextLabel}: must be in format 'group/service-id'`)
+     }
+     return { groupId, serviceId }
+   }
+   if (value && typeof value === 'object') {
+     const maybe = value as Partial<ServiceIdentifier>
+     if (typeof maybe.groupId === 'string' && maybe.groupId && typeof maybe.serviceId === 'string' && maybe.serviceId) {
+       return { groupId: maybe.groupId, serviceId: maybe.serviceId }
+     }
+   }
+   throw new Error(`Invalid targetIdentifier for ${contextLabel}: must be a string 'group/service' or an object with groupId and serviceId`)
+}
+
 export function validateServiceDefinition(data: any, identifier: string): ServiceDefinition {
   if (!data || typeof data !== 'object') {
     throw new Error(`Invalid service definition for ${identifier}: must be an object`)
@@ -213,26 +242,24 @@ export function validateServiceDefinition(data: any, identifier: string): Servic
         throw new Error(`Invalid connectionType for ${identifier} connection ${index}: must be one of ${Object.values(ConnectionType).join(', ')}`)
       }
 
-      if (!conn.targetIdentifier || typeof conn.targetIdentifier !== 'string' || !conn.targetIdentifier.includes('/')) {
-        throw new Error(`Invalid targetIdentifier for ${identifier} connection ${index}: must be in format 'group/service-id'`)
-      }
+      parseServiceIdentifier(conn.targetIdentifier, `${identifier} connection ${index}`)
 
-      if (!conn.description || typeof conn.description !== 'string') {
-        throw new Error(`Invalid description for ${identifier} connection ${index}: must be a non-empty string`)
-      }
-    })
-  }
+       if (!conn.description || typeof conn.description !== 'string') {
+         throw new Error(`Invalid description for ${identifier} connection ${index}: must be a non-empty string`)
+       }
+     })
+   }
 
-  return {
+   return {
     friendlyName: data.friendlyName,
     description: data.description,
     serviceType: data.serviceType as ServiceType,
     identifier: identifier,
-    outgoingConnections: data.outgoingConnections?.map((conn: any) => ({
-      connectionType: conn.connectionType as ConnectionType,
-      targetIdentifier: conn.targetIdentifier,
-      description: conn.description
-    })),
+    outgoingConnections: data.outgoingConnections?.map((conn: any, index: number) => ({
+       connectionType: conn.connectionType as ConnectionType,
+      targetIdentifier: parseServiceIdentifier(conn.targetIdentifier, `${identifier} connection ${index}`),
+       description: conn.description
+     })),
     incomingConnections: [], // Will be calculated later
     groupName: '' // Will be set by loader
   }
