@@ -10,17 +10,6 @@
       @click="$emit('go-home')"
       :disable="pending"
     />
-    <q-btn
-      v-if="canGoBack"
-      size="sm"
-      icon="arrow_back"
-      color="primary"
-      flat
-      round
-      dense
-      @click="$emit('go-back')"
-      :disable="pending"
-    />
     <q-separator vertical inset class="q-mx-sm" />
     <q-btn
       size="sm"
@@ -31,16 +20,6 @@
       @click="$emit('toggle-incoming')"
       :disable="pending"
       :title="hideIncomingConnections ? 'Show incoming connections' : 'Hide incoming connections'"
-    />
-    <q-btn
-      size="sm"
-      :icon="hideExternalToExternal ? 'link_off' : 'link'"
-      :color="hideExternalToExternal ? 'negative' : 'primary'"
-      flat
-      dense
-      @click="$emit('toggle-external-to-external')"
-      :disable="pending"
-      :title="hideExternalToExternal ? 'Show external-to-external links' : 'Hide external-to-external links'"
     />
     <q-separator vertical inset class="q-mx-sm" />
     <q-btn
@@ -79,25 +58,19 @@
 <script setup lang="ts">
 interface Props {
   pending?: boolean
-  canGoBack?: boolean
   hideIncomingConnections?: boolean
-  hideExternalToExternal?: boolean
   showLegend: boolean
   isDarkMode: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   pending: false,
-  canGoBack: false,
   hideIncomingConnections: false,
-  hideExternalToExternal: false
 })
 
 defineEmits<{
   'go-home': []
-  'go-back': []
   'toggle-incoming': []
-  'toggle-external-to-external': []
   'toggle-legend': []
   'toggle-dark-mode': []
   'log-diagram': []

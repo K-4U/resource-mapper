@@ -65,3 +65,10 @@ export function buildConnectionLine(
   }
   return `${indent}${sourceNodeId} --> ${targetNodeId}`
 }
+
+export function withDiagramConfig(
+  diagram: string,
+): string {
+    // return "config:\n        flowchart:\n            defaultRenderer: \"elk\"" + "\n\n" + diagram
+    return diagram;
+}

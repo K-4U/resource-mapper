@@ -30,11 +30,12 @@
 
     <div v-else class="group-layout">
       <FlowCanvas
-        class="group-canvas"
+         class="group-canvas"
         :diagram="diagramDefinition"
         :pending="pending"
         :show-toolbar="true"
         @node-click="handleNodeClick"
+        @node-double-click="handleNodeDoubleClick"
         @go-home="navigateHome"
       />
       <ServiceDetailSidebar
@@ -113,6 +114,22 @@ const serviceNodeLookup = computed<Record<string, ServiceDefinition>>(() => {
   })
   return map
 })
+const externalServiceNodeLookup = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  externalGroups.value.forEach(entry => {
+    entry.services.forEach(service => {
+      map[getServiceNodeIdFromDefinition(service)] = service.groupName
+    })
+  })
+  return map
+})
+const externalGroupNodeLookup = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  externalGroups.value.forEach(entry => {
+    map[`${entry.direction}_${entry.group.groupName}`] = entry.group.groupName
+  })
+  return map
+})
 const selectedService = computed(() => selectedServiceId.value ? serviceNodeLookup.value[selectedServiceId.value] ?? null : null)
 
 const externalGroups = computed<ExternalGroupServices[]>(() => externalServicesData.value || [])
@@ -136,6 +153,14 @@ function handleNodeClick(nodeId: string) {
   } else {
     selectedServiceId.value = null
   }
+}
+
+function handleNodeDoubleClick(nodeId: string) {
+  const externalGroupId = externalServiceNodeLookup.value[nodeId] || externalGroupNodeLookup.value[nodeId]
+  if (!externalGroupId) {
+    return
+  }
+  router.push({ path: '/group', query: { groupId: externalGroupId } })
 }
 
 function navigateHome() {

@@ -1,30 +1,30 @@
 <template>
   <div class="diagram-container">
     <DiagramToolbar
-      :pending="pending"
-      :can-go-back="canGoBack"
-      :hide-incoming-connections="hideIncomingConnections"
-      :hide-external-to-external="hideExternalToExternal"
-      :show-legend="showLegend"
-      :is-dark-mode="isDarkMode"
-      @go-home="emit('goHome')"
-      @go-back="emit('goBack')"
-      @toggle-incoming="emit('toggleIncomingConnections')"
-      @toggle-external-to-external="emit('toggleExternalToExternal')"
-      @toggle-legend="showLegend = !showLegend"
-      @toggle-dark-mode="toggleDarkMode"
-      @log-diagram="logCurrentDiagram"
+        :pending="pending"
+        :can-go-back="canGoBack"
+        :hide-incoming-connections="hideIncomingConnections"
+        :hide-external-to-external="hideExternalToExternal"
+        :show-legend="showLegend"
+        :is-dark-mode="isDarkMode.value"
+        @go-home="emit('goHome')"
+        @go-back="emit('goBack')"
+        @toggle-incoming="emit('toggleIncomingConnections')"
+        @toggle-external-to-external="emit('toggleExternalToExternal')"
+        @toggle-legend="showLegend = !showLegend"
+        @toggle-dark-mode="toggleDarkMode"
+        @log-diagram="logCurrentDiagram"
     />
 
     <div class="diagram-surface" :class="{ 'is-loading': pending }" ref="diagramSurfaceRef">
       <ClientOnly>
         <VueMermaidString
-          v-show="renderableDiagram"
-          :key="renderableDiagram"
-          :value="renderableDiagram"
-          :options="mermaidOptions"
-          @node-click="onMermaidNodeClick"
-          @parse-error="handleParseError"
+            v-show="renderableDiagram"
+            :key="diagramRenderKey"
+            :value="renderableDiagram"
+            :options="mermaidOptions"
+            @node-click="onMermaidNodeClick"
+            @parse-error="handleParseError"
         />
       </ClientOnly>
       <div v-if="!hasDiagram && !pending" class="diagram-placeholder">
@@ -33,7 +33,7 @@
     </div>
 
     <div v-if="showLegend && !pending" class="floating-legend">
-      <Legend />
+      <Legend/>
     </div>
 
     <q-banner v-if="parseError" class="diagram-error bg-negative text-white">
@@ -44,10 +44,11 @@
 
 <script setup lang="ts">
 import VueMermaidString from 'vue-mermaid-string'
-import type { MermaidConfig } from 'mermaid'
+import type {MermaidConfig} from 'mermaid'
 import mermaid from 'mermaid'
 import Legend from '~/components/Legend.vue'
 import DiagramToolbar from '~/components/DiagramToolbar.vue'
+import {withDiagramConfig} from '~/utils/mermaid/diagramHelpers'
 
 interface Props {
   diagram: string
@@ -83,17 +84,26 @@ const parseError = ref<string>('')
 const PLACEHOLDER_DIAGRAM = 'architecture-beta\nservice placeholder(server)["No data yet"]'
 
 const hasDiagram = computed(() => !!props.diagram?.trim())
-const renderableDiagram = computed(() => (hasDiagram.value ? props.diagram : PLACEHOLDER_DIAGRAM))
+const renderableDiagram = computed(() =>
+    hasDiagram.value
+        ? withDiagramConfig(props.diagram)
+        : PLACEHOLDER_DIAGRAM
+)
+const diagramRenderKey = computed(() => `${renderableDiagram.value}::${isDarkMode.value ? 'dark' : 'default'}`)
 
-const { $q } = useNuxtApp()
+const {$q} = useNuxtApp()
 const isDarkMode = computed(() => $q.dark.isActive)
 
 const mermaidOptions = computed(() => ({
-  darkMode: isDarkMode,
+  theme: isDarkMode.value ? 'dark' : 'default',
   securityLevel: 'loose',
   logLevel: 'info',
   architecture: {
     padding: 32
+  },
+  flowchart: {
+    htmlLabels: true,
+    curve: 'basis'
   },
   ...props.mermaidOptions
 }))
@@ -133,7 +143,6 @@ try {
 } catch (error) {
   console.warn('Unable to register AWS icon pack for mermaid:', error)
 }
-
 
 
 const DOUBLE_CLICK_THRESHOLD_MS = 400
