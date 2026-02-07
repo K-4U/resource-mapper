@@ -162,6 +162,11 @@ export interface ServiceDefinition {
   groupName: string  // Set from folder structure by loader
 }
 
+export interface ExternalGroupServices {
+  group: GroupInfo
+  services: ServiceDefinition[]
+}
+
 export interface GroupInfo {
   name: string
   description?: string
@@ -195,20 +200,15 @@ export interface ServiceConnection {
 
 export function parseServiceIdentifier(value: unknown, contextLabel: string): ServiceIdentifier {
    if (typeof value === 'string') {
-     const braceIndex = value.indexOf('{')
-     if (braceIndex !== -1 && value.endsWith('}')) {
-       const serviceId = value.slice(0, braceIndex)
-       const groupId = value.slice(braceIndex + 1, -1)
-       if (groupId && serviceId) {
-         return { groupId, serviceId }
-       }
-     }
-     const [groupId, serviceId] = value.split('/')
-     if (!groupId || !serviceId) {
-       throw new Error(`Invalid targetIdentifier for ${contextLabel}: must be in format 'group/service-id'`)
-     }
-     return { groupId, serviceId }
-   }
+      if (value.includes('{') || value.includes('}')) {
+        throw new Error(`Invalid targetIdentifier for ${contextLabel}: legacy 'service{group}' format is not supported`)
+      }
+      const [groupId, serviceId] = value.split('/')
+      if (!groupId || !serviceId) {
+        throw new Error(`Invalid targetIdentifier for ${contextLabel}: must be in format 'group/service-id'`)
+      }
+      return { groupId, serviceId }
+    }
    if (value && typeof value === 'object') {
      const maybe = value as Partial<ServiceIdentifier>
      if (typeof maybe.groupId === 'string' && maybe.groupId && typeof maybe.serviceId === 'string' && maybe.serviceId) {

@@ -1,6 +1,7 @@
 import yaml from 'js-yaml'
-import { validateServiceDefinition, type ServiceDefinition } from '~/types'
+import { validateServiceDefinition, type ExternalGroupServices, type GroupInfo, type ServiceDefinition } from '~/types'
 import { YamlEntityService } from './YamlEntityService'
+import { resourceService } from './ResourceService'
 
 class ServicesService extends YamlEntityService<ServiceDefinition> {
   constructor() {
@@ -41,7 +42,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
       return service
     } catch (error) {
       console.warn(`Failed to parse service ${identifier}:`, error)
-      return null
+      throw error
     }
   }
 
@@ -66,6 +67,50 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
 
   async getAllServices(): Promise<Record<string, ServiceDefinition>> {
     return this.fetchAllEntities()
+  }
+
+  async getExternalServicesForGroup(groupId: string): Promise<ExternalGroupServices[]> {
+    const services = await this.getServicesByGroup(groupId)
+    const groupedTargets = new Map<string, Set<string>>()
+
+    services.forEach(service => {
+      service.outgoingConnections?.forEach(connection => {
+        const target = connection.targetIdentifier
+        if (!target.groupId || !target.serviceId || target.groupId === groupId) {
+          return
+        }
+        if (!groupedTargets.has(target.groupId)) {
+          groupedTargets.set(target.groupId, new Set())
+        }
+        groupedTargets.get(target.groupId)!.add(target.serviceId)
+      })
+    })
+
+    const results: ExternalGroupServices[] = []
+    for (const [targetGroupId, serviceIds] of groupedTargets.entries()) {
+      const resolvedServices: ServiceDefinition[] = []
+      for (const serviceId of serviceIds) {
+        const definition = await this.getService(targetGroupId, serviceId)
+        if (definition) {
+          resolvedServices.push(definition)
+        }
+      }
+      if (!resolvedServices.length) {
+        continue
+      }
+      const group = (await resourceService.getGroup(targetGroupId)) ?? this.createFallbackGroup(targetGroupId)
+      results.push({ group, services: resolvedServices })
+    }
+    return results
+  }
+
+  private createFallbackGroup(groupId: string): GroupInfo {
+    return {
+      name: groupId,
+      description: undefined,
+      teamId: undefined,
+      groupName: groupId
+    }
   }
 
   __setServiceFileMocks(files: Record<string, string>) {

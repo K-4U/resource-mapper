@@ -4,7 +4,8 @@ import { ref } from 'vue'
 const { servicesServiceMock, useAsyncDataMock } = vi.hoisted(() => ({
   servicesServiceMock: {
     getServicesByGroup: vi.fn(),
-    getService: vi.fn()
+    getService: vi.fn(),
+    getExternalServicesForGroup: vi.fn()
   },
   useAsyncDataMock: vi.fn()
 }))
@@ -17,13 +18,14 @@ vi.mock('#app', () => ({
   useAsyncData: (...args: unknown[]) => useAsyncDataMock(...args)
 }))
 
-import { useServices, useService } from '~/composables/useServices'
+import { useServices, useService, useExternalServicesForGroup } from '~/composables/useServices'
 
 describe('useServices composable', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     servicesServiceMock.getServicesByGroup.mockReset()
     servicesServiceMock.getService.mockReset()
+    servicesServiceMock.getExternalServicesForGroup.mockReset()
     useAsyncDataMock.mockReset()
   })
 
@@ -107,5 +109,26 @@ describe('useServices composable', () => {
     const value = await fetcher()
     expect(value).toEqual([])
     expect(servicesServiceMock.getServicesByGroup).not.toHaveBeenCalled()
+  })
+
+  it('fetches external services for a group via useExternalServicesForGroup', async () => {
+    const asyncResult = { data: [] }
+    useAsyncDataMock.mockReturnValue(asyncResult)
+    servicesServiceMock.getExternalServicesForGroup.mockResolvedValue([])
+
+    const groupRef = ref('api')
+    const result = useExternalServicesForGroup(groupRef)
+
+    expect(result).toBe(asyncResult)
+    const [keyGetter, fetcher, options] = useAsyncDataMock.mock.calls[0]
+    expect(keyGetter()).toBe('external-services-api')
+
+    await fetcher()
+    expect(servicesServiceMock.getExternalServicesForGroup).toHaveBeenCalledWith('api')
+
+    groupRef.value = 'data'
+    expect(keyGetter()).toBe('external-services-data')
+    expect(options?.watch?.length).toBe(1)
+    expect(options?.watch?.[0]?.()).toBe('data')
   })
 })

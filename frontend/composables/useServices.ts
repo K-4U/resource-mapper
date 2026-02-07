@@ -1,7 +1,7 @@
 import { unref, type MaybeRef } from 'vue'
 import { useAsyncData } from '#app'
 import { servicesService } from '~/services/ServicesService'
-import type { ServiceDefinition } from '~/types'
+import type { ExternalGroupServices, ServiceDefinition } from '~/types'
 
 /**
  * Retrieves all services for the provided group identifier.
@@ -52,3 +52,21 @@ export function useService(
   )
 }
 
+export function useExternalServicesForGroup(groupId: MaybeRef<string | null | undefined>) {
+  return useAsyncData<ExternalGroupServices[]>(
+    () => {
+      const id = unref(groupId)
+      return id ? `external-services-${id}` : 'external-services-null'
+    },
+    () => {
+      const id = unref(groupId)
+      if (!id) {
+        return Promise.resolve([])
+      }
+      return servicesService.getExternalServicesForGroup(id)
+    },
+    {
+      watch: [() => unref(groupId)]
+    }
+  )
+}

@@ -50,14 +50,15 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from '#app'
 import { useGroups } from '~/composables/useGroups'
-import { useServices } from '~/composables/useServices'
+import { useExternalServicesForGroup, useServices } from '~/composables/useServices'
 import LoadingSpinner from '~/components/LoadingSpinner.vue'
 import ErrorDisplay from '~/components/ErrorDisplay.vue'
 import EmptyState from '~/components/EmptyState.vue'
 import FlowCanvas from '~/components/FlowCanvas.vue'
 import ServiceDetailSidebar from '~/components/ServiceDetailSidebar.vue'
-import { buildGroupServicesDiagram, getServiceNodeId } from '~/utils/mermaid/groupServicesDiagram'
-import type { GroupInfo, ServiceDefinition } from '~/types'
+import { buildGroupServicesDiagram } from '~/utils/mermaid/groupServicesDiagram'
+import { getServiceNodeIdFromDefinition } from '~/utils/mermaid/diagramHelpers'
+import type { ExternalGroupServices, GroupInfo, ServiceDefinition } from '~/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,8 +84,15 @@ const {
   refresh: refreshServices
 } = await useServices(groupId)
 
-const pending = computed(() => groupsPending.value || servicesPending.value)
-const error = computed(() => groupsError.value || servicesError.value)
+const {
+  data: externalServicesData,
+  pending: externalPending,
+  error: externalError,
+  refresh: refreshExternal
+} = await useExternalServicesForGroup(groupId)
+
+const pending = computed(() => groupsPending.value || servicesPending.value || externalPending.value)
+const error = computed(() => groupsError.value || servicesError.value || externalError.value)
 const loadingMessage = computed(() => 'Loading group overview...')
 const groupInfo = computed<GroupInfo | null>(() => {
   if (!groupId.value) {
@@ -101,22 +109,25 @@ const serviceNodeLookup = computed<Record<string, ServiceDefinition>>(() => {
     return map
   }
   services.value.forEach(service => {
-    map[getServiceNodeId(currentGroupId, service.identifier)] = service
+    map[getServiceNodeIdFromDefinition(service)] = service
   })
   return map
 })
 const selectedService = computed(() => selectedServiceId.value ? serviceNodeLookup.value[selectedServiceId.value] ?? null : null)
 
+const externalGroups = computed<ExternalGroupServices[]>(() => externalServicesData.value || [])
+
 const diagramDefinition = computed(() => {
   if (!groupInfo.value) {
     return ''
   }
-  return buildGroupServicesDiagram(groupInfo.value, services.value)
+  return buildGroupServicesDiagram(groupInfo.value, services.value, externalGroups.value)
 })
 
 function refreshData() {
   refreshGroups()
   refreshServices()
+  refreshExternal()
 }
 
 function handleNodeClick(nodeId: string) {
