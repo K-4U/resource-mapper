@@ -1,9 +1,11 @@
 import yaml from 'js-yaml'
-import { validateServiceDefinition, type ExternalGroupServices, type GroupInfo, type ServiceDefinition } from '~/types'
+import { validateServiceDefinition, type ExternalConnectionDirection, type ExternalGroupServices, type GroupInfo, type ServiceDefinition, type ServiceIncomingLink } from '~/types'
 import { YamlEntityService } from './YamlEntityService'
 import { resourceService } from './ResourceService'
 
 class ServicesService extends YamlEntityService<ServiceDefinition> {
+  private incomingConnectionsPopulated = false
+
   constructor() {
     super(import.meta.glob('../public/services/*/*.yaml', {
       eager: true,
@@ -47,10 +49,12 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   async getService(groupId: string, serviceId: string): Promise<ServiceDefinition | null> {
+    await this.ensureIncomingConnectionsPopulated()
     return this.fetchEntity(`${groupId}/${serviceId}`)
   }
 
   async getServicesByGroup(groupId: string): Promise<ServiceDefinition[]> {
+    await this.ensureIncomingConnectionsPopulated()
     const result: ServiceDefinition[] = []
     const prefix = `${groupId}/`
     for (const id of this.getIds()) {
@@ -66,12 +70,15 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   async getAllServices(): Promise<Record<string, ServiceDefinition>> {
-    return this.fetchAllEntities()
+    return this.ensureIncomingConnectionsPopulated()
   }
 
   async getExternalServicesForGroup(groupId: string): Promise<ExternalGroupServices[]> {
     const services = await this.getServicesByGroup(groupId)
-    const groupedTargets = new Map<string, Set<string>>()
+    const allServices = await this.getAllServices()
+
+    const outgoingTargets = new Map<string, Set<string>>()
+    const incomingTargets = new Map<string, Set<string>>()
 
     services.forEach(service => {
       service.outgoingConnections?.forEach(connection => {
@@ -79,28 +86,49 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
         if (!target.groupId || !target.serviceId || target.groupId === groupId) {
           return
         }
-        if (!groupedTargets.has(target.groupId)) {
-          groupedTargets.set(target.groupId, new Set())
+        if (!outgoingTargets.has(target.groupId)) {
+          outgoingTargets.set(target.groupId, new Set())
         }
-        groupedTargets.get(target.groupId)!.add(target.serviceId)
+        outgoingTargets.get(target.groupId)!.add(target.serviceId)
+      })
+
+      service.incomingConnections?.forEach(connection => {
+        const source = connection.sourceIdentifier
+        if (!source.groupId || !source.serviceId || source.groupId === groupId) {
+          return
+        }
+        if (!incomingTargets.has(source.groupId)) {
+          incomingTargets.set(source.groupId, new Set())
+        }
+        incomingTargets.get(source.groupId)!.add(source.serviceId)
       })
     })
 
     const results: ExternalGroupServices[] = []
-    for (const [targetGroupId, serviceIds] of groupedTargets.entries()) {
-      const resolvedServices: ServiceDefinition[] = []
-      for (const serviceId of serviceIds) {
-        const definition = await this.getService(targetGroupId, serviceId)
-        if (definition) {
-          resolvedServices.push(definition)
+    const buildEntries = async (
+      targetMap: Map<string, Set<string>>,
+      direction: ExternalConnectionDirection
+    ) => {
+      for (const [externalGroupId, serviceIds] of targetMap.entries()) {
+        const resolvedServices: ServiceDefinition[] = []
+        serviceIds.forEach(serviceId => {
+          const key = `${externalGroupId}/${serviceId}`
+          const definition = allServices[key]
+          if (definition) {
+            resolvedServices.push(definition)
+          }
+        })
+        if (!resolvedServices.length) {
+          continue
         }
+        const group = (await resourceService.getGroup(externalGroupId)) ?? this.createFallbackGroup(externalGroupId)
+        results.push({ group, services: resolvedServices, direction })
       }
-      if (!resolvedServices.length) {
-        continue
-      }
-      const group = (await resourceService.getGroup(targetGroupId)) ?? this.createFallbackGroup(targetGroupId)
-      results.push({ group, services: resolvedServices })
     }
+
+    await buildEntries(outgoingTargets, 'outgoing')
+    await buildEntries(incomingTargets, 'incoming')
+
     return results
   }
 
@@ -113,8 +141,43 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
     }
   }
 
+  private async ensureIncomingConnectionsPopulated(): Promise<Record<string, ServiceDefinition>> {
+    const services = await this.fetchAllEntities()
+    if (this.incomingConnectionsPopulated) {
+      return services
+    }
+
+    Object.values(services).forEach(service => {
+      service.incomingConnections = []
+    })
+
+    Object.entries(services).forEach(([, service]) => {
+      service.outgoingConnections?.forEach(connection => {
+        const target = connection.targetIdentifier
+        if (!target.groupId || !target.serviceId) {
+          return
+        }
+        const targetKey = `${target.groupId}/${target.serviceId}`
+        const targetService = services[targetKey]
+        if (!targetService) {
+          return
+        }
+        const incomingEntry: ServiceIncomingLink = {
+          connectionType: connection.connectionType,
+          sourceIdentifier: { groupId: service.groupName, serviceId: service.identifier },
+          description: connection.description
+        }
+        targetService.incomingConnections?.push(incomingEntry)
+      })
+    })
+
+    this.incomingConnectionsPopulated = true
+    return services
+  }
+
   __setServiceFileMocks(files: Record<string, string>) {
     this.setFileMocks(files)
+    this.incomingConnectionsPopulated = false
   }
 }
 

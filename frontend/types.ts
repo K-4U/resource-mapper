@@ -158,13 +158,22 @@ export interface ServiceDefinition {
   serviceType: ServiceType
   identifier: string  // Set from filename by loader
   outgoingConnections?: ServiceLink[]
-  incomingConnections?: ServiceLink[]  // Calculated at load time
+  incomingConnections?: ServiceIncomingLink[]  // Calculated at load time
   groupName: string  // Set from folder structure by loader
+}
+
+export type ExternalConnectionDirection = 'incoming' | 'outgoing'
+
+export interface ServiceIncomingLink {
+  connectionType: ConnectionType
+  sourceIdentifier: ServiceIdentifier
+  description: string
 }
 
 export interface ExternalGroupServices {
   group: GroupInfo
   services: ServiceDefinition[]
+  direction: ExternalConnectionDirection
 }
 
 export interface GroupInfo {
@@ -261,9 +270,9 @@ export function validateServiceDefinition(data: any, identifier: string): Servic
        description: conn.description
      })),
     incomingConnections: [], // Will be calculated later
-    groupName: '' // Will be set by loader
-  }
-}
+     groupName: '' // Will be set by loader
+   }
+ }
 
 export function validateGroupInfo(data: any, groupName: string): GroupInfo {
   if (!data || typeof data !== 'object') {

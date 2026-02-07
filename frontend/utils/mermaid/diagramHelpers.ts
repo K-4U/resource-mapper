@@ -16,8 +16,7 @@ export function buildServiceNodeLines(
 ): { nodeId: string; lines: string[] } {
     const indent = options.indent ?? DEFAULT_INDENT
     const nodeId = getServiceNodeIdFromDefinition(service)
-    const labelBody = service.friendlyName
-    const label = escapeLabel(labelBody)
+    const label = escapeLabel(service.friendlyName)
     return {
         nodeId,
         lines: [`${indent}${nodeId}["${label}"]`, `${indent}click ${nodeId}`]
@@ -31,10 +30,11 @@ export function getServiceNodeIdFromDefinition(service: ServiceDefinition): stri
 export interface GroupSubgraphOptions {
     indent?: string
     kind?: 'primary' | 'external'
+    customId?: string
 }
 
 export function getGroupSubgraphId(group: Pick<GroupInfo, 'groupName'>, kind: GroupSubgraphOptions['kind'] = 'primary'): string {
-    const prefix = kind === 'external' ? 'incoming' : 'group'
+    const prefix = kind === 'external' ? 'external' : 'group'
     return `${prefix}_${sanitizeNodePart(group.groupName)}`
 }
 
@@ -45,7 +45,7 @@ export function buildGroupSubgraphLines(
 ): string[] {
     const indent = options.indent ?? DEFAULT_INDENT
     const kind = options.kind ?? 'primary'
-    const groupId = getGroupSubgraphId(group, kind)
+    const groupId = options.customId ?? getGroupSubgraphId(group, kind)
     const safeLabel = escapeLabel(group.name)
     return [
         `${indent}subgraph ${groupId}["${safeLabel}"]`,

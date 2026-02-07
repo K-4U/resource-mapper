@@ -57,13 +57,13 @@ describe('ServicesService', () => {
     expect(result).toBeNull()
   })
 
-  it('returns external services grouped by target group', async () => {
-    resourceServiceMock.getGroup.mockResolvedValue({
-      name: 'Data Platform',
-      description: 'data team',
-      teamId: 'data',
-      groupName: 'data'
-    })
+  it('returns external services grouped by direction', async () => {
+    resourceServiceMock.getGroup.mockImplementation(async (groupId: string) => ({
+      name: groupId.toUpperCase(),
+      description: `${groupId} description`,
+      teamId: groupId,
+      groupName: groupId
+    }))
 
     const service = await createServicesService({
       '../public/services/api/gateway.yaml': `
@@ -77,29 +77,63 @@ outgoingConnections:
       '../public/services/api/payments.yaml': `
 friendlyName: Payments
 serviceType: LAMBDA
-outgoingConnections:
-  - connectionType: CALLS
-    targetIdentifier: data/warehouse
-    description: Uses warehouse
-`
-      ,
+`,
       '../public/services/data/warehouse.yaml': `
 friendlyName: Warehouse
 serviceType: REDSHIFT
+outgoingConnections:
+  - connectionType: CALLS
+    targetIdentifier: api/payments
+    description: Calls payments
 `
     })
 
     const result = await service.getExternalServicesForGroup('api')
 
-    expect(resourceServiceMock.getGroup).toHaveBeenCalledWith('data')
-    expect(result).toHaveLength(1)
-    expect(result[0].group).toEqual(
-      expect.objectContaining({ groupName: 'data' })
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          direction: 'outgoing',
+          group: expect.objectContaining({ groupName: 'data' }),
+          services: expect.arrayContaining([
+            expect.objectContaining({ identifier: 'warehouse', groupName: 'data' })
+          ])
+        }),
+        expect.objectContaining({
+          direction: 'incoming',
+          group: expect.objectContaining({ groupName: 'data' }),
+          services: expect.arrayContaining([
+            expect.objectContaining({ identifier: 'warehouse', groupName: 'data' })
+          ])
+        })
+      ])
     )
-    expect(result[0].services).toHaveLength(1)
-    expect(result[0].services[0]).toEqual(
-      expect.objectContaining({ identifier: 'warehouse', groupName: 'data' })
-    )
+  })
+
+  it('populates incoming connections on target services', async () => {
+    const service = await createServicesService({
+      '../public/services/api/payments.yaml': `
+friendlyName: Payments
+serviceType: LAMBDA
+`,
+      '../public/services/data/warehouse.yaml': `
+friendlyName: Warehouse
+serviceType: REDSHIFT
+outgoingConnections:
+  - connectionType: CALLS
+    targetIdentifier: api/payments
+    description: Calls payments
+`
+    })
+
+    const payments = await service.getService('api', 'payments')
+    expect(payments?.incomingConnections).toEqual([
+      expect.objectContaining({
+        connectionType: 'CALLS',
+        sourceIdentifier: { groupId: 'data', serviceId: 'warehouse' },
+        description: 'Calls payments'
+      })
+    ])
   })
 
   it('rejects legacy brace-based target identifiers', async () => {
