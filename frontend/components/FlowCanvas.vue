@@ -1,73 +1,19 @@
 <template>
   <div class="diagram-container">
-    <div class="diagram-toolbar" v-if="showToolbar">
-      <q-btn
-        v-if="showToolbar"
-        size="sm"
-        icon="home"
-        color="primary"
-        flat
-        round
-        dense
-        @click="emit('goHome')"
-        :disable="pending"
-      />
-      <q-btn
-        v-if="showToolbar && canGoBack"
-        size="sm"
-        icon="arrow_back"
-        color="primary"
-        flat
-        round
-        dense
-        @click="emit('goBack')"
-        :disable="pending"
-      />
-      <q-separator vertical v-if="showToolbar" inset class="q-mx-sm" />
-      <q-btn
-        v-if="showToolbar"
-        size="sm"
-        :icon="hideIncomingConnections ? 'visibility_off' : 'visibility'"
-        :color="hideIncomingConnections ? 'negative' : 'primary'"
-        flat
-        dense
-        @click="emit('toggleIncomingConnections')"
-        :disable="pending"
-        :title="hideIncomingConnections ? 'Show incoming connections' : 'Hide incoming connections'"
-      />
-      <q-btn
-        v-if="showToolbar"
-        size="sm"
-        :icon="hideExternalToExternal ? 'link_off' : 'link'"
-        :color="hideExternalToExternal ? 'negative' : 'primary'"
-        flat
-        dense
-        @click="emit('toggleExternalToExternal')"
-        :disable="pending"
-        :title="hideExternalToExternal ? 'Show external-to-external links' : 'Hide external-to-external links'"
-      />
-      <q-separator vertical inset class="q-mx-sm" />
-      <q-btn
-        size="sm"
-        :icon="showLegend ? 'receipt_long' : 'menu'"
-        color="secondary"
-        flat
-        dense
-        @click="showLegend = !showLegend"
-        :disable="pending"
-        :title="showLegend ? 'Hide legend' : 'Show legend'"
-      />
-      <q-btn
-        size="sm"
-        :icon="isDarkMode ? 'dark_mode' : 'light_mode'"
-        color="accent"
-        flat
-        dense
-        @click="toggleDarkMode"
-        :disable="pending"
-        :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
-      />
-    </div>
+    <DiagramToolbar
+      :pending="pending"
+      :can-go-back="canGoBack"
+      :hide-incoming-connections="hideIncomingConnections"
+      :hide-external-to-external="hideExternalToExternal"
+      :show-legend="showLegend"
+      :is-dark-mode="isDarkMode"
+      @go-home="emit('goHome')"
+      @go-back="emit('goBack')"
+      @toggle-incoming="emit('toggleIncomingConnections')"
+      @toggle-external-to-external="emit('toggleExternalToExternal')"
+      @toggle-legend="showLegend = !showLegend"
+      @toggle-dark-mode="toggleDarkMode"
+    />
 
     <div class="diagram-surface" :class="{ 'is-loading': pending }" ref="diagramSurfaceRef">
       <ClientOnly>
@@ -99,6 +45,7 @@
 import VueMermaidString from 'vue-mermaid-string'
 import type { MermaidConfig } from 'mermaid'
 import Legend from '~/components/Legend.vue'
+import DiagramToolbar from '~/components/DiagramToolbar.vue'
 
 interface Props {
   diagram: string
@@ -176,6 +123,7 @@ function toggleDarkMode() {
 }
 
 function onMermaidNodeClick(nodeId: string) {
+  console.log('Node clicked:', nodeId)
   emit('nodeClick', nodeId)
 }
 
