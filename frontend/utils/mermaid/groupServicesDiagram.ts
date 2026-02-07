@@ -1,4 +1,5 @@
 import type { GroupInfo, ServiceDefinition } from '~/types'
+import { getServiceCategory } from '~/utils/serviceTypeCategory'
 
 const sanitize = (value: string) => (value || 'node').replace(/[^a-zA-Z0-9_]/g, '_')
 const escapeLabel = (value: string) => (value || '').replace(/"/g, '\\"')
@@ -21,7 +22,8 @@ export function buildGroupServicesDiagram(group: GroupInfo, services: ServiceDef
   services.forEach(service => {
     const nodeId = getServiceNodeId(service.identifier)
     const label = escapeLabel(service.friendlyName)
-    lines.push(`service ${nodeId}(logos:aws-lambda)[${label}] in ${groupNodeId}`)
+    const iconCode = getServiceCategory(service.serviceType)
+    lines.push(`service ${nodeId}(${iconCode})[${label}] in ${groupNodeId}`)
   })
 
   return lines.join('\n')
