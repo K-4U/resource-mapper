@@ -22,7 +22,7 @@ export function useGroup(groupId: MaybeRef<string | null | undefined>) {
     () => {
       const id = unref(groupId)
       if (!id) {
-        return null
+        return Promise.resolve(null)
       }
       return resourceService.getGroup(id)
     },

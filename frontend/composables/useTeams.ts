@@ -22,7 +22,7 @@ export function useTeam(teamId: MaybeRef<string | null | undefined>) {
     () => {
       const id = unref(teamId)
       if (!id) {
-        return null
+        return Promise.resolve(null)
       }
       return teamsService.getTeam(id)
     },
@@ -31,4 +31,3 @@ export function useTeam(teamId: MaybeRef<string | null | undefined>) {
     }
   )
 }
-

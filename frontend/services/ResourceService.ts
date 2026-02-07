@@ -1,97 +1,52 @@
 import yaml from 'js-yaml'
 import { validateGroupInfo, type GroupInfo } from '~/types'
+import { YamlEntityService } from './YamlEntityService'
 
-let rawGroupInfoFiles = import.meta.glob('../public/services/*/group-info.yaml', {
-  eager: true,
-  import: 'default',
-  query: '?raw'
-}) as Record<string, string>
+class ResourceService extends YamlEntityService<GroupInfo> {
+  constructor() {
+    super(import.meta.glob('../public/services/*/group-info.yaml', {
+      eager: true,
+      import: 'default',
+      query: '?raw'
+    }) as Record<string, string>)
+  }
 
-const GROUP_FILE_INDEX: Record<string, string> = {}
-const GROUP_INFO_CACHE = new Map<string, GroupInfo>()
-
-function rebuildGroupIndex() {
-  Object.keys(GROUP_FILE_INDEX).forEach(key => { delete GROUP_FILE_INDEX[key] })
-  Object.keys(rawGroupInfoFiles).forEach(path => {
-    const normalized = path.replace(/\\/g, '/').replace('../public', '')
-    const segments = normalized.split('/').filter(Boolean)
-    const groupId = segments[1]
-    if (groupId) {
-      GROUP_FILE_INDEX[groupId] = normalized
-    }
-  })
-}
-
-rebuildGroupIndex()
-
-/**
- * Test-only hook that lets us inject virtual group-info files.
- */
-export function __setGroupFileMocks(files: Record<string, string>) {
-  rawGroupInfoFiles = files
-  GROUP_INFO_CACHE.clear()
-  rebuildGroupIndex()
-}
-
-/**
- * Parses the YAML contents of a group's group-info file into a Group object.
- */
-function parseGroupInfo(groupId: string, rawYaml: string): GroupInfo | null {
-  try {
-    const parsed = yaml.load(rawYaml)
-    if (!parsed || typeof parsed !== 'object') {
+  protected extractId(relativePath: string): string | null {
+    const segments = relativePath.split('/').filter(Boolean)
+    if (segments.length < 2) {
       return null
     }
-    return validateGroupInfo(parsed, groupId)
-  } catch (error) {
-    console.warn(`Failed to parse group info for ${groupId}:`, error)
-    return null
-  }
-}
-
-class ResourceService {
-  /**
-   * Loads and caches a group's metadata so subsequent calls avoid re-parsing YAML.
-   */
-  private loadGroupIntoCache(groupId: string) {
-    if (GROUP_INFO_CACHE.has(groupId)) {
-      return
-    }
-    const path = GROUP_FILE_INDEX[groupId]
-    if (!path) {
-      return
-    }
-    const rawYaml = rawGroupInfoFiles[`../public${path}`]
-    if (!rawYaml) {
-      return
-    }
-    const group = parseGroupInfo(groupId, rawYaml)
-    if (group) {
-      GROUP_INFO_CACHE.set(groupId, group)
-    }
+    return segments[1]
   }
 
-  /**
-   * Returns a single group descriptor by folder name.
-   */
-  async getGroup(groupId: string): Promise<GroupInfo | null> {
-    this.loadGroupIntoCache(groupId)
-    return GROUP_INFO_CACHE.get(groupId) ?? null
-  }
-
-  /**
-   * Lists every discovered group, keyed by its folder name.
-   */
-  async getAllGroups(): Promise<Record<string, GroupInfo>> {
-    const result: Record<string, GroupInfo> = {}
-    for (const groupId of Object.keys(GROUP_FILE_INDEX)) {
-      const group = await this.getGroup(groupId)
-      if (group) {
-        result[groupId] = group
+  protected parseEntity(groupId: string, rawYaml: string): GroupInfo | null {
+    try {
+      const parsed = yaml.load(rawYaml)
+      if (!parsed || typeof parsed !== 'object') {
+        return null
       }
+      return validateGroupInfo(parsed, groupId)
+    } catch (error) {
+      console.warn(`Failed to parse group info for ${groupId}:`, error)
+      return null
     }
-    return result
+  }
+
+  async getGroup(groupId: string): Promise<GroupInfo | null> {
+    return this.fetchEntity(groupId)
+  }
+
+  async getAllGroups(): Promise<Record<string, GroupInfo>> {
+    return this.fetchAllEntities()
+  }
+
+  __setGroupFileMocks(files: Record<string, string>) {
+    this.setFileMocks(files)
   }
 }
 
 export const resourceService = new ResourceService()
+
+export function __setGroupFileMocks(files: Record<string, string>) {
+  resourceService.__setGroupFileMocks(files)
+}

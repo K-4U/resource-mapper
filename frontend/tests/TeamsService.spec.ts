@@ -29,7 +29,6 @@ describe('TeamsService', () => {
       '../public/teams/data-wizards.yaml': `\nname: Data Wizards\n`
     })
 
-    const spy = vi.spyOn(service, 'getTeam')
     const teams = await service.getAllTeams()
 
     expect(teams).toEqual({
@@ -42,7 +41,6 @@ describe('TeamsService', () => {
         teamId: 'data-wizards'
       }
     })
-    expect(spy).toHaveBeenCalledTimes(2)
   })
 
   it('returns null for unknown teams', async () => {
