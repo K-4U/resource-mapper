@@ -1,22 +1,20 @@
 <template>
   <div class="loading-container">
-    <q-card flat bordered class="q-pa-xl" style="max-width: 500px;">
-      <q-card-section class="text-center">
-        <div class="text-h1 text-grey-5">{{ icon }}</div>
-        <div class="text-h5 text-grey-7 q-mt-md">{{ title }}</div>
-        <p class="text-body1 text-grey-6 q-mt-sm">{{ message }}</p>
-      </q-card-section>
-
-      <q-card-actions v-if="onAction" align="center" class="q-pt-md">
-        <q-btn
-          @click="onAction"
+    <v-card variant="outlined" class="pa-8" max-width="500">
+      <v-card-text class="text-center">
+        <div class="text-h2 text-medium-emphasis">{{ icon }}</div>
+        <div class="text-h5 text-high-emphasis mt-4">{{ title }}</div>
+        <p class="text-body-1 text-medium-emphasis mt-2">{{ message }}</p>
+      </v-card-text>
+      <v-card-actions v-if="onAction" class="justify-center">
+        <v-btn
           color="primary"
-          :label="actionLabel"
-          unelevated
-          size="lg"
+          :text="actionLabel"
+          size="large"
+          @click="onAction"
         />
-      </q-card-actions>
-    </q-card>
+      </v-card-actions>
+    </v-card>
   </div>
 </template>
 
@@ -29,4 +27,3 @@ defineProps<{
   onAction?: () => void
 }>()
 </script>
-

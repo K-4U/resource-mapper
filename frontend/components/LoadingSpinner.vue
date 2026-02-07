@@ -1,11 +1,13 @@
 <template>
   <div class="loading-container">
-    <div style="text-align: center;">
-      <q-spinner-dots
+    <div class="text-center">
+      <v-progress-circular
         color="primary"
-        size="80px"
+        size="80"
+        width="8"
+        indeterminate
       />
-      <p class="text-h6 q-mt-md text-grey-7">{{ message }}</p>
+      <p class="text-h6 mt-4 text-medium-emphasis">{{ message }}</p>
     </div>
   </div>
 </template>
@@ -15,4 +17,3 @@ defineProps<{
   message?: string
 }>()
 </script>
-

@@ -10,11 +10,6 @@
 
 body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    background-color: var(--q-grey-1);
-}
-
-body.body--dark {
-    background-color: var(--q-dark);
 }
 
 .diagram-container,
@@ -33,32 +28,6 @@ body.body--dark {
     height: auto;
     max-width: none;
     background-color: transparent;
-}
-
-.diagram-surface .mermaid .node rect,
-.diagram-surface .mermaid .node polygon,
-.diagram-surface .mermaid .node circle {
-    rx: 6px;
-    ry: 6px;
-    stroke-width: var(--group-border-width);
-}
-
-.diagram-surface .mermaid .label {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-}
-
-.diagram-surface .mermaid .edgeLabel {
-    font-size: 12px;
-    fill: var(--q-dark);
-}
-
-.body--dark .diagram-surface .mermaid .edgeLabel {
-    fill: var(--q-grey-4);
-}
-
-.diagram-placeholder {
-    color: var(--q-grey-7);
 }
 
 .loading-container {

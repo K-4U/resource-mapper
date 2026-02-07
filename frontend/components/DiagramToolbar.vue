@@ -1,56 +1,49 @@
 <template>
   <div class="diagram-toolbar">
-    <q-btn
-      size="sm"
-      icon="home"
-      color="primary"
-      flat
-      round
-      dense
+    <v-btn
+      icon="mdi-home"
+      variant="text"
+      size="small"
+      :disabled="pending"
       @click="$emit('go-home')"
-      :disable="pending"
     />
-    <q-separator vertical inset class="q-mx-sm" />
-    <q-btn
-      size="sm"
-      :icon="hideIncomingConnections ? 'visibility_off' : 'visibility'"
-      :color="hideIncomingConnections ? 'negative' : 'primary'"
-      flat
-      dense
+    <v-divider vertical class="mx-2" />
+    <v-btn
+      variant="text"
+      size="small"
+      :icon="hideIncomingConnections ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+      :color="hideIncomingConnections ? 'error' : 'primary'"
+      :disabled="pending"
       @click="$emit('toggle-incoming')"
-      :disable="pending"
       :title="hideIncomingConnections ? 'Show incoming connections' : 'Hide incoming connections'"
     />
-    <q-separator vertical inset class="q-mx-sm" />
-    <q-btn
-      size="sm"
-      icon="bug_report"
+    <v-divider vertical class="mx-2" />
+    <v-btn
+      icon="mdi-bug-outline"
       color="secondary"
-      flat
-      dense
-      @click="$emit('log-diagram')"
-      :disable="pending"
+      variant="text"
+      size="small"
+      :disabled="pending"
       title="Log Mermaid UML"
+      @click="$emit('log-diagram')"
     />
-    <q-btn
-      size="sm"
-      :icon="showLegend ? 'receipt_long' : 'menu'"
+    <v-btn
+      :icon="showLegend ? 'mdi-format-list-bulleted' : 'mdi-format-list-checkbox'"
       color="secondary"
-      flat
-      dense
-      @click="$emit('toggle-legend')"
-      :disable="pending"
+      variant="text"
+      size="small"
+      :disabled="pending"
       :title="showLegend ? 'Hide legend' : 'Show legend'"
+      @click="$emit('toggle-legend')"
     />
-    <q-btn
-      size="sm"
-      :icon="isDarkMode ? 'dark_mode' : 'light_mode'"
+    <v-btn
+      :icon="isDarkMode ? 'mdi-weather-night' : 'mdi-white-balance-sunny'"
       color="accent"
-      flat
-      dense
-      @click="$emit('toggle-dark-mode')"
-      :disable="pending"
+      variant="text"
+      size="small"
+      :disabled="pending"
       :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+      @click="$emit('toggle-dark-mode')"
     />
   </div>
 </template>
@@ -88,9 +81,8 @@ defineEmits<{
   z-index: 2;
 }
 
-.body--dark .diagram-toolbar {
+.v-theme--dark .diagram-toolbar {
   background-color: rgba(18, 18, 18, 0.9);
   border-color: rgba(255, 255, 255, 0.12);
 }
 </style>
-

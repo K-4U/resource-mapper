@@ -1,49 +1,41 @@
 <template>
   <aside class="sidebar">
-    <q-scroll-area class="fit">
-      <q-toolbar class="bg-primary text-white">
-        <q-toolbar-title>
-          <div class="text-subtitle1">Details</div>
-        </q-toolbar-title>
-        <q-btn flat dense round icon="close" @click="$emit('clear-selection')" />
-      </q-toolbar>
+    <v-sheet class="d-flex flex-column fill-height" elevation="0">
+      <v-toolbar color="primary" density="comfortable" dark>
+        <v-toolbar-title class="text-subtitle-1">Details</v-toolbar-title>
+        <v-spacer />
+        <v-btn icon="mdi-close" variant="text" density="comfortable" @click="$emit('clear-selection')" />
+      </v-toolbar>
 
-      <q-card flat bordered class="q-ma-md">
-        <q-card-section>
-          <div class="text-h6 q-mb-sm">{{ groupTitle }}</div>
-          <div v-if="groupInfo?.description" class="text-caption text-grey-7">
+      <v-card variant="outlined" class="ma-4">
+        <v-card-text>
+          <div class="text-h6 mb-2">{{ groupTitle }}</div>
+          <div v-if="groupInfo?.description" class="text-body-2 text-medium-emphasis">
             {{ groupInfo.description }}
           </div>
-          <div v-else-if="serviceId" class="text-caption text-grey-7">
+          <div v-else-if="serviceId" class="text-body-2 text-medium-emphasis">
             Service: {{ serviceId }}
           </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-list dense>
-          <q-item>
-            <q-item-section avatar>
-              <q-icon name="badge" color="primary" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Group ID</q-item-label>
-              <q-item-label caption>{{ groupId ?? '—' }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="teamInfo">
-            <q-item-section avatar>
-              <q-icon name="group" color="primary" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Team</q-item-label>
-              <q-item-label caption>{{ teamInfo.name }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card>
-    </q-scroll-area>
+        </v-card-text>
+        <v-divider />
+        <v-list density="compact">
+          <v-list-item>
+            <template #prepend>
+              <v-icon icon="mdi-badge-account" color="primary" class="mr-2" />
+            </template>
+            <v-list-item-title>Group ID</v-list-item-title>
+            <v-list-item-subtitle>{{ groupId ?? '—' }}</v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item v-if="teamInfo">
+            <template #prepend>
+              <v-icon icon="mdi-account-group" color="primary" class="mr-2" />
+            </template>
+            <v-list-item-title>Team</v-list-item-title>
+            <v-list-item-subtitle>{{ teamInfo.name }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-sheet>
   </aside>
 </template>
 
@@ -94,10 +86,7 @@ const groupTitle = computed(() => {
 .sidebar {
   width: 320px;
   height: 100%;
-  background-color: #f5f5f5;
-  border-left: 1px solid rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 </style>

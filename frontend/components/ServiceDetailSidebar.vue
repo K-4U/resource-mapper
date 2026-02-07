@@ -1,51 +1,45 @@
 <template>
   <aside class="sidebar">
-    <q-scroll-area class="fit">
-      <q-card flat bordered class="q-ma-md">
-        <q-card-section class="bg-primary text-white">
+    <v-sheet class="d-flex flex-column fill-height" elevation="0">
+      <v-card variant="outlined" class="ma-4">
+        <v-card-text class="bg-primary text-white">
           <div class="text-caption text-uppercase">Group</div>
           <div class="text-h6">{{ group.name }}</div>
-          <div class="text-body2 q-mt-sm" v-if="group.description">{{ group.description }}</div>
-          <div class="text-caption text-white-7 q-mt-sm">ID: {{ group.groupName }}</div>
-          <div v-if="group.teamId" class="text-caption text-white-7">Team: {{ group.teamId }}</div>
-        </q-card-section>
-      </q-card>
+          <div v-if="group.description" class="text-body-2 mt-2">{{ group.description }}</div>
+          <div class="text-caption mt-2">ID: {{ group.groupName }}</div>
+          <div v-if="group.teamId" class="text-caption">Team: {{ group.teamId }}</div>
+        </v-card-text>
+      </v-card>
 
-      <q-card flat bordered class="q-ma-md">
-        <q-card-section class="row items-center justify-between">
+      <v-card variant="outlined" class="ma-4">
+        <v-card-text class="d-flex align-center justify-space-between">
           <div>
             <div class="text-caption text-uppercase">Service</div>
-            <div class="text-h6 q-mt-xs">
-              {{ service ? service.friendlyName : 'Select a service' }}
-            </div>
+            <div class="text-h6 mt-1">{{ service ? service.friendlyName : 'Select a service' }}</div>
           </div>
-          <q-btn
+          <v-btn
             v-if="service"
-            icon="clear"
-            flat
-            dense
-            round
+            icon="mdi-close"
+            variant="text"
+            density="comfortable"
             @click="$emit('clear-service')"
             :aria-label="'Clear selected service'"
           />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section v-if="service">
-          <div class="text-caption text-grey-7">{{ service.identifier }}</div>
-          <q-chip square color="accent" text-color="white" class="q-mt-sm">
+        </v-card-text>
+        <v-divider />
+        <v-card-text v-if="service">
+          <div class="text-caption text-medium-emphasis">{{ service.identifier }}</div>
+          <v-chip class="mt-3" color="secondary" text-color="white" variant="flat">
             {{ service.serviceType }}
-          </q-chip>
-          <p v-if="service.description" class="q-mt-md text-body2">{{ service.description }}</p>
-          <div v-else class="text-caption text-grey-7 q-mt-md">No description provided.</div>
-        </q-card-section>
-
-        <q-card-section v-else class="text-caption text-grey-7">
+          </v-chip>
+          <p v-if="service.description" class="mt-4 text-body-2">{{ service.description }}</p>
+          <div v-else class="text-caption text-medium-emphasis mt-4">No description provided.</div>
+        </v-card-text>
+        <v-card-text v-else class="text-caption text-medium-emphasis">
           Click a service node in the diagram to see its details here.
-        </q-card-section>
-      </q-card>
-    </q-scroll-area>
+        </v-card-text>
+      </v-card>
+    </v-sheet>
   </aside>
 </template>
 
@@ -67,8 +61,6 @@ defineEmits<{ 'clear-service': [] }>()
   width: 340px;
   max-width: 35vw;
   height: 100vh;
-  background-color: #f5f5f5;
-  border-left: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }

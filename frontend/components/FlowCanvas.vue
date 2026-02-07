@@ -36,9 +36,15 @@
       <Legend/>
     </div>
 
-    <q-banner v-if="parseError" class="diagram-error bg-negative text-white">
+    <v-alert
+      v-if="parseError"
+      type="error"
+      class="diagram-error"
+      variant="tonal"
+      density="compact"
+    >
       {{ parseError }}
-    </q-banner>
+    </v-alert>
   </div>
 </template>
 
@@ -46,6 +52,7 @@
 import VueMermaidString from 'vue-mermaid-string'
 import type {MermaidConfig} from 'mermaid'
 import mermaid from 'mermaid'
+import { useTheme } from 'vuetify'
 import Legend from '~/components/Legend.vue'
 import DiagramToolbar from '~/components/DiagramToolbar.vue'
 import {withDiagramConfig} from '~/utils/mermaid/diagramHelpers'
@@ -91,8 +98,8 @@ const renderableDiagram = computed(() =>
 )
 const diagramRenderKey = computed(() => `${renderableDiagram.value}::${isDarkMode.value ? 'dark' : 'default'}`)
 
-const {$q} = useNuxtApp()
-const isDarkMode = computed(() => $q.dark.isActive)
+const theme = useTheme()
+const isDarkMode = computed(() => theme.global.current.value.dark)
 
 const mermaidOptions = computed(() => ({
   theme: isDarkMode.value ? 'dark' : 'default',
@@ -119,11 +126,12 @@ watch(renderableDiagram, () => {
 })
 
 onMounted(() => {
-  if (import.meta.client) {
-    const savedDarkMode = localStorage.getItem('darkMode')
-    if (savedDarkMode !== null) {
-      $q.dark.set(savedDarkMode === 'true')
-    }
+  if (!import.meta.client) {
+    return
+  }
+  const savedTheme = localStorage.getItem('preferredTheme')
+  if (savedTheme === 'dark' || savedTheme === 'light') {
+    theme.global.name.value = savedTheme
   }
 })
 
@@ -150,9 +158,10 @@ let lastClickedNode: string | null = null
 let lastClickTimestamp = 0
 
 function toggleDarkMode() {
-  $q.dark.toggle()
+  const nextTheme = isDarkMode.value ? 'light' : 'dark'
+  theme.global.name.value = nextTheme
   if (import.meta.client) {
-    localStorage.setItem('darkMode', $q.dark.isActive.toString())
+    localStorage.setItem('preferredTheme', nextTheme)
   }
 }
 
@@ -201,58 +210,10 @@ function logCurrentDiagram() {
   flex-direction: column;
 }
 
-:deep(.internalService > rect) {
-  fill: var(--q-grey-2) !important;
-  stroke: var(--q-grey-2) !important;
-  stroke-width: 2px !important;
-  rx: 6px;
-  ry: 6px;
-}
-
-:deep(.body--dark .internalService > rect),
-.body--dark :deep(.internalService > rect) {
-  fill: var(--q-dark) !important;
-  stroke: var(--q-grey-6) !important;
-}
-
-:deep(.externalService > rect) {
-  fill: rgba(var(--q-warning-rgb), 0.15) !important;
-  stroke: var(--q-warning) !important;
-  stroke-width: 2px !important;
-  rx: 6px;
-  ry: 6px;
-}
-
-:deep(.body--dark .externalService > rect),
-.body--dark :deep(.externalService > rect) {
-  fill: rgba(var(--q-warning-rgb), 0.35) !important;
-  stroke: var(--q-warning) !important;
-}
-
-.diagram-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background-color: rgba(255, 255, 255, 0.9);
-  z-index: 2;
-}
-
-.body--dark .diagram-toolbar {
-  background-color: rgba(18, 18, 18, 0.9);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
 .diagram-surface {
   flex: 1;
   overflow: auto;
   padding: 16px;
-  background-color: var(--q-grey-1);
-}
-
-.body--dark .diagram-surface {
-  background-color: var(--q-dark-page);
 }
 
 .diagram-surface.is-loading {
@@ -263,12 +224,11 @@ function logCurrentDiagram() {
 .diagram-placeholder {
   width: 100%;
   height: 100%;
-  border: 1px dashed var(--q-grey-5);
+  border: 1px dashed currentColor;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--q-grey-7);
 }
 
 .floating-legend {
