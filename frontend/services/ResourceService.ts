@@ -1,11 +1,5 @@
 import yaml from 'js-yaml'
-
-export type Group = {
-  groupId: string
-  name: string
-  description: string
-  team: string
-}
+import { validateGroupInfo, type GroupInfo } from '~/types'
 
 let rawGroupInfoFiles = import.meta.glob('../public/services/*/group-info.yaml', {
   eager: true,
@@ -14,7 +8,7 @@ let rawGroupInfoFiles = import.meta.glob('../public/services/*/group-info.yaml',
 }) as Record<string, string>
 
 const GROUP_FILE_INDEX: Record<string, string> = {}
-const GROUP_INFO_CACHE = new Map<string, Group>()
+const GROUP_INFO_CACHE = new Map<string, GroupInfo>()
 
 function rebuildGroupIndex() {
   Object.keys(GROUP_FILE_INDEX).forEach(key => { delete GROUP_FILE_INDEX[key] })
@@ -42,16 +36,17 @@ export function __setGroupFileMocks(files: Record<string, string>) {
 /**
  * Parses the YAML contents of a group's group-info file into a Group object.
  */
-function parseGroupInfo(groupId: string, rawYaml: string): Group | null {
-  const parsed = yaml.load(rawYaml)
-  if (!parsed || typeof parsed !== 'object') {
+function parseGroupInfo(groupId: string, rawYaml: string): GroupInfo | null {
+  try {
+    const parsed = yaml.load(rawYaml)
+    if (!parsed || typeof parsed !== 'object') {
+      return null
+    }
+    return validateGroupInfo(parsed, groupId)
+  } catch (error) {
+    console.warn(`Failed to parse group info for ${groupId}:`, error)
     return null
   }
-  const data = parsed as Record<string, unknown>
-  const name = typeof data.name === 'string' ? data.name : groupId
-  const description = typeof data.description === 'string' ? data.description : ''
-  const teamId = typeof data.teamId === 'string' ? data.teamId : ''
-  return { groupId, name, description, team: teamId }
 }
 
 class ResourceService {
@@ -79,7 +74,7 @@ class ResourceService {
   /**
    * Returns a single group descriptor by folder name.
    */
-  async getGroup(groupId: string): Promise<Group | null> {
+  async getGroup(groupId: string): Promise<GroupInfo | null> {
     this.loadGroupIntoCache(groupId)
     return GROUP_INFO_CACHE.get(groupId) ?? null
   }
@@ -87,8 +82,8 @@ class ResourceService {
   /**
    * Lists every discovered group, keyed by its folder name.
    */
-  async getAllGroups(): Promise<Record<string, Group>> {
-    const result: Record<string, Group> = {}
+  async getAllGroups(): Promise<Record<string, GroupInfo>> {
+    const result: Record<string, GroupInfo> = {}
     for (const groupId of Object.keys(GROUP_FILE_INDEX)) {
       const group = await this.getGroup(groupId)
       if (group) {

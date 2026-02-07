@@ -16,33 +16,33 @@ describe('ResourceService', () => {
     const group = await resourceService.getGroup('api')
 
     expect(group).toEqual({
-      groupId: 'api',
+      groupName: 'api',
       name: 'API',
       description: 'API group',
-      team: 'team-api'
+      teamId: 'team-api'
     })
   })
 
   it('returns all discovered groups keyed by folder name', async () => {
     const resourceService = await createResourceService({
       '../public/services/api/group-info.yaml': `\nname: API\ndescription: Public APIs\nteamId: api-team\n`,
-      '../public/services/data/group-info.yaml': `\ndescription: Data platform\n`
+      '../public/services/data/group-info.yaml': `\nname: Data\ndescription: Data platform\nteamId: data-team\n`
     })
 
     const groups = await resourceService.getAllGroups()
 
     expect(groups).toEqual({
       api: {
-        groupId: 'api',
+        groupName: 'api',
         name: 'API',
         description: 'Public APIs',
-        team: 'api-team'
+        teamId: 'api-team'
       },
       data: {
-        groupId: 'data',
-        name: 'data',
+        groupName: 'data',
+        name: 'Data',
         description: 'Data platform',
-        team: ''
+        teamId: 'data-team'
       }
     })
   })
