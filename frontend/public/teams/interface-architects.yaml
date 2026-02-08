@@ -4,6 +4,12 @@ description: |
   From pixels to payloads, we design the experiences that users love.
   Frontend, APIs, and everything in between.
 teamLead: "Jordan Lee"
-email: "interface-architects@k4u.nl"
-slackChannel: "#team-interface-architects"
-oncallPhone: "+31 20 300 4000"
+reachability:
+  - channel: email
+    detail: "interface-architects@k4u.nl"
+  - channel: slack
+    detail: "#team-interface-architects"
+  - channel: phone
+    detail: "+31 20 300 4000"
+  - channel: pagerduty
+    detail: "pagerduty://interface-architects"

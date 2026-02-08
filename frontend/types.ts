@@ -162,6 +162,21 @@ export interface ServiceDefinition {
   groupName: string  // Set from folder structure by loader
 }
 
+export type TeamReachChannel =
+  | 'email'
+  | 'slack'
+  | 'phone'
+  | 'teams'
+  | 'pigeon'
+  | 'sms'
+  | 'web'
+  | 'pagerduty'
+
+export interface TeamReachOption {
+  channel: TeamReachChannel
+  detail: string
+}
+
 export type ExternalConnectionDirection = 'incoming' | 'outgoing'
 
 export interface ServiceIncomingLink {
@@ -187,10 +202,8 @@ export interface Team {
   name: string
   description?: string
   teamLead?: string
-  email?: string
-  slackChannel?: string
-  oncallPhone?: string
   teamId: string  // Set from filename by loader
+  reachability?: TeamReachOption[]
 }
 
 
@@ -292,29 +305,46 @@ export function validateGroupInfo(data: any, groupName: string): GroupInfo {
 }
 
 export function validateTeam(data: any, teamId: string): Team {
-  if (!data || typeof data !== 'object') {
-    throw new Error(`Invalid team data for ${teamId}: must be an object`)
-  }
+   if (!data || typeof data !== 'object') {
+     throw new Error(`Invalid team data for ${teamId}: must be an object`)
+   }
 
-  if (!data.name || typeof data.name !== 'string') {
-    throw new Error(`Invalid name for team ${teamId}: must be a non-empty string`)
-  }
+   if (!data.name || typeof data.name !== 'string') {
+     throw new Error(`Invalid name for team ${teamId}: must be a non-empty string`)
+   }
 
-  // Validate email format if present
-  if (data.email && typeof data.email === 'string') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(data.email)) {
-      throw new Error(`Invalid email for team ${teamId}: must be a valid email address`)
-    }
-  }
+   const reachability: TeamReachOption[] = []
 
-  return {
-    name: data.name,
-    description: data.description,
-    teamLead: data.teamLead,
-    email: data.email,
-    slackChannel: data.slackChannel,
-    oncallPhone: data.oncallPhone,
-    teamId: teamId
-  }
-}
+   if (Array.isArray(data.reachability)) {
+     data.reachability.forEach((contact: any, index: number) => {
+       if (!contact || typeof contact !== 'object') {
+         throw new Error(`Invalid reachability entry #${index} for team ${teamId}: must be an object`)
+       }
+       if (!contact.channel || typeof contact.channel !== 'string') {
+         throw new Error(`Invalid reachability channel for team ${teamId} entry #${index}: must be a non-empty string`)
+       }
+       if (!contact.detail || typeof contact.detail !== 'string') {
+         throw new Error(`Invalid reachability detail for team ${teamId} entry #${index}: must be a non-empty string`)
+       }
+       reachability.push({ channel: contact.channel as TeamReachChannel, detail: contact.detail })
+     })
+   }
+
+   const addLegacyContact = (channel: TeamReachChannel, detail?: string) => {
+     if (detail && typeof detail === 'string') {
+       reachability.push({ channel, detail: detail })
+     }
+   }
+
+   addLegacyContact('email', data.email)
+   addLegacyContact('slack', data.slackChannel)
+   addLegacyContact('phone', data.oncallPhone)
+
+   return {
+     name: data.name,
+     description: data.description,
+     teamLead: data.teamLead,
+     reachability,
+     teamId: teamId
+   }
+ }

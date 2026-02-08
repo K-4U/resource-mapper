@@ -4,7 +4,12 @@ description: |
   Masters of persistence, guardians of state, and keepers of the sacred schemas.
   If it needs to be stored, we've got a spell for it.
 teamLead: "Morgan Chen"
-email: "data-wizards@k4u.nl"
-slackChannel: "#team-data-wizards"
-oncallPhone: "+31 20 200 3000"
-
+reachability:
+  - channel: email
+    detail: "data-wizards@k4u.nl"
+  - channel: slack
+    detail: "#team-data-wizards"
+  - channel: phone
+    detail: "+31 20 200 3000"
+  - channel: teams
+    detail: "teams://data-wizards-room"

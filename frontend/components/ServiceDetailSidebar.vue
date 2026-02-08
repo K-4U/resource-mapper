@@ -1,16 +1,21 @@
 <template>
   <aside class="sidebar">
     <v-sheet class="d-flex flex-column fill-height" elevation="0">
-      <v-card variant="outlined" class="ma-4">
-        <v-card-text>
-          <div class="text-caption text-uppercase text-medium-emphasis">Current Group</div>
-          <div class="text-h6">{{ group.name }}</div>
-          <div v-if="group.description" class="text-body-2 mt-2 text-medium-emphasis">{{ group.description }}</div>
-          <div class="text-caption mt-2">ID: {{ group.groupName }}</div>
-        </v-card-text>
-      </v-card>
-
-      <TeamContactCard v-if="group.teamId" :team-id="group.teamId" />
+      <v-expansion-panels v-model="currentPanel" multiple class="ma-4">
+        <v-expansion-panel value="current-group">
+          <v-expansion-panel-title>
+            <div>
+              <div class="text-caption text-uppercase text-medium-emphasis">Current Group</div>
+              <div class="text-h6">{{ group.name }}</div>
+            </div>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <div v-if="group.description" class="text-body-2 text-medium-emphasis mb-2">{{ group.description }}</div>
+            <div class="text-caption text-medium-emphasis">ID: {{ group.groupName }}</div>
+            <TeamContactCard v-if="group.teamId" :team-id="group.teamId" flat />
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
       <v-card variant="outlined" class="ma-4">
         <v-card-text class="d-flex align-center justify-space-between">
@@ -74,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import TeamContactCard from '~/components/TeamContactCard.vue'
 import type { GroupInfo, ServiceDefinition } from '~/types'
 
@@ -92,6 +97,20 @@ const isExternalService = computed(() => {
   }
   return props.serviceGroup.groupName !== props.group.groupName
 })
+
+const currentPanel = ref<string[]>(['current-group'])
+
+watch(
+  isExternalService,
+  (external) => {
+    if (external) {
+      currentPanel.value = []
+    } else {
+      currentPanel.value = ['current-group']
+    }
+  },
+  { immediate: true }
+)
 
 defineEmits<{ 'clear-service': [] }>()
 </script>
