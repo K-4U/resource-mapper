@@ -162,15 +162,18 @@ export interface ServiceDefinition {
   groupName: string  // Set from folder structure by loader
 }
 
-export type TeamReachChannel =
-  | 'email'
-  | 'slack'
-  | 'phone'
-  | 'teams'
-  | 'pigeon'
-  | 'sms'
-  | 'web'
-  | 'pagerduty'
+export const TEAM_REACH_CHANNELS = [
+  'email',
+  'slack',
+  'phone',
+  'teams',
+  'pigeon',
+  'sms',
+  'web',
+  'pagerduty'
+] as const
+
+export type TeamReachChannel = typeof TEAM_REACH_CHANNELS[number]
 
 export interface TeamReachOption {
   channel: TeamReachChannel
@@ -323,22 +326,19 @@ export function validateTeam(data: any, teamId: string): Team {
        if (!contact.channel || typeof contact.channel !== 'string') {
          throw new Error(`Invalid reachability channel for team ${teamId} entry #${index}: must be a non-empty string`)
        }
+       const channel = contact.channel as string
+       if (!TEAM_REACH_CHANNELS.includes(channel as TeamReachChannel)) {
+         throw new Error(
+           `Invalid reachability channel '${channel}' for team ${teamId} entry #${index}: ` +
+           `allowed channels are ${TEAM_REACH_CHANNELS.join(', ')}`
+         )
+       }
        if (!contact.detail || typeof contact.detail !== 'string') {
          throw new Error(`Invalid reachability detail for team ${teamId} entry #${index}: must be a non-empty string`)
        }
-       reachability.push({ channel: contact.channel as TeamReachChannel, detail: contact.detail })
+       reachability.push({ channel: channel as TeamReachChannel, detail: contact.detail })
      })
    }
-
-   const addLegacyContact = (channel: TeamReachChannel, detail?: string) => {
-     if (detail && typeof detail === 'string') {
-       reachability.push({ channel, detail: detail })
-     }
-   }
-
-   addLegacyContact('email', data.email)
-   addLegacyContact('slack', data.slackChannel)
-   addLegacyContact('phone', data.oncallPhone)
 
    return {
      name: data.name,
