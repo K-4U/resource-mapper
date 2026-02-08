@@ -1,0 +1,7 @@
+name: "Data Storage"
+description: |
+  Manages database systems and data persistence layers.
+  This group handles RDS relational databases, DynamoDB NoSQL tables,
+  and data backup/recovery strategies for the entire platform.
+teamId: "data-wizards"
+

@@ -1,0 +1,9 @@
+friendlyName: "RDS PostgreSQL Database"
+description: |
+  Multi-AZ PostgreSQL RDS instance for transactional data and relational storage.
+  
+  Provides ACID transactions, complex queries, and data consistency for critical business data.
+  Configured with automated backups, point-in-time recovery, and read replicas for scaling.
+serviceType: RDS
+outgoingConnections: []
+
