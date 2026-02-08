@@ -116,7 +116,7 @@ function handleNodeDoubleClick(nodeId: string) {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f6f7fb;
+  background-color: var(--v-theme-background);
   padding: 0;
 }
 
