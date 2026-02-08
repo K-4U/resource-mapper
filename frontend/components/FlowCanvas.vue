@@ -1,6 +1,7 @@
 <template>
   <div class="diagram-container">
     <DiagramToolbar
+        v-if="showToolbar"
         :pending="pending"
         :can-go-back="canGoBack"
         :hide-incoming-connections="hideIncomingConnections"

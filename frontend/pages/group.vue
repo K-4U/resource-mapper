@@ -42,7 +42,8 @@
       <ServiceDetailSidebar
         :group="groupInfo"
         :service="selectedService"
-        @clear-service="selectedServiceId = null"
+        :service-group="selectedServiceGroup"
+        @clear-service="clearServiceSelection"
       />
     </div>
   </div>
@@ -104,6 +105,7 @@ const groupInfo = computed<GroupInfo | null>(() => {
 })
 const services = computed<ServiceDefinition[]>(() => servicesData.value || [])
 const selectedServiceId = ref<string | null>(null)
+const selectedExternalService = ref<{ service: ServiceDefinition; group: GroupInfo } | null>(null)
 const serviceNodeLookup = computed<Record<string, ServiceDefinition>>(() => {
   const map: Record<string, ServiceDefinition> = {}
   const currentGroupId = groupId.value
@@ -115,11 +117,11 @@ const serviceNodeLookup = computed<Record<string, ServiceDefinition>>(() => {
   })
   return map
 })
-const externalServiceNodeLookup = computed<Record<string, string>>(() => {
-  const map: Record<string, string> = {}
+const externalServiceDetailLookup = computed<Record<string, { service: ServiceDefinition; group: GroupInfo }>>(() => {
+  const map: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
   externalGroups.value.forEach(entry => {
     entry.services.forEach(service => {
-      map[getServiceNodeIdFromDefinition(service)] = service.groupName
+      map[getServiceNodeIdFromDefinition(service)] = { service, group: entry.group }
     })
   })
   return map
@@ -131,7 +133,22 @@ const externalGroupNodeLookup = computed<Record<string, string>>(() => {
   })
   return map
 })
-const selectedService = computed(() => selectedServiceId.value ? serviceNodeLookup.value[selectedServiceId.value] ?? null : null)
+const selectedService = computed(() => {
+  if (selectedServiceId.value) {
+    return serviceNodeLookup.value[selectedServiceId.value] ?? null
+  }
+  return selectedExternalService.value?.service ?? null
+})
+
+const selectedServiceGroup = computed<GroupInfo | null>(() => {
+  if (!selectedService.value) {
+    return null
+  }
+  if (selectedServiceId.value) {
+    return groupInfo.value ?? null
+  }
+  return selectedExternalService.value?.group ?? null
+})
 
 const externalGroups = computed<ExternalGroupServices[]>(() => externalServicesData.value || [])
 
@@ -151,13 +168,21 @@ function refreshData() {
 function handleNodeClick(nodeId: string) {
   if (serviceNodeLookup.value[nodeId]) {
     selectedServiceId.value = nodeId
-  } else {
-    selectedServiceId.value = null
+    selectedExternalService.value = null
+    return
   }
+  const external = externalServiceDetailLookup.value[nodeId]
+  if (external) {
+    selectedServiceId.value = null
+    selectedExternalService.value = external
+    return
+  }
+  selectedServiceId.value = null
+  selectedExternalService.value = null
 }
 
 function handleNodeDoubleClick(nodeId: string) {
-  const externalGroupId = externalServiceNodeLookup.value[nodeId] || externalGroupNodeLookup.value[nodeId]
+  const externalGroupId = externalServiceDetailLookup.value[nodeId]?.group.groupName || externalGroupNodeLookup.value[nodeId]
   if (!externalGroupId) {
     return
   }
@@ -167,26 +192,29 @@ function handleNodeDoubleClick(nodeId: string) {
 function navigateHome() {
   router.push({ path: '/' })
 }
+
+function clearServiceSelection() {
+  selectedServiceId.value = null
+  selectedExternalService.value = null
+}
 </script>
 
 <style scoped>
 .group-page {
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   display: flex;
-  align-items: stretch;
-  background-color: #f6f7fb;
+  flex-direction: column;
 }
 
 .group-layout {
   display: flex;
   flex: 1;
+  width: 100%;
 }
 
 .group-canvas {
   flex: 1;
   height: 100%;
-  background: transparent;
-  padding: 0;
 }
 </style>

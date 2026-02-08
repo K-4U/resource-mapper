@@ -26,15 +26,15 @@
         class="flow-canvas"
         :diagram="diagramDefinition"
         :pending="pending"
-        :show-toolbar="false"
+        :show-toolbar="true"
         group-name="All Groups"
         @node-click="handleNodeClick"
         @node-double-click="handleNodeDoubleClick"
       />
       <GroupDetailSidebar
-        v-if="selectedGroupId"
         class="sidebar"
         :group-id="selectedGroupId"
+        placeholder-message="Select a group to get more info"
         @clear-selection="clearSelection"
       />
     </div>
@@ -115,17 +115,16 @@ function handleNodeDoubleClick(nodeId: string) {
 .page-container {
   height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background-color: #f6f7fb;
-  padding: 1rem;
+  padding: 0;
 }
 
 .layout {
   display: flex;
+  flex: 1;
   width: 100%;
-  height: 100%;
-  gap: 1rem;
+  gap: 0;
 }
 
 .flow-canvas {
@@ -136,5 +135,6 @@ function handleNodeDoubleClick(nodeId: string) {
 .sidebar {
   width: 320px;
   max-width: 35%;
+  height: 100%;
 }
 </style>
