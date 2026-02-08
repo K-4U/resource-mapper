@@ -34,6 +34,7 @@
         :diagram="diagramDefinition"
         :pending="pending"
         :show-toolbar="true"
+        :group-name="groupInfo?.name || groupInfo?.groupName || groupId"
         @node-click="handleNodeClick"
         @node-double-click="handleNodeDoubleClick"
         @go-home="navigateHome"

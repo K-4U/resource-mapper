@@ -7,6 +7,7 @@
         :hide-external-to-external="hideExternalToExternal"
         :show-legend="showLegend"
         :is-dark-mode="isDarkMode.value"
+        :label="groupName"
         @go-home="emit('goHome')"
         @go-back="emit('goBack')"
         @toggle-incoming="emit('toggleIncomingConnections')"
@@ -65,6 +66,7 @@ interface Props {
   hideIncomingConnections?: boolean
   hideExternalToExternal?: boolean
   mermaidOptions?: MermaidConfig
+  groupName?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -74,7 +76,8 @@ const props = withDefaults(defineProps<Props>(), {
   canGoBack: false,
   hideIncomingConnections: false,
   hideExternalToExternal: false,
-  mermaidOptions: () => ({})
+  mermaidOptions: () => ({}),
+  groupName: ''
 })
 
 const emit = defineEmits<{

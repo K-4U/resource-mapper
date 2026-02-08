@@ -27,6 +27,7 @@
         :diagram="diagramDefinition"
         :pending="pending"
         :show-toolbar="false"
+        group-name="All Groups"
         @node-click="handleNodeClick"
         @node-double-click="handleNodeDoubleClick"
       />

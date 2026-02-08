@@ -8,6 +8,8 @@
       @click="$emit('go-home')"
     />
     <v-divider vertical class="mx-2" />
+    <div v-if="label" class="toolbar-label text-body-2">{{ label }}</div>
+    <v-spacer />
     <v-btn
       variant="text"
       size="small"
@@ -54,11 +56,13 @@ interface Props {
   hideIncomingConnections?: boolean
   showLegend: boolean
   isDarkMode: boolean
+  label?: string
 }
 
 withDefaults(defineProps<Props>(), {
   pending: false,
   hideIncomingConnections: false,
+  label: ''
 })
 
 defineEmits<{
@@ -79,6 +83,10 @@ defineEmits<{
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background-color: rgba(255, 255, 255, 0.9);
   z-index: 2;
+}
+
+.toolbar-label {
+  font-weight: 500;
 }
 
 .v-theme--dark .diagram-toolbar {
