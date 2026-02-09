@@ -1,16 +1,6 @@
 <script lang="ts">
   import type { Team } from '$lib/types'
-  import {
-    Mail,
-    Phone,
-    MessageSquare,
-    Globe,
-    Slack,
-    Users,
-    Bird,
-    BellRing,
-    Link
-  } from 'lucide-svelte'
+  import Icon from '@iconify/svelte'
 
   export let teamId: string | null = null
   export let team: Team | null = null
@@ -27,25 +17,23 @@
     pagerduty: ''
   }
 
-  type IconComponent = typeof Mail
-
-  const channelIcons: Record<string, IconComponent> = {
-    email: Mail,
-    phone: Phone,
-    sms: MessageSquare,
-    web: Globe,
-    slack: Slack,
-    teams: Users,
-    pigeon: Bird,
-    pagerduty: BellRing
+  const channelIcons: Record<string, string> = {
+    email: 'mdi:email-outline',
+    phone: 'mdi:phone-outline',
+    sms: 'mdi:message-text-outline',
+    web: 'mdi:web',
+    slack: 'mdi:slack',
+    teams: 'mdi:microsoft-teams',
+    pigeon: 'mdi:owl',
+    pagerduty: 'mdi:bell-ring-outline'
   }
 
   $: resolvedTeam = team ?? (teamId && teams ? teams[teamId] ?? null : null)
   $: reachOptions = resolvedTeam?.reachability ?? []
 
-  const defaultChannelIcon: IconComponent = Link
+  const defaultChannelIcon = 'mdi:link-variant'
 
-  function getChannelIcon(channel: string): IconComponent {
+  function getChannelIcon(channel: string): string {
     return channelIcons[channel.toLowerCase()] ?? defaultChannelIcon
   }
 
@@ -83,7 +71,7 @@
           {#each reachOptions as entry}
             <li class="flex items-center justify-between rounded-lg border border-gray-700/40 px-3 py-2">
               <div class="flex items-center gap-2">
-                <svelte:component this={getChannelIcon(entry.channel)} class="h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Icon icon={getChannelIcon(entry.channel)} class="h-4 w-4 text-gray-400" aria-hidden="true" />
                 <span>{formatChannel(entry.channel)}</span>
               </div>
               {#if buildLink(entry.channel, entry.detail)}

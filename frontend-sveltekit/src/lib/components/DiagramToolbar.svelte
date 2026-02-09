@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Home, Eye, EyeOff, Sun, Moon, ScrollText } from 'lucide-svelte'
+  import Icon from '@iconify/svelte'
 
   const dispatch = createEventDispatcher<{
     goHome: void
@@ -21,7 +21,7 @@
     on:click={() => dispatch('goHome')}
     disabled={pending}
   >
-    <Home class="h-4 w-4" aria-hidden="true" />
+    <Icon icon="mdi:home-outline" class="h-4 w-4" aria-hidden="true" />
     <span>Home</span>
   </button>
 
@@ -36,10 +36,10 @@
       disabled={pending}
     >
       {#if showLegend}
-        <EyeOff class="h-4 w-4" aria-hidden="true" />
+        <Icon icon="mdi:eye-off-outline" class="h-4 w-4" aria-hidden="true" />
         <span>Hide legend</span>
       {:else}
-        <Eye class="h-4 w-4" aria-hidden="true" />
+        <Icon icon="mdi:eye-outline" class="h-4 w-4" aria-hidden="true" />
         <span>Show legend</span>
       {/if}
     </button>
@@ -49,10 +49,10 @@
       disabled={pending}
     >
       {#if isDarkMode}
-        <Sun class="h-4 w-4" aria-hidden="true" />
+        <Icon icon="mdi:weather-sunny" class="h-4 w-4" aria-hidden="true" />
         <span>Light mode</span>
       {:else}
-        <Moon class="h-4 w-4" aria-hidden="true" />
+        <Icon icon="mdi:weather-night" class="h-4 w-4" aria-hidden="true" />
         <span>Dark mode</span>
       {/if}
     </button>
@@ -61,7 +61,7 @@
       on:click={() => dispatch('logDiagram')}
       disabled={pending}
     >
-      <ScrollText class="h-4 w-4" aria-hidden="true" />
+      <Icon icon="mdi:note-text-outline" class="h-4 w-4" aria-hidden="true" />
       <span>Log</span>
     </button>
   </div>
