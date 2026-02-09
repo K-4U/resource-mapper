@@ -10,7 +10,7 @@ describe('/+page.svelte', () => {
 				groups: {},
 				groupConnections: [],
 				teams: {},
-				errorMessage: null
+				errorMessage: undefined
 			}
 		});
 

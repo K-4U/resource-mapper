@@ -10,7 +10,7 @@
   $: groupInfo = groupId ? groups[groupId] ?? null : null
 </script>
 
-<aside class="flex h-full w-80 flex-col border-l border-gray-800/60 bg-gray-950/40">
+<aside data-testid="group-sidebar" class="flex h-full w-full flex-col border-l border-gray-900/70 bg-gray-950/70">
   <div class="flex-1 overflow-y-auto p-4">
     {#if !groupInfo}
       <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-gray-400">

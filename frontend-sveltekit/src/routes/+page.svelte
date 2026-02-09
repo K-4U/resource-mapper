@@ -78,8 +78,8 @@
 {:else if !hasDiagramContent}
   <EmptyState title="No Groups Found" message="No group definitions were discovered in the static data set." />
 {:else}
-  <div class="flex min-h-[70vh] gap-6">
-    <div class="flex-1 rounded-2xl border border-white/5 bg-black/20 shadow-xl">
+  <div class="flex h-full min-h-0 flex-1 flex-col gap-6 lg:flex-row">
+    <div class="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-black/20 shadow-xl">
       <FlowCanvas
         diagram={diagramDefinition}
         pending={false}
@@ -92,11 +92,13 @@
         }}
       />
     </div>
-    <GroupDetailSidebar
-      groupId={selectedGroupId}
-      groups={groups ?? {}}
-      teams={teams ?? null}
-      placeholderMessage="Select a group to see details"
-    />
+    <div class="flex h-full min-h-0 w-full lg:w-[420px] xl:w-[480px]">
+      <GroupDetailSidebar
+        groupId={selectedGroupId}
+        groups={groups ?? {}}
+        teams={teams ?? null}
+        placeholderMessage="Select a group to see details"
+      />
+    </div>
   </div>
 {/if}

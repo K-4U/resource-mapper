@@ -1,5 +1,16 @@
 <script lang="ts">
   import type { Team } from '$lib/types'
+  import {
+    Mail,
+    Phone,
+    MessageSquare,
+    Globe,
+    Slack,
+    Users,
+    Bird,
+    BellRing,
+    Link
+  } from 'lucide-svelte'
 
   export let teamId: string | null = null
   export let team: Team | null = null
@@ -16,11 +27,30 @@
     pagerduty: ''
   }
 
+  type IconComponent = typeof Mail
+
+  const channelIcons: Record<string, IconComponent> = {
+    email: Mail,
+    phone: Phone,
+    sms: MessageSquare,
+    web: Globe,
+    slack: Slack,
+    teams: Users,
+    pigeon: Bird,
+    pagerduty: BellRing
+  }
+
   $: resolvedTeam = team ?? (teamId && teams ? teams[teamId] ?? null : null)
   $: reachOptions = resolvedTeam?.reachability ?? []
 
+  const defaultChannelIcon: IconComponent = Link
+
+  function getChannelIcon(channel: string): IconComponent {
+    return channelIcons[channel.toLowerCase()] ?? defaultChannelIcon
+  }
+
   function formatChannel(channel: string) {
-    return channel.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    return channel.replace(/[-_]/g, ' ').replace(/^\w|\s\w/g, (c) => c.toUpperCase())
   }
 
   function buildLink(channel: string, detail: string) {
@@ -52,7 +82,10 @@
         <ul class="mt-2 space-y-2 text-sm text-gray-200">
           {#each reachOptions as entry}
             <li class="flex items-center justify-between rounded-lg border border-gray-700/40 px-3 py-2">
-              <span>{formatChannel(entry.channel)}</span>
+              <div class="flex items-center gap-2">
+                <svelte:component this={getChannelIcon(entry.channel)} class="h-4 w-4 text-gray-400" aria-hidden="true" />
+                <span>{formatChannel(entry.channel)}</span>
+              </div>
               {#if buildLink(entry.channel, entry.detail)}
                 <a
                   href={buildLink(entry.channel, entry.detail)}
@@ -74,4 +107,3 @@
     </div>
   </div>
 {/if}
-

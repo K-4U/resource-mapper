@@ -169,7 +169,7 @@
   }
 </script>
 
-<div data-testid="flow-canvas" class="relative flex h-full flex-1 flex-col bg-gradient-to-b from-slate-950 to-slate-900">
+<div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-gradient-to-b from-slate-950 to-slate-900">
   {#if showToolbar}
     <DiagramToolbar
       {pending}
