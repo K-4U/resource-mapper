@@ -5,7 +5,8 @@
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
   import EmptyState from '$lib/components/EmptyState.svelte'
   import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
-  import { buildGroupOverviewDiagram } from '$lib/utils/mermaid/groupDiagram'
+  import type { FlowGraphInput } from '$lib/utils/flow/types'
+  import { buildGroupOverviewGraph } from '$lib/utils/flow/groupOverviewGraph'
   import { goto, invalidateAll } from '$app/navigation'
 
   export let data: PageData
@@ -16,29 +17,29 @@
   const errorMessage = data.errorMessage
 
   let selectedGroupId: string | null = null
-  let diagramDefinition = ''
+  let graphInput: FlowGraphInput | null = null
   let nodeGroupMap: Record<string, string> = {}
   let isLoading = true
   let hasDiagramContent = false
 
   $: if (groups && groupConnections) {
-    const { diagram, nodeToGroupMap } = buildGroupOverviewDiagram(groups, groupConnections)
-    console.debug('[overview.svelte] built diagram', {
+    const { graph, nodeToGroupMap } = buildGroupOverviewGraph(groups, groupConnections)
+    console.debug('[overview.svelte] built flow graph', {
       groups: Object.keys(groups).length,
       connections: groupConnections.length,
       nodeCount: Object.keys(nodeToGroupMap).length,
-      diagram: diagram
+      hasGraph: !!graph
     })
-    diagramDefinition = diagram
+    graphInput = graph
     nodeGroupMap = nodeToGroupMap
   } else {
-    diagramDefinition = ''
+    graphInput = null
     nodeGroupMap = {}
     selectedGroupId = null
   }
 
   $: isLoading = !groups || !groupConnections
-  $: hasDiagramContent = !!diagramDefinition.trim()
+  $: hasDiagramContent = !!(graphInput && graphInput.nodes.length > 0)
 
   function handleNodeClick(event: CustomEvent<string>) {
     console.debug('[overview.svelte] nodeClick', event.detail)
@@ -81,7 +82,7 @@
   <div class="flex h-full min-h-0 flex-1 flex-col gap-6 lg:flex-row">
     <div class="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-black/20 shadow-xl">
       <FlowCanvas
-        diagram={diagramDefinition}
+        graph={graphInput}
         pending={false}
         label="All Groups"
         on:nodeClick={handleNodeClick}

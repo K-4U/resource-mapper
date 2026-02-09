@@ -4,14 +4,15 @@ You are upgrading the Resource Mapper frontend so that the existing Mermaid-powe
 
 ---
 ### 1. Objectives & Constraints
-1. **Preserve services/data**: Keep everything under `/src/lib/services` and `types.ts` untouched; diagram builders may change but must still consume the same data.
-2. **Keep interactions**: The current click/double-click events and `goHome` behaviour must keep triggering the existing routing logic (`nodeClick`, `nodeDoubleClick`, `goHome`).
-3. **Custom node visuals**: Replace basic nodes with reusable Svelte Flow node components that always render AWS icons from the existing icon set (fallback styling allowed, but no new icon sources yet).
-4. **Use SvelteFlow’s ELK integration**: Leverage the official @xyflow/svelte ELK helpers (instead of rolling elkjs manually) to compute layout; avoid hard-coded coordinates.
-5. **Minimal view changes**: `routes/+page.svelte` and `routes/group/[groupId]/+page.svelte` should keep their data prep logic; adapt only the props that feed the new Flow layer.
-6. **Edge labels visible**: Preserve connection labels by default; later we will add controls to hide them.
-7. **Drag constraints**: Users should not be able to drag nodes outside their owning group/subgraph; use SvelteFlow features (e.g., `nodeExtent` or custom guards) to enforce this.
-8. **Layout recompute**: Recalculate ELK layout on every load/render for now; caching can come later.
+1. **Svelte-only scope**: All work happens inside `frontend-sveltekit` (FlowCanvas, diagram helpers, components). The Spring Boot backend and other folders stay untouched.
+2. **Preserve services/data**: Keep everything under `/src/lib/services` and `types.ts` untouched; diagram builders may change but must still consume the same data.
+3. **Keep interactions**: The current click/double-click events and `goHome` behaviour must keep triggering the existing routing logic (`nodeClick`, `nodeDoubleClick`, `goHome`).
+4. **Custom node visuals**: Replace basic nodes with reusable Svelte Flow node components that always render AWS icons from the existing icon set (fallback styling allowed, but no new icon sources yet).
+5. **Use SvelteFlow’s ELK integration**: Leverage the official @xyflow/svelte ELK helpers (instead of rolling elkjs manually) to compute layout; avoid hard-coded coordinates.
+6. **Minimal view changes**: `routes/+page.svelte` and `routes/group/[groupId]/+page.svelte` should keep their data prep logic; adapt only the props that feed the new Flow layer.
+7. **Edge labels visible**: Preserve connection labels by default; later we will add controls to hide them.
+8. **Drag constraints**: Users should not be able to drag nodes outside their owning group/subgraph; use SvelteFlow features (e.g., `nodeExtent` or custom guards) to enforce this.
+9. **Layout recompute**: Recalculate ELK layout on every load/render for now; caching can come later.
 
 ---
 ### 2. High-level Migration Plan

@@ -4,9 +4,10 @@
   import FlowCanvas from '$lib/components/FlowCanvas.svelte'
   import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
   import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
+  import EmptyState from '$lib/components/EmptyState.svelte'
   import ServiceDetailSidebar from '$lib/components/ServiceDetailSidebar.svelte'
-  import { buildGroupServicesDiagram } from '$lib/utils/mermaid/groupServicesDiagram'
-  import { getServiceNodeIdFromDefinition } from '$lib/utils/mermaid/diagramHelpers'
+  import type { FlowGraphInput } from '$lib/utils/flow/types'
+  import { buildGroupServicesGraph } from '$lib/utils/flow/groupServicesGraph'
   import { goto } from '$app/navigation'
 
   export let data: PageData
@@ -22,46 +23,37 @@
   let serviceNodeLookup: Record<string, ServiceDefinition> = {}
   let externalServiceLookup: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
   let externalGroupNodeLookup: Record<string, string> = {}
-  let diagramDefinition = ''
+  let groupGraph: FlowGraphInput | null = null
   let loadError: string | null = null
+  let hasDiagramContent = false
 
   if (!group) {
     loadError = groupId ? `Unable to load group '${groupId}'.` : 'Missing group identifier.'
   }
 
-  $: diagramDefinition = group ? buildGroupServicesDiagram(group, services, externalServices) : ''
-  if (group) {
-    console.debug('[group.svelte] built diagram', {
+  $: if (group) {
+    const result = buildGroupServicesGraph(group, services, externalServices)
+    groupGraph = result.graph
+    serviceNodeLookup = result.serviceNodes
+    externalServiceLookup = result.externalNodes
+    externalGroupNodeLookup = Object.entries(result.externalNodes).reduce<Record<string, string>>((acc, [nodeId, entry]) => {
+      acc[nodeId] = entry.group.groupName
+      return acc
+    }, {})
+    console.debug('[group.svelte] built flow graph', {
       group: group.groupName,
       services: services.length,
-      externalEntries: externalServices.length
+      externalEntries: externalServices.length,
+      nodeCount: groupGraph.nodes.length
     })
-  }
-
-  $: serviceNodeLookup = services.reduce((acc, service) => {
-    const key = getServiceNodeIdFromDefinition(service)
-    acc[key] = service
-    return acc
-  }, {} as Record<string, ServiceDefinition>)
-  console.debug('[group.svelte] serviceNodeLookup size', Object.keys(serviceNodeLookup).length)
-
-  $: {
+  } else {
+    groupGraph = null
+    serviceNodeLookup = {}
     externalServiceLookup = {}
     externalGroupNodeLookup = {}
-    externalServices.forEach(entry => {
-      entry.services.forEach(service => {
-        externalServiceLookup[getServiceNodeIdFromDefinition(service)] = {
-          service,
-          group: entry.group
-        }
-      })
-      externalGroupNodeLookup[`${entry.direction}_${entry.group.groupName}`] = entry.group.groupName
-    })
-    console.debug('[group.svelte] external lookups populated', {
-      serviceNodes: Object.keys(externalServiceLookup).length,
-      groupNodes: Object.keys(externalGroupNodeLookup).length
-    })
   }
+
+  $: hasDiagramContent = !!(groupGraph && groupGraph.nodes.length > 0)
 
   function handleNodeClick(event: CustomEvent<string>) {
     const nodeId = event.detail
@@ -83,7 +75,7 @@
 
   function handleNodeDoubleClick(event: CustomEvent<string>) {
     const nodeId = event.detail
-    const externalGroupId = externalServiceLookup[nodeId]?.group.groupName || externalGroupNodeLookup[nodeId]
+    const externalGroupId = externalGroupNodeLookup[nodeId]
     console.debug('[group.svelte] nodeDoubleClick', { nodeId, externalGroupId })
     if (externalGroupId) {
       goto(`/group/${externalGroupId}`)
@@ -104,11 +96,13 @@
   />
 {:else if !group}
   <LoadingSpinner message="Loading group..." />
+{:else if !hasDiagramContent}
+  <EmptyState title="No services" message="This group has no service diagram to display yet." />
 {:else}
   <div class="flex h-full min-h-0 flex-1 flex-col gap-6 lg:flex-row">
     <div class="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-black/20 shadow-xl">
       <FlowCanvas
-        diagram={diagramDefinition}
+        graph={groupGraph}
         pending={false}
         label={group.name}
         on:nodeClick={handleNodeClick}

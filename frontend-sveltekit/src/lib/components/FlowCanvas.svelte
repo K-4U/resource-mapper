@@ -1,13 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
-  import mermaid from 'mermaid'
+  import { createEventDispatcher, onMount } from 'svelte'
+  import { writable, type Writable } from 'svelte/store'
+  import type { Edge, Node, NodeTypes } from '@xyflow/svelte'
+  import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte'
   import DiagramToolbar from '$lib/components/DiagramToolbar.svelte'
   import Legend from '$lib/components/Legend.svelte'
-  import { withDiagramConfig } from '$lib/utils/mermaid/diagramHelpers'
+  import { layoutFlowGraph } from '$lib/utils/flow/layout'
+  import type { FlowEdgeData, FlowGraphInput, FlowNodeData } from '$lib/utils/flow/types'
+  import GroupNode from '$lib/components/flow/GroupNode.svelte'
+  import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
+  import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
 
   const DOUBLE_CLICK_THRESHOLD = 400
 
-  export let diagram = ''
+  export let graph: FlowGraphInput | null = null
   export let pending = false
   export let label = ''
   export let showToolbar = true
@@ -18,116 +24,86 @@
     goHome: void
   }>()
 
-  let container: HTMLDivElement | null = null
+  const nodeTypes = { group: GroupNode, service: ServiceNode, external: ExternalNode } as NodeTypes
+  const nodes: Writable<Node[]> = writable<Node[]>([])
+  const edges: Writable<Edge[]> = writable<Edge[]>([])
+
   let isDarkMode = false
   let showLegend = true
-  let parseError = ''
+  let emptyStateLabel = 'No diagram available.'
   let lastClickedNode: string | null = null
   let lastClickTimestamp = 0
-  let renderCounter = 0
-  let mounted = false
-  let emptyStateLabel = 'No diagram available.'
-  let dataSignature = ''
-
-  const normalizeNodeId = (nodeId: string) => nodeId.replace(/^flowchart-/, '').replace(/-\d+$/, '')
-
-  function scheduleRender(reason: string) {
-    if (!mounted) {
-      return
-    }
-    renderCounter += 1
-    const renderId = renderCounter
-    console.debug('[FlowCanvas] scheduleRender', { reason, renderId })
-    queueMicrotask(() => {
-      if (mounted) {
-        renderDiagram(renderId)
-      }
-    })
-  }
-
-  const handleResize = () => {
-    scheduleRender('resize')
-  }
+  let layoutError = ''
+  let layoutBusy = false
+  let graphReady = false
+  let currentSignature = ''
+  let flowKey = 0
+  let showOverlay = true
+  let hasGraphData = false
 
   onMount(() => {
-    mounted = true
     const stored = typeof window !== 'undefined' ? localStorage.getItem('preferredTheme') : null
     if (stored === 'dark') {
       isDarkMode = true
       document.documentElement.classList.add('dark')
     }
-    mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: isDarkMode ? 'dark' : 'default' })
-    const resizeObserver = new ResizeObserver(() => handleResize())
-    if (container) {
-      resizeObserver.observe(container)
-    }
-    window.addEventListener('resize', handleResize)
-    scheduleRender('mount')
-    return () => {
-      mounted = false
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', handleResize)
-    }
   })
 
-  onDestroy(() => {
-    mounted = false
-  })
-
-  $: if (mounted) {
-    const signature = `${diagram?.trim() ?? ''}:${pending}`
-    if (signature !== dataSignature) {
-      dataSignature = signature
-      console.debug('[FlowCanvas] data signature changed', signature)
-      scheduleRender('data-change')
-    }
+  $: targetSignature = graph?.signature ?? ''
+  $: if (targetSignature !== currentSignature || (!graph && currentSignature !== '')) {
+    runLayout(graph, targetSignature)
   }
+  $: hasGraphData = !!graph && graph.nodes.length > 0
+  $: showOverlay = pending || layoutBusy || !graphReady
+  $: console.debug('[FlowCanvas] overlay state', { showOverlay, pending, layoutBusy, graphReady })
 
-  async function renderDiagram(renderId?: number) {
-    const targetRenderId = renderId ?? renderCounter
-    console.debug('[FlowCanvas] renderDiagram invoked', { hasDiagram: !!diagram?.trim(), pending, targetRenderId })
-    if (!container || !mounted) {
-      return
-    }
-    if (!diagram?.trim()) {
-      container.innerHTML = ''
-      parseError = ''
+  async function runLayout(sourceGraph: FlowGraphInput | null, signature: string) {
+    layoutError = ''
+    graphReady = false
+    console.debug('[FlowCanvas] runLayout start', { hasGraph: !!sourceGraph, signature })
+    if (!sourceGraph) {
+      nodes.set([])
+      edges.set([])
       emptyStateLabel = pending ? 'Rendering diagram…' : 'No diagram available.'
-      console.debug('[FlowCanvas] renderDiagram empty state', { pending })
+      currentSignature = signature
+      flowKey += 1
+      console.debug('[FlowCanvas] runLayout skipped - no graph data')
       return
     }
+    layoutBusy = true
     try {
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: isDarkMode ? 'dark' : 'default' })
-      const { svg } = await mermaid.render(`diagram-${targetRenderId}`, withDiagramConfig(diagram))
-      container.innerHTML = svg
-      console.debug('[FlowCanvas] renderDiagram success', { id: `diagram-${targetRenderId}` })
-      attachNodeListeners()
-      parseError = ''
+      const result = await layoutFlowGraph(sourceGraph)
+      if (result.signature !== signature) {
+        console.debug('[FlowCanvas] runLayout result ignored due to stale signature', {
+          expected: signature,
+          received: result.signature
+        })
+        return
+      }
+      nodes.set(result.nodes as Node[])
+      edges.set(result.edges as Edge[])
+      currentSignature = result.signature
+      flowKey += 1
+      graphReady = true
+      console.debug('[FlowCanvas] runLayout complete', { nodeCount: result.nodes.length, edgeCount: result.edges.length })
     } catch (error) {
-      parseError = error instanceof Error ? error.message : 'Failed to render diagram.'
-      console.error('[FlowCanvas] renderDiagram error', error)
+      layoutError = error instanceof Error ? error.message : 'Failed to lay out diagram.'
+      console.error('[FlowCanvas] layout error', error)
+      nodes.set([])
+      edges.set([])
+      graphReady = false
+    } finally {
+      layoutBusy = false
+      console.debug('[FlowCanvas] runLayout finished', { graphReady, layoutBusy })
     }
   }
 
-  function attachNodeListeners() {
-    if (!container) return
-    container.querySelectorAll('.node').forEach(node => {
-      node.addEventListener('click', handleNodeClick as EventListener)
-    })
-  }
-
-  function handleNodeClick(event: Event) {
-    const target = event.currentTarget as HTMLElement | null
-    if (!target?.id) {
-      return
-    }
-    const rawNodeId = target.id
-    const nodeId = normalizeNodeId(rawNodeId)
+  function handleFlowNodeClick(event: CustomEvent<{ node?: { id?: string } }>) {
+    const nodeId = event.detail?.node?.id
+    if (!nodeId) return
     const now = Date.now()
-    console.debug('[FlowCanvas] node click received', { rawNodeId, nodeId })
     if (lastClickedNode === nodeId && now - lastClickTimestamp <= DOUBLE_CLICK_THRESHOLD) {
       dispatch('nodeDoubleClick', nodeId)
-      console.debug('[FlowCanvas] double click emitted', nodeId)
       lastClickedNode = null
       lastClickTimestamp = 0
       return
@@ -139,12 +115,10 @@
 
   function toggleLegend() {
     showLegend = !showLegend
-    console.debug('[FlowCanvas] toggleLegend', showLegend)
   }
 
   function toggleDarkMode() {
     isDarkMode = !isDarkMode
-    console.debug('[FlowCanvas] toggleDarkMode', isDarkMode)
     if (isDarkMode) {
       document.documentElement.classList.add('dark')
       localStorage.setItem('preferredTheme', 'dark')
@@ -152,19 +126,17 @@
       document.documentElement.classList.remove('dark')
       localStorage.setItem('preferredTheme', 'light')
     }
-    scheduleRender('theme-change')
   }
 
   function logDiagram() {
-    if (!diagram?.trim()) {
+    if (!graph) {
       console.info('[FlowCanvas] No diagram to log yet')
       return
     }
-    console.info('[FlowCanvas]\n' + diagram)
+    console.info('[FlowCanvas graph]', graph)
   }
 
   function handleToolbarHome() {
-    console.debug('[FlowCanvas] toolbar goHome triggered')
     dispatch('goHome')
   }
 </script>
@@ -172,7 +144,7 @@
 <div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-gradient-to-b from-slate-950 to-slate-900">
   {#if showToolbar}
     <DiagramToolbar
-      {pending}
+      pending={showOverlay}
       {label}
       {showLegend}
       {isDarkMode}
@@ -183,24 +155,51 @@
     />
   {/if}
 
-  <div class="relative flex-1 overflow-auto">
-    <div bind:this={container} class="min-h-full p-4 text-white" aria-live="polite" aria-busy={pending}></div>
-    {#if pending}
-      <div class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-sm text-gray-200 backdrop-blur">
-        Rendering diagram…
-      </div>
-    {:else if !diagram?.trim()}
-      <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-sm text-gray-400">
+  <div class="relative flex-1 overflow-hidden">
+    {#if hasGraphData}
+      {#key flowKey}
+        <SvelteFlow
+          class="h-full w-full"
+          nodes={nodes}
+          edges={edges}
+          {nodeTypes}
+          nodesDraggable={true}
+          nodesConnectable={false}
+          elementsSelectable={true}
+          panOnDrag={true}
+          panOnScroll={true}
+          selectionOnDrag={false}
+          nodeClickDistance={2}
+          colorMode={isDarkMode ? 'dark' : 'light'}
+          fitView={true}
+          fitViewOptions={{ padding: 0.2 }}
+          on:nodeclick={handleFlowNodeClick}
+        >
+          <Background bgColor={isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Lines} gap={24} />
+        </SvelteFlow>
+      {/key}
+    {:else}
+      <div class="flex h-full flex-col items-center justify-center gap-2 text-sm text-gray-400">
         <span class="text-3xl" aria-hidden="true">🌀</span>
         <span>{emptyStateLabel}</span>
       </div>
     {/if}
-    {#if showLegend && !pending}
+
+    {#if showOverlay}
+      <div
+        data-testid="flow-loading-overlay"
+        class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-sm text-gray-200 backdrop-blur"
+      >
+        Rendering diagram…
+      </div>
+    {/if}
+
+    {#if showLegend && !showOverlay}
       <div class="pointer-events-none absolute bottom-4 right-4"><Legend /></div>
     {/if}
   </div>
 
-  {#if parseError}
-    <div class="border-t border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-300">{parseError}</div>
+  {#if layoutError}
+    <div class="border-t border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-300">{layoutError}</div>
   {/if}
 </div>
