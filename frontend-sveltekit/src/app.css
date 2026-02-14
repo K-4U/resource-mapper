@@ -18,5 +18,16 @@ body {
 }
 
 .big-title {
-  @apply text-xs uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400;
+  @apply uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400;
+}
+
+/**
+TODO: The styles below are for all nodes, style them based on the type of node, e.g. .svelte-flow__node[data-type="custom"] { ... }
+ */
+.svelte-flow__node {
+  @apply gap-1 rounded-2xl border px-4 py-3 dark:bg-gray-600 border-black bg-gray-100
+}
+
+.svelte-flow__node.selected {
+  @apply border-blue-400/80 bg-blue-500 dark:bg-blue-950 shadow-lg
 }

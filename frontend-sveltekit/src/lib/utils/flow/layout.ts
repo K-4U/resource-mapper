@@ -47,7 +47,6 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
         y: layoutNode?.y ?? 0
       },
       style: toInlineStyle(node.style),
-      draggable: false,
       selectable: node.selectable ?? true,
       class: node.className,
       width: layoutNode?.width ?? node.width ?? fallbackSize.width,

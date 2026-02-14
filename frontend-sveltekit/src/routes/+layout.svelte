@@ -23,13 +23,7 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-<div class="flex min-h-screen flex-col bg-white text-gray-900 dark:bg-slate-950 dark:text-gray-100">
-	<Header />
-	<main class="flex flex-1 flex-col px-6 py-6 overflow-hidden bg-gray-50 dark:bg-slate-900">
-		<div class="flex flex-1 min-h-0">
-			<div class="flex flex-1 min-h-0">
-				{@render children()}
-			</div>
-		</div>
-	</main>
-</div>
+<Header />
+<main class="w-full h-full px-6 py-6">
+    {@render children()}
+</main>

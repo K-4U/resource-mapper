@@ -26,7 +26,6 @@ export interface RawFlowNode {
   height?: number
   data: FlowNodeData
   className?: string
-  draggable?: boolean
   selectable?: boolean
   style?: Record<string, string>
 }
