@@ -10,22 +10,22 @@
   $: groupInfo = groupId ? groups[groupId] ?? null : null
 </script>
 
-<aside data-testid="group-sidebar" class="flex h-full w-full flex-col border-l border-gray-900/70 bg-gray-950/70">
+<aside data-testid="group-sidebar" class="flex h-full w-full flex-col border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100">
   <div class="flex-1 overflow-y-auto p-4">
     {#if !groupInfo}
-      <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-gray-400">
+      <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-700 p-4 text-sm text-gray-500 dark:text-gray-300">
         {placeholderMessage}
       </div>
     {:else}
-      <div class="rounded-2xl border border-white/5 bg-black/30 p-4 shadow">
-        <p class="text-xs uppercase tracking-[0.3em] text-blue-300">Group</p>
-        <h2 class="mt-2 text-xl font-semibold text-white">{groupInfo.name}</h2>
+      <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-700 p-4 shadow">
+        <p class="big-title">Group</p>
+        <h2 class="mt-2 text-xl font-semibold text-gray-900 dark:text-white">{groupInfo.name}</h2>
         {#if groupInfo.description}
-          <p class="mt-2 text-sm text-gray-300">{groupInfo.description}</p>
+          <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">{groupInfo.description}</p>
         {/if}
-        <dl class="mt-4 space-y-1 text-xs text-gray-400">
+        <dl class="mt-4 space-y-1 text-xs text-gray-500 dark:text-gray-300">
           <div>
-            <dt class="font-medium text-gray-300">Identifier</dt>
+            <dt class="font-medium text-gray-700 dark:text-gray-300">Identifier</dt>
             <dd>{groupInfo.groupName}</dd>
           </div>
         </dl>

@@ -1,10 +1,7 @@
 @import '@xyflow/svelte/dist/style.css';
-
-:root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #f3f4f6;
-  background: #030712;
-}
+@import "tailwindcss";
+@plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
 
 html,
 body,
@@ -13,48 +10,13 @@ body,
   min-height: 100%;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 55%),
-    radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.2), transparent 45%),
-    #030712;
-  color: #f3f4f6;
 }
 
-#svelte {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-::selection {
-  background: rgba(59, 130, 246, 0.4);
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(17, 24, 39, 0.8);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.6);
-  border-radius: 999px;
-}
-
-:global(.svelte-flow__node) {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  box-shadow: none;
+.big-title {
+  @apply text-xs uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400;
 }

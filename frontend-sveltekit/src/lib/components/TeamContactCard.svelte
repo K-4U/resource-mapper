@@ -54,24 +54,21 @@
 </script>
 
 {#if resolvedTeam}
-  <div class="rounded-xl border border-gray-200 bg-white/5 p-4">
-    <div class="text-sm font-semibold text-gray-300">Responsible Team</div>
-    <h3 class="text-lg font-semibold text-white">{resolvedTeam.name}</h3>
+  <div class="rounded-xl border border-gray-200 bg-gray-100 dark:bg-slate-800 p-4 text-gray-900 dark:text-gray-100">
+    <div class="big-title">Team</div>
+    <h3 class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">{resolvedTeam.name}</h3>
     {#if resolvedTeam.description}
-      <p class="mt-1 text-sm text-gray-400">{resolvedTeam.description}</p>
-    {/if}
-    {#if resolvedTeam.teamLead}
-      <p class="mt-2 text-xs text-gray-500">Led by {resolvedTeam.teamLead}</p>
+      <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">{resolvedTeam.description}</p>
     {/if}
 
     <div class="mt-4">
-      <div class="text-sm font-medium text-gray-300">How to reach them</div>
+      <div class="text-sm font-medium text-gray-700 dark:text-gray-300">How to reach them</div>
       {#if reachOptions.length}
-        <ul class="mt-2 space-y-2 text-sm text-gray-200">
+        <ul class="mt-2 space-y-2 text-sm text-gray-700 dark:text-gray-200">
           {#each reachOptions as entry}
-            <li class="flex items-center justify-between rounded-lg border border-gray-700/40 px-3 py-2">
+            <li class="flex items-center justify-between rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-700 px-3 py-2">
               <div class="flex items-center gap-2">
-                <Icon icon={getChannelIcon(entry.channel)} class="h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Icon icon={getChannelIcon(entry.channel)} class="h-4 w-4 text-gray-400 dark:text-gray-300" aria-hidden="true" />
                 <span>{formatChannel(entry.channel)}</span>
               </div>
               {#if buildLink(entry.channel, entry.detail)}
@@ -79,18 +76,18 @@
                   href={buildLink(entry.channel, entry.detail)}
                   target={entry.channel === 'web' ? '_blank' : undefined}
                   rel="noreferrer"
-                  class="text-blue-400 hover:text-blue-300"
+                  class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
                 >
                   {entry.detail}
                 </a>
               {:else}
-                <span class="text-gray-400">{entry.detail}</span>
+                <span class="text-gray-500 dark:text-gray-400">{entry.detail}</span>
               {/if}
             </li>
           {/each}
         </ul>
       {:else}
-        <p class="mt-2 text-sm text-gray-500">No contact methods provided yet.</p>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No contact methods provided yet.</p>
       {/if}
     </div>
   </div>

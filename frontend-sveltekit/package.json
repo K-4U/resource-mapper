@@ -14,7 +14,9 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.2",
@@ -29,6 +31,7 @@
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^22",
 		"@vitest/browser-playwright": "^4.0.18",
+		"@vitest/coverage-v8": "^4.0.18",
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.14.0",

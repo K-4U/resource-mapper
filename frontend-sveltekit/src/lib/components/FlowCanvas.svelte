@@ -127,7 +127,7 @@
   }
 </script>
 
-<div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-linear-to-b from-slate-950 to-slate-900">
+<div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-gray-50 text-gray-900 dark:bg-slate-900 dark:text-gray-100">
   <div class="relative flex-1 overflow-hidden">
     {#if hasGraphData}
       {#key flowKey}
@@ -152,7 +152,7 @@
         </SvelteFlow>
       {/key}
     {:else}
-      <div class="flex h-full flex-col items-center justify-center gap-2 text-sm text-gray-400">
+      <div class="flex h-full flex-col items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-300">
         <span class="text-3xl" aria-hidden="true">🌀</span>
         <span>{emptyStateLabel}</span>
       </div>
@@ -161,7 +161,7 @@
     {#if showOverlay}
       <div
         data-testid="flow-loading-overlay"
-        class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40 text-sm text-gray-200 backdrop-blur"
+        class="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/80 text-sm text-gray-700 dark:bg-black/70 dark:text-gray-200 backdrop-blur"
       >
         Rendering diagram…
       </div>
@@ -173,6 +173,6 @@
   </div>
 
   {#if layoutError}
-    <div class="border-t border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-300">{layoutError}</div>
+    <div class="border-t border-red-200 bg-red-100 px-4 py-2 text-sm text-red-700 dark:text-red-200 dark:bg-red-500/20 dark:border-red-500/40">{layoutError}</div>
   {/if}
 </div>
