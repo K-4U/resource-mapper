@@ -3,20 +3,18 @@
   import { writable, type Writable } from 'svelte/store'
   import type { Edge, Node, NodeTypes } from '@xyflow/svelte'
   import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte'
-  import DiagramToolbar from '$lib/components/DiagramToolbar.svelte'
   import Legend from '$lib/components/Legend.svelte'
   import { layoutFlowGraph } from '$lib/utils/flow/layout'
-  import type { FlowEdgeData, FlowGraphInput, FlowNodeData } from '$lib/utils/flow/types'
+  import type { FlowGraphInput } from '$lib/utils/flow/types'
   import GroupNode from '$lib/components/flow/GroupNode.svelte'
   import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
   import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
+  import { showLegend, isDarkMode, logDiagramAction } from '$lib/stores/diagram';
 
   const DOUBLE_CLICK_THRESHOLD = 400
 
   export let graph: FlowGraphInput | null = null
   export let pending = false
-  export let label = ''
-  export let showToolbar = true
 
   const dispatch = createEventDispatcher<{
     nodeClick: string
@@ -28,8 +26,6 @@
   const nodes: Writable<Node[]> = writable<Node[]>([])
   const edges: Writable<Edge[]> = writable<Edge[]>([])
 
-  let isDarkMode = false
-  let showLegend = true
   let emptyStateLabel = 'No diagram available.'
   let lastClickedNode: string | null = null
   let lastClickTimestamp = 0
@@ -44,9 +40,17 @@
   onMount(() => {
     const stored = typeof window !== 'undefined' ? localStorage.getItem('preferredTheme') : null
     if (stored === 'dark') {
-      isDarkMode = true
+      isDarkMode.set(true)
       document.documentElement.classList.add('dark')
     }
+
+    let lastLogAction = 0;
+    logDiagramAction.subscribe((n) => {
+      if (n !== lastLogAction) {
+        lastLogAction = n;
+        logDiagram();
+      }
+    });
   })
 
   $: targetSignature = graph?.signature ?? ''
@@ -113,48 +117,17 @@
     dispatch('nodeClick', nodeId)
   }
 
-  function toggleLegend() {
-    showLegend = !showLegend
-  }
-
-  function toggleDarkMode() {
-    isDarkMode = !isDarkMode
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('preferredTheme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('preferredTheme', 'light')
-    }
-  }
-
   function logDiagram() {
-    if (!graph) {
-      console.info('[FlowCanvas] No diagram to log yet')
-      return
-    }
-    console.info('[FlowCanvas graph]', graph)
-  }
-
-  function handleToolbarHome() {
-    dispatch('goHome')
+    // Replace this with your actual diagram logging logic
+    console.log('[FlowCanvas] Diagram log triggered', {
+      nodes: $nodes,
+      edges: $edges,
+      graph: graph
+    });
   }
 </script>
 
-<div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-gradient-to-b from-slate-950 to-slate-900">
-  {#if showToolbar}
-    <DiagramToolbar
-      pending={showOverlay}
-      {label}
-      {showLegend}
-      {isDarkMode}
-      on:goHome={handleToolbarHome}
-      on:toggleLegend={toggleLegend}
-      on:toggleDarkMode={toggleDarkMode}
-      on:logDiagram={logDiagram}
-    />
-  {/if}
-
+<div data-testid="flow-canvas" class="relative flex h-full min-h-0 flex-1 flex-col bg-linear-to-b from-slate-950 to-slate-900">
   <div class="relative flex-1 overflow-hidden">
     {#if hasGraphData}
       {#key flowKey}
@@ -170,12 +143,12 @@
           panOnScroll={true}
           selectionOnDrag={false}
           nodeClickDistance={2}
-          colorMode={isDarkMode ? 'dark' : 'light'}
+          colorMode={$isDarkMode ? 'dark' : 'light'}
           fitView={true}
           fitViewOptions={{ padding: 0.2 }}
           on:nodeclick={handleFlowNodeClick}
         >
-          <Background bgColor={isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Lines} gap={24} />
+          <Background bgColor={$isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Lines} gap={24} />
         </SvelteFlow>
       {/key}
     {:else}
@@ -194,7 +167,7 @@
       </div>
     {/if}
 
-    {#if showLegend && !showOverlay}
+    {#if $showLegend && !showOverlay}
       <div class="pointer-events-none absolute bottom-4 right-4"><Legend /></div>
     {/if}
   </div>
