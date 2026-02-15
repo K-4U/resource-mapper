@@ -8,7 +8,7 @@ import {
     type ServiceIdentifier
 } from '$lib/types'
 import type {FlowEdgeData, FlowNodeData, GroupServicesGraphResult,} from '$lib/utils/flow/types'
-import {createGraphSignature, edgeColorForConnection} from '$lib/utils/flow/helpers'
+import {createGraphSignature} from '$lib/utils/flow/helpers'
 import {getServiceNodeIdFromDefinition} from '$lib/utils/flow/serviceIds'
 import {getAwsIconPath} from '$lib/utils/awsIcons'
 import type {Edge, Node} from "@xyflow/svelte";
@@ -292,13 +292,14 @@ function buildEdge(
     connectionType?: ConnectionType,
     direction: 'incoming' | 'outgoing' | 'internal' = 'internal'
 ): Edge<FlowEdgeData> {
-    const color = edgeColorForConnection(connectionType)
-    //TODO: Add class here.
     return {
         id: `edge_${sourceId}_${targetId}_${direction}`,
         source: sourceId,
         target: targetId,
+        // type: 'snake',
         type: 'smoothstep',
+        markerEnd: 'arrow',
+        class: `edge-${direction.toLowerCase()}`,
         label: connectionType || "",
         data: {label: connectionType, connectionType, direction}
     }

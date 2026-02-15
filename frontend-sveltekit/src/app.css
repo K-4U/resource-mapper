@@ -42,3 +42,11 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
 .svelte-flow__node-external {
     @apply bg-yellow-100 dark:bg-yellow-600
 }
+
+.svelte-flow__edge {
+    @apply stroke-3;
+}
+
+.svelte-flow__edge.edge-incoming {
+    @apply stroke-green-400 dark:stroke-green-600 stroke-2 rounded-lg
+}

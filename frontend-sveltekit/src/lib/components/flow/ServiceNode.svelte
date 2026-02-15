@@ -56,6 +56,7 @@
 
 <Handle type="target" position={Position.Left}/>
 <Handle type="source" position={Position.Right}/>
+
 <div class="flex items-center gap-3">
     {#if iconPath}
         <img src={iconPath} alt={data.label} class="h-10 w-10 rounded-lg bg-white/5 object-contain"

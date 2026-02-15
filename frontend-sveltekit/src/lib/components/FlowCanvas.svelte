@@ -1,16 +1,26 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte'
-  import { writable, type Writable } from 'svelte/store'
-  import {Controls, type Edge, MiniMap, type Node, type NodeTypes, Panel} from '@xyflow/svelte'
-  import { SvelteFlow, Background, BackgroundVariant } from '@xyflow/svelte'
+  import {createEventDispatcher, onMount} from 'svelte'
+  import {
+    Background,
+    BackgroundVariant,
+    Controls,
+    type Edge,
+    type EdgeTypes,
+    MiniMap,
+    type Node,
+    type NodeTypes,
+    Panel,
+    SvelteFlow
+  } from '@xyflow/svelte'
   import Legend from '$lib/components/Legend.svelte'
-  import { layoutFlowGraph } from '$lib/utils/flow/layout'
-  import type { FlowGraphInput } from '$lib/utils/flow/types'
+  import {layoutFlowGraph} from '$lib/utils/flow/layout'
+  import type {FlowGraphInput} from '$lib/utils/flow/types'
   import GroupNode from '$lib/components/flow/GroupNode.svelte'
   import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
   import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
-  import { showLegend, isDarkMode, logDiagramAction } from '$lib/stores/diagram';
+  import {isDarkMode, logDiagramAction, showLegend} from '$lib/stores/diagram';
   import ServiceGroupNode from "$lib/components/flow/ServiceGroupNode.svelte";
+  import SnakeEdge from "$lib/components/flow/SnakeEdge.svelte";
 
   const DOUBLE_CLICK_THRESHOLD = 400
 
@@ -24,6 +34,7 @@
   }>()
 
   const nodeTypes = { group: GroupNode, service: ServiceNode, external: ExternalNode, serviceGroup: ServiceGroupNode } as NodeTypes
+  const edgeTypes = { snake: SnakeEdge } as EdgeTypes
 
   let nodes: Node[] = []
   let edges: Edge[] = []
@@ -130,6 +141,7 @@
           bind:nodes
           bind:edges
           {nodeTypes}
+          {edgeTypes}
           nodesDraggable
           nodesConnectable={false}
           panOnDrag
