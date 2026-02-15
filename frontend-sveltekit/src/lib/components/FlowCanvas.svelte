@@ -55,7 +55,6 @@
     let layoutBusy = false
     let graphReady = false
     let currentSignature = ''
-    let flowKey = 0
     let showOverlay = true
     let hasGraphData = false
 
@@ -69,31 +68,38 @@
         });
     })
 
-    $: targetSignature = graph?.signature ?? ''
-    $: if (targetSignature !== currentSignature || (!graph && currentSignature !== '')) {
-        runLayout(graph, targetSignature)
+    // 3. Fix the Reactive Trigger
+    // Ensure this ONLY triggers when the parent passes a brand new graph
+    $: {
+        const newTargetSignature = graph?.signature ?? '';
+        if (newTargetSignature !== '' && newTargetSignature !== currentSignature) {
+            runLayout(graph, newTargetSignature, false);
+        }
     }
     $: hasGraphData = !!graph && graph.serviceNodes.length > 0
     $: showOverlay = pending || layoutBusy || !graphReady
     $: console.debug('[FlowCanvas] overlay state', {showOverlay, pending, layoutBusy, graphReady})
 
-    async function runLayout(sourceGraph: FlowGraphInput | null, signature: string) {
+    async function runLayout(sourceGraph: FlowGraphInput | null, signature: string, edgesOnly = false) {
         layoutError = ''
-        graphReady = false
+
+        if(!edgesOnly) {
+            graphReady = false
+        }
+
         console.debug('[FlowCanvas] runLayout start', {hasGraph: !!sourceGraph, signature})
         if (!sourceGraph) {
             nodes = []
             edges = []
             emptyStateLabel = pending ? 'Rendering diagram…' : 'No diagram available.'
             currentSignature = signature
-            flowKey += 1
             console.debug('[FlowCanvas] runLayout skipped - no graph data')
             return
         }
         layoutBusy = true
         try {
-            const result = await layoutFlowGraph(sourceGraph)
-            if (result.signature !== signature) {
+            const result = await layoutFlowGraph(sourceGraph, edgesOnly)
+            if (result.signature !== signature && !edgesOnly) {
                 console.debug('[FlowCanvas] runLayout result ignored due to stale signature', {
                     expected: signature,
                     received: result.signature
@@ -102,8 +108,12 @@
             }
             nodes = result.nodes as Node[]
             edges = result.edges as Edge[]
-            currentSignature = result.signature
-            flowKey += 1
+
+            // Only update the "official" signature if it was a full layout
+            if (!edgesOnly) {
+                currentSignature = result.signature;
+            }
+
             graphReady = true
             console.debug('[FlowCanvas] runLayout complete', {
                 nodeCount: result.nodes.length,
@@ -151,7 +161,7 @@
             signature: `layout-${Date.now()}`
         };
 
-        runLayout(graphInput, graphInput.signature);
+        runLayout(graphInput, graphInput.signature, true);
     }
 
     //TODO: Fix me
@@ -182,39 +192,39 @@
 <div data-testid="flow-canvas"
      class="flex h-full flex-auto flex-col overflow-hidden rounded-2xl border border-white/5 bg-black/20 shadow-xl">
     {#if hasGraphData}
-        {#key flowKey}
-            <SvelteFlow
-                    bind:nodes
-                    bind:edges
-                    {nodeTypes}
-                    {edgeTypes}
-                    onnodedragstart={handleNodeDragStart}
-                    onnodedragstop={triggerLayout}
-                    nodesDraggable
-                    nodesConnectable={false}
-                    panOnDrag
-                    zoomOnScroll
-                    selectionOnDrag={false}
-                    colorMode={$isDarkMode ? 'dark' : 'light'}
-                    fitView
-                    fitViewOptions={{ padding: 0.2 }}
-            >
-                <!-- Todo: See if we can use tailwind here-->
-                <Background bgColor={$isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Dots} gap={24}/>
-                <MiniMap nodeColor={(n) => {
+
+        <SvelteFlow
+                bind:nodes
+                bind:edges
+                {nodeTypes}
+                {edgeTypes}
+                onnodedragstart={handleNodeDragStart}
+                onnodedragstop={triggerLayout}
+                nodesDraggable
+                nodesConnectable={false}
+                panOnDrag
+                zoomOnScroll
+                selectionOnDrag={false}
+                colorMode={$isDarkMode ? 'dark' : 'light'}
+                fitView
+                fitViewOptions={{ padding: 0.2 }}
+        >
+            <!-- Todo: See if we can use tailwind here-->
+            <Background bgColor={$isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Dots} gap={24}/>
+            <MiniMap nodeColor={(n) => {
             if (n.type === 'group') return '#2563eb'
             if (n.type === 'service') return '#16a34a'
             if (n.type === 'external') return '#d97706'
             return '#9ca3af'
           }} position="bottom-left"/>
-                <Controls position="top-left"/>
-                <Panel position="bottom-right">
-                    {#if $showLegend && !showOverlay}
-                        <Legend/>
-                    {/if}
-                </Panel>
-            </SvelteFlow>
-        {/key}
+            <Controls position="top-left"/>
+            <Panel position="bottom-right">
+                {#if $showLegend && !showOverlay}
+                    <Legend/>
+                {/if}
+            </Panel>
+        </SvelteFlow>
+
 
     {:else}
         <div class="flex h-full flex-col items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-300">

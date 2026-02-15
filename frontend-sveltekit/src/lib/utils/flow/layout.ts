@@ -15,6 +15,7 @@ const ELK_OPTIONS: Record<string, string> = {
     'elk.portConstraints': 'FREE',
     'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
     'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+    'elk.componentLayout.active': 'true', // Helps with disconnected components
 };
 
 function convertEdgesToElkEdges(input: FlowGraphInput) {
@@ -22,27 +23,41 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
         id: edge.id,
         sources: [edge.source],
         targets: [edge.target],
-        originalEdge: edge
+        originalEdge: edge,
+        layoutOptions: { 'elk.noLayout': 'false' }
     }));
 }
 
-export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphOutput> {
+
+
+export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly:boolean = false): Promise<FlowGraphOutput> {
     const elkEdges = convertEdgesToElkEdges(input);
+    console.debug('[layoutFlowGraph] Starting layout with input:', { input, edgesOnly });
+    // Helper: Build node properties and handle the "noLayout" flag
+    const prepareElkNode = (node: any) => ({
+        ...node,
+        x: node.position?.x ?? 0,
+        y: node.position?.y ?? 0,
+        layoutOptions: edgesOnly ? { 'elk.noLayout': 'true' } : {}
+    })
 
     // 1. Build the nested ELK structure
     const elkChildren: ElkNode[] = input.groupNodes.map(parent => ({
         ...parent,
+        x: parent.position.x ?? 0,
+        y: parent.position.y ?? 0,
         layoutOptions: {
             ...ELK_OPTIONS,
-            'elk.padding': `[top=60,left=${PADDING},bottom=${PADDING},right=${PADDING}]`
+            'elk.padding': `[top=60,left=${PADDING},bottom=${PADDING},right=${PADDING}]`,
+            ...(edgesOnly ? { 'elk.noLayout': 'true' } : {}),
         },
-        children: input.serviceNodes.filter(child => child.parentId === parent.id)
+        children: input.serviceNodes.filter(child => child.parentId === parent.id).map(prepareElkNode)
     }));
 
     // Add nodes that aren't in any group
     input.serviceNodes
         .filter(child => child.parentId === undefined)
-        .forEach(node => elkChildren.push(node));
+        .forEach(node => elkChildren.push(prepareElkNode(node)));
 
     const elkGraph = {
         id: 'root',
@@ -50,6 +65,8 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
         children: elkChildren,
         edges: elkEdges
     };
+
+    console.log(JSON.stringify(elkGraph, null, 2))
 
     return elk.layout(elkGraph).then((layoutedGraph) => {
         const flattenedNodes: Node<FlowNodeData>[] = [];
@@ -104,6 +121,8 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
             allLayoutedEdges.push(...(layoutedGraph.edges as any));
         }
 
+        console.debug(allLayoutedEdges);
+
         // 3. Globalize Edge Points
         const finalEdges: Edge<FlowEdgeData>[] = allLayoutedEdges
             .filter((edge) => edge.originalEdge.data?.connectionType !== 'group')
@@ -112,15 +131,13 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
             const points: ElkPoint[] = [];
 
             if (section) {
+                console.debug('[layoutFlowGraph] Processing edge for points', { edge, section });
                 const sourceId = edge.sources[0];
                 const targetId = edge.targets[0];
 
                 const sourceParentId = nodeToParent.get(sourceId);
                 const targetParentId = nodeToParent.get(targetId);
 
-                // THE LOGIC FIX:
-                // Only apply an offset if BOTH nodes are in the SAME parent.
-                // If they are in different parents, ELK already routed them in global space.
                 let offset = { x: 0, y: 0 };
 
                 if (sourceParentId && sourceParentId === targetParentId) {
