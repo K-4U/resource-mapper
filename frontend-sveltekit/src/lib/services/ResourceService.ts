@@ -2,7 +2,7 @@ import yaml from 'js-yaml'
 import { validateGroupInfo, type GroupInfo } from '$lib/types'
 import { YamlEntityService } from './YamlEntityService'
 
-class ResourceService extends YamlEntityService<GroupInfo> {
+class GroupService extends YamlEntityService<GroupInfo> {
   constructor() {
     super(
       import.meta.glob('../../../data/services/*/group-info.yaml', {
@@ -11,7 +11,7 @@ class ResourceService extends YamlEntityService<GroupInfo> {
         query: '?raw'
       }) as Record<string, string>
     )
-    console.debug('[ResourceService] initialized')
+    console.debug('[GroupService] initialized')
   }
 
   protected extractId(relativePath: string): string | null {
@@ -24,7 +24,7 @@ class ResourceService extends YamlEntityService<GroupInfo> {
   }
 
   protected parseEntity(groupId: string, rawYaml: string): GroupInfo | null {
-    console.debug('[ResourceService] parseEntity', { groupId })
+    console.debug('[GroupService] parseEntity', { groupId })
     try {
       const parsed = yaml.load(rawYaml)
       if (!parsed || typeof parsed !== 'object') {
@@ -38,22 +38,22 @@ class ResourceService extends YamlEntityService<GroupInfo> {
   }
 
   async getGroup(groupId: string): Promise<GroupInfo | null> {
-    console.debug('[ResourceService] getGroup', groupId)
+    console.debug('[GroupService] getGroup', groupId)
     return this.fetchEntity(groupId)
   }
 
   async getAllGroups(): Promise<Record<string, GroupInfo>> {
-    console.debug('[ResourceService] getAllGroups start')
+    console.debug('[GroupService] getAllGroups start')
     return this.fetchAllEntities()
   }
 
   __setGroupFileMocks(files: Record<string, string>) {
-    console.debug('[ResourceService] __setGroupFileMocks', Object.keys(files))
+    console.debug('[GroupService] __setGroupFileMocks', Object.keys(files))
     this.setFileMocks(files)
   }
 }
 
-export const resourceService = new ResourceService()
+export const resourceService = new GroupService()
 
 export function __setGroupFileMocks(files: Record<string, string>) {
   resourceService.__setGroupFileMocks(files)

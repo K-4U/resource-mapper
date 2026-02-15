@@ -10,6 +10,7 @@
   import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
   import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
   import { showLegend, isDarkMode, logDiagramAction } from '$lib/stores/diagram';
+  import ServiceGroupNode from "$lib/components/flow/ServiceGroupNode.svelte";
 
   const DOUBLE_CLICK_THRESHOLD = 400
 
@@ -22,7 +23,7 @@
     goHome: void
   }>()
 
-  const nodeTypes = { group: GroupNode, service: ServiceNode, external: ExternalNode } as NodeTypes
+  const nodeTypes = { group: GroupNode, service: ServiceNode, external: ExternalNode, serviceGroup: ServiceGroupNode } as NodeTypes
 
   let nodes: Node[] = []
   let edges: Edge[] = []
@@ -52,7 +53,7 @@
   $: if (targetSignature !== currentSignature || (!graph && currentSignature !== '')) {
     runLayout(graph, targetSignature)
   }
-  $: hasGraphData = !!graph && graph.nodes.length > 0
+  $: hasGraphData = !!graph && graph.serviceNodes.length > 0
   $: showOverlay = pending || layoutBusy || !graphReady
   $: console.debug('[FlowCanvas] overlay state', { showOverlay, pending, layoutBusy, graphReady })
 

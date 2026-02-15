@@ -108,13 +108,13 @@ class ConnectionsService {
     return edges
   }
 
-  async getConnectionsFromGroup(groupId: string, includeSelfConnections = false): Promise<ServiceConnection[]> {
+  async getConnectionsFromGroup(groupId: string, includeSelfConnections = false): Promise<GroupConnection[]> {
     await this.ensureLoaded()
     const serviceIds = this.servicesByGroup.get(groupId)
     if (!serviceIds) {
       return []
     }
-    const results: ServiceConnection[] = []
+    const groupCounts = new Map<string, number>()
     serviceIds.forEach(serviceKey => {
       const edges = this.connectionsFromService.get(serviceKey)
       if (!edges) {
@@ -125,21 +125,25 @@ class ConnectionsService {
         if (!includeSelfConnections && targetGroup === groupId) {
           return
         }
-        results.push(edge)
+        groupCounts.set(targetGroup, (groupCounts.get(targetGroup) ?? 0) + 1)
       })
     })
+    const results: GroupConnection[] = []
+    groupCounts.forEach((count, targetGroup) => {
+      results.push({ sourceGroup: groupId, targetGroup, connectionCount: count })
+    })
     console.debug('[ConnectionsService] getConnectionsFromGroup', { groupId, includeSelfConnections, count: results.length })
-    return cloneEdges(results)
+    return results
   }
 
-  async getConnectionsToGroup(groupId: string, includeSelfConnections = false): Promise<ServiceConnection[]> {
+  async getConnectionsToGroup(groupId: string, includeSelfConnections = false): Promise<GroupConnection[]> {
     await this.ensureLoaded()
     const serviceIds = this.servicesByGroup.get(groupId)
     if (!serviceIds) {
       return []
     }
     const prefix = `${groupId}/`
-    const results: ServiceConnection[] = []
+    const groupCounts = new Map<string, number>()
     this.connectionsToService.forEach((edges, targetKey) => {
       if (!targetKey.startsWith(prefix)) {
         return
@@ -149,11 +153,15 @@ class ConnectionsService {
         if (!includeSelfConnections && startGroup === groupId) {
           return
         }
-        results.push(edge)
+        groupCounts.set(startGroup, (groupCounts.get(startGroup) ?? 0) + 1)
       })
     })
+    const results: GroupConnection[] = []
+    groupCounts.forEach((count, sourceGroup) => {
+      results.push({ sourceGroup, targetGroup: groupId, connectionCount: count })
+    })
     console.debug('[ConnectionsService] getConnectionsToGroup', { groupId, includeSelfConnections, count: results.length })
-    return cloneEdges(results)
+    return results
   }
 
   async getAllGroupConnections(includeSelfConnections = false): Promise<GroupConnection[]> {

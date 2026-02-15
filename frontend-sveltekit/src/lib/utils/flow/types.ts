@@ -6,7 +6,7 @@ export type FlowNodeKind = 'group' | 'service' | 'external'
 export interface FlowNodeData extends Record<string, unknown> {
   label: string
   subLabel?: string
-  iconPath?: string | null
+  serviceType?: string
   groupId?: string
   serviceId?: string
   kind: FlowNodeKind
@@ -20,29 +20,10 @@ export interface FlowEdgeData extends Record<string, unknown> {
   direction?: 'incoming' | 'outgoing' | 'internal'
 }
 
-export interface RawFlowNode {
-  id: string
-  width?: number
-  height?: number
-  data: FlowNodeData
-  className?: string
-  selectable?: boolean
-  style?: Record<string, string>
-}
-
-export interface RawFlowEdge {
-  id: string
-  source: string
-  target: string
-  label?: string
-  data?: FlowEdgeData
-  animated?: boolean
-  style?: Record<string, string>
-}
-
 export interface FlowGraphInput {
-  nodes: RawFlowNode[]
-  edges: RawFlowEdge[]
+  groupNodes: Node<FlowNodeData>[]
+  serviceNodes: Node<FlowNodeData>[]
+  edges: Edge<FlowEdgeData>[]
   signature: string
 }
 

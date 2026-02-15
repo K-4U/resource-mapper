@@ -194,6 +194,7 @@ export interface ExternalGroupServices {
 }
 
 export interface GroupInfo {
+  id: string,
   name: string
   description?: string
   teamId?: string
@@ -287,20 +288,21 @@ export function validateServiceDefinition(data: any, identifier: string): Servic
   }
 }
 
-export function validateGroupInfo(data: any, groupName: string): GroupInfo {
+export function validateGroupInfo(data: any, groupId: string): GroupInfo {
   if (!data || typeof data !== 'object') {
-    throw new Error(`Invalid group info for ${groupName}: must be an object`)
+    throw new Error(`Invalid group info for ${groupId}: must be an object`)
   }
 
   if (!data.name || typeof data.name !== 'string') {
-    throw new Error(`Invalid name for group ${groupName}: must be a non-empty string`)
+    throw new Error(`Invalid name for group ${groupId}: must be a non-empty string`)
   }
 
   return {
+    id: groupId,
     name: data.name,
     description: data.description,
     teamId: data.teamId,
-    groupName: groupName
+    groupName: groupId
   }
 }
 

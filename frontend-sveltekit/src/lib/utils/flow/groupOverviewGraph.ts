@@ -15,9 +15,10 @@
 // In summary: This file is VERY MUCH needed because it is the single source of truth for how group and connection data
 // is represented in the diagram, and it enables a clean, maintainable, and testable architecture.
 
-import type { GroupConnection, GroupInfo } from '$lib/types'
-import type { FlowGraphInput, RawFlowEdge, RawFlowNode } from '$lib/utils/flow/types'
-import { createGraphSignature, formatConnectionLabel, sanitizeNodeId } from '$lib/utils/flow/helpers'
+import type {GroupConnection, GroupInfo} from '$lib/types'
+import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
+import {createGraphSignature, formatConnectionLabel, sanitizeNodeId} from '$lib/utils/flow/helpers'
+import type {Edge, Node} from "@xyflow/svelte"
 
 export interface GroupOverviewGraphResult {
   graph: FlowGraphInput | null
@@ -33,18 +34,19 @@ export function buildGroupOverviewGraph(
   }
 
   // Convert each group into a diagram node
-  const nodes: RawFlowNode[] = Object.entries(groups).map(([groupId, groupInfo]) => ({
+  const nodes: Node<FlowNodeData>[] = Object.entries(groups).map(([groupId, groupInfo]) => ({
     id: sanitizeNodeId(groupId, 'group'),
     data: {
       label: groupInfo.name,
       subLabel: groupInfo.description ?? groupId,
       groupId,
       kind: 'group'
-    }
+    },
+    position: { x: 0, y: 0 },
   }))
 
   // Convert each connection into a diagram edge
-  const edges: RawFlowEdge[] = connections.map((connection, index) => {
+  const edges: Edge<FlowEdgeData>[] = connections.map((connection, index) => {
     const sourceId = sanitizeNodeId(connection.sourceGroup, 'group')
     const targetId = sanitizeNodeId(connection.targetGroup, 'group')
     return {

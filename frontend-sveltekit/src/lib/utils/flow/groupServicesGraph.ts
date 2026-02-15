@@ -1,234 +1,305 @@
-import type {
-  ConnectionType,
-  ExternalConnectionDirection,
-  ExternalGroupServices,
-  GroupInfo,
-  ServiceDefinition
+import {
+    type ConnectionType,
+    type ExternalConnectionDirection,
+    type ExternalGroupServices,
+    type GroupConnection,
+    type GroupInfo,
+    type ServiceDefinition,
+    type ServiceIdentifier
 } from '$lib/types'
-import type { FlowGraphInput, GroupServicesGraphResult, RawFlowEdge, RawFlowNode } from '$lib/utils/flow/types'
-import { createGraphSignature, edgeColorForConnection } from '$lib/utils/flow/helpers'
-import { getServiceNodeIdFromDefinition } from '$lib/utils/flow/serviceIds'
-import { getAwsIconPath } from '$lib/utils/awsIcons'
+import type {FlowEdgeData, FlowNodeData, GroupServicesGraphResult,} from '$lib/utils/flow/types'
+import {createGraphSignature, edgeColorForConnection} from '$lib/utils/flow/helpers'
+import {getServiceNodeIdFromDefinition} from '$lib/utils/flow/serviceIds'
+import {getAwsIconPath} from '$lib/utils/awsIcons'
+import type {Edge, Node} from "@xyflow/svelte";
 
 interface ExternalNodeMeta {
-  direction: ExternalConnectionDirection
-  group: GroupInfo
-  service: ServiceDefinition
+    direction: ExternalConnectionDirection
+    group: GroupInfo
+    service: ServiceDefinition
+}
+
+const position = {x: 0, y: 0};
+
+function createServiceNode(nodeId: string, service: ServiceDefinition, group: GroupInfo): Node<FlowNodeData> {
+    return {
+        id: nodeId,
+        type: 'service',
+        width: 220,
+        height: 120,
+        data: {
+            label: service.friendlyName,
+            subLabel: service.description ?? undefined,
+            groupId: group.id,
+            serviceId: service.identifier,
+            serviceType: service.serviceType,
+            kind: 'service'
+        },
+        parentId: `group_${group.id}`,
+        position
+    };
+}
+
+function addGroupIfNotExists(servicesToGroupMap: Map<string, string[]>, target: ServiceIdentifier) {
+    if (!servicesToGroupMap.has(target.groupId)) {
+        servicesToGroupMap.set(target.groupId, []);
+    }
+    servicesToGroupMap.get(target.groupId)?.push(target.serviceId);
 }
 
 export function buildGroupServicesGraph(
-  group: GroupInfo,
-  services: ServiceDefinition[],
-  externalGroups: ExternalGroupServices[] = []
+    group: GroupInfo,
+    services: ServiceDefinition[],
+    allGroups: Map<string, GroupInfo>,
+    groupConnections: GroupConnection[],
+    externalGroups: ExternalGroupServices[] = []
 ): GroupServicesGraphResult {
-  const nodes: RawFlowNode[] = []
-  const edges: RawFlowEdge[] = []
-  const serviceNodeLookup = new Map<string, string>()
-  const externalNodeMap = new Map<string, RawFlowNode>()
-  const serviceNodeRecord: Record<string, ServiceDefinition> = {}
-  const externalNodeRecord: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
+    const nodes: Node<FlowNodeData>[] = []
+    const edges: Edge<FlowEdgeData>[] = []
+    const serviceNodeLookup = new Map<string, string>()
+    const externalNodeMap = new Map<string, Node<FlowNodeData>>()
+    const serviceNodeRecord: Record<string, ServiceDefinition> = {}
+    const externalNodeRecord: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
 
-  if (!services.length) {
-    nodes.push({
-      id: `placeholder_${group.groupName}`,
-      width: 240,
-      height: 120,
-      data: {
-        label: 'No services defined',
-        subLabel: 'Add services to see relationships',
-        kind: 'service',
-        groupId: group.groupName,
-        isPlaceholder: true
-      }
-    })
-    return {
-      graph: {
-        nodes,
-        edges,
-        signature: createGraphSignature('group-services', { group: group.groupName, placeholder: true })
-      },
-      serviceNodes: serviceNodeRecord,
-      externalNodes: externalNodeRecord
+    const servicesToGroupMap = new Map<string, string[]>();
+
+    if (!services.length) {
+        nodes.push({
+            id: `placeholder_${group.groupName}`,
+            data: {
+                label: 'No services defined',
+                subLabel: 'Add services to see relationships',
+                kind: 'service',
+                groupId: group.groupName,
+                isPlaceholder: true
+            },
+            position
+        })
+        return {
+            graph: {
+                groupNodes: [],
+                serviceNodes: nodes,
+                edges,
+                signature: createGraphSignature('group-services', {group: group.groupName, placeholder: true})
+            },
+            serviceNodes: serviceNodeRecord,
+            externalNodes: externalNodeRecord
+        }
     }
-  }
 
-  services.forEach(service => {
-    const nodeId = getServiceNodeIdFromDefinition(service)
-    serviceNodeLookup.set(service.identifier, nodeId)
-    serviceNodeRecord[nodeId] = service
-    nodes.push({
-      id: nodeId,
-      width: 240,
-      height: 140,
-      data: {
-        label: service.friendlyName,
-        subLabel: service.description ?? undefined,
-        iconPath: getAwsIconPath(service.serviceType),
-        groupId: group.groupName,
-        serviceId: service.identifier,
-        kind: 'service'
-      }
-    })
-  })
+    console.log(allGroups);
 
-  const outgoingLookup = createDirectionLookup(externalGroups, 'outgoing')
-  const incomingLookup = createDirectionLookup(externalGroups, 'incoming')
+    // First pass to create nodes for all services within the group and build a lookup for their IDs
+    services.forEach(service => {
+        const nodeId = getServiceNodeIdFromDefinition(service)
+        serviceNodeLookup.set(service.identifier, nodeId)
+        serviceNodeRecord[nodeId] = service
 
-  services.forEach(service => {
-    const sourceId = serviceNodeLookup.get(service.identifier)
-    if (!sourceId) return
+        console.log(service.groupName);
+        nodes.push(createServiceNode(nodeId, service, allGroups.get(service.groupName)))
 
-    service.outgoingConnections?.forEach(connection => {
-      const target = connection.targetIdentifier
-      if (target.groupId === group.groupName) {
-        const targetId = target.serviceId ? serviceNodeLookup.get(target.serviceId) : undefined
-        if (!targetId) return
-        edges.push(buildEdge(sourceId, targetId, connection.connectionType))
-        return
-      }
-
-      if (!target.groupId || !target.serviceId) {
-        return
-      }
-      const externalTarget = ensureExternalNode(
-        'outgoing',
-        target.groupId,
-        target.serviceId,
-        outgoingLookup,
-        externalNodeMap,
-        externalNodeRecord
-      )
-      if (!externalTarget) return
-      edges.push(buildEdge(sourceId, externalTarget, connection.connectionType, 'outgoing'))
+        if (!servicesToGroupMap.has(service.groupName)) {
+            servicesToGroupMap.set(service.groupName, []);
+        }
+        servicesToGroupMap.get(service.groupName)?.push(service.identifier);
     })
 
-    service.incomingConnections?.forEach(connection => {
-      const source = connection.sourceIdentifier
-      if (source.groupId === group.groupName) {
-        const sourceNodeId = source.serviceId ? serviceNodeLookup.get(source.serviceId) : undefined
-        if (!sourceNodeId) return
-        const targetNodeId = serviceNodeLookup.get(service.identifier)
-        if (!targetNodeId) return
-        edges.push(buildEdge(sourceNodeId, targetNodeId, connection.connectionType))
-        return
-      }
+    const outgoingLookup = createDirectionLookup(externalGroups, 'outgoing')
+    const incomingLookup = createDirectionLookup(externalGroups, 'incoming')
 
-      if (!source.groupId || !source.serviceId) {
-        return
-      }
-      const externalSource = ensureExternalNode(
-        'incoming',
-        source.groupId,
-        source.serviceId,
-        incomingLookup,
-        externalNodeMap,
-        externalNodeRecord
-      )
-      if (!externalSource) return
-      const targetNodeId = serviceNodeLookup.get(service.identifier)
-      if (!targetNodeId) return
-      edges.push(buildEdge(externalSource, targetNodeId, connection.connectionType, 'incoming'))
+    services.forEach(service => {
+        const sourceId = serviceNodeLookup.get(service.identifier)
+        if (!sourceId) return
+
+        service.outgoingConnections?.forEach(connection => {
+            const target = connection.targetIdentifier
+            if (target.groupId === group.groupName) {
+                const targetId = target.serviceId ? serviceNodeLookup.get(target.serviceId) : undefined
+                if (!targetId) return
+                edges.push(buildEdge(sourceId, targetId, connection.connectionType))
+                return
+            }
+
+            if (!target.groupId || !target.serviceId) {
+                return
+            }
+            const externalTarget = ensureExternalNode(
+                'outgoing',
+                allGroups.get(target.groupId),
+                target.serviceId,
+                outgoingLookup,
+                externalNodeMap,
+                externalNodeRecord
+            )
+            if (!externalTarget) return
+            edges.push(buildEdge(sourceId, externalTarget, connection.connectionType, 'outgoing'))
+
+            addGroupIfNotExists(servicesToGroupMap, target);
+        })
+
+        service.incomingConnections?.forEach(connection => {
+            const source = connection.sourceIdentifier
+            if (source.groupId === group.groupName) {
+                const sourceNodeId = source.serviceId ? serviceNodeLookup.get(source.serviceId) : undefined
+                if (!sourceNodeId) return
+                const targetNodeId = serviceNodeLookup.get(service.identifier)
+                if (!targetNodeId) return
+                edges.push(buildEdge(sourceNodeId, targetNodeId, connection.connectionType))
+                return
+            }
+
+            if (!source.groupId || !source.serviceId) {
+                return
+            }
+            const externalSource = ensureExternalNode(
+                'incoming',
+                allGroups.get(source.groupId),
+                source.serviceId,
+                incomingLookup,
+                externalNodeMap,
+                externalNodeRecord
+            )
+            if (!externalSource) return
+            const targetNodeId = serviceNodeLookup.get(service.identifier)
+            if (!targetNodeId) return
+            edges.push(buildEdge(externalSource, targetNodeId, connection.connectionType, 'incoming'))
+
+            addGroupIfNotExists(servicesToGroupMap, source);
+        })
     })
-  })
 
-  const signature = createGraphSignature('group-services', {
-    group: group.groupName,
-    services: services.map(service => ({ identifier: service.identifier, type: service.serviceType })).sort((a, b) =>
-      a.identifier.localeCompare(b.identifier)
-    ),
-    external: externalGroups.map(entry => ({
-      direction: entry.direction,
-      group: entry.group.groupName,
-      services: entry.services.map(service => service.identifier).sort()
-    }))
-  })
+    const groupNodes: Node<FlowNodeData>[] = []
+    //Loop over all visible groups and add them too
+    allGroups.forEach((groupInfo, groupName) => {
+        groupNodes.push({
+            id: `group_${groupName}`,
+            type: 'serviceGroup',
+            data: {
+                label: groupInfo.name,
+                subLabel: groupInfo.description ?? undefined,
+                groupId: groupInfo.groupName,
+                kind: ''
+            },
+            position
+        })
+    });
 
-  return {
-    graph: { nodes: nodes.concat(Array.from(externalNodeMap.values())), edges, signature },
-    serviceNodes: serviceNodeRecord,
-    externalNodes: externalNodeRecord
-  }
+    //Loop over all group connections and add edges between groups.
+    groupConnections.forEach(connection => {
+        const sourceId = `group_${connection.sourceGroup}`
+        const targetId = `group_${connection.targetGroup}`
+        edges.push(buildEdge(sourceId, targetId))
+    });
+
+    const signature = createGraphSignature('group-services', {
+        group: group.groupName,
+        services: services.map(service => ({identifier: service.identifier, type: service.serviceType})).sort((a, b) =>
+            a.identifier.localeCompare(b.identifier)
+        ),
+        external: externalGroups.map(entry => ({
+            direction: entry.direction,
+            group: entry.group.groupName,
+            services: entry.services.map(service => service.identifier).sort()
+        }))
+    })
+
+    return {
+        graph: {
+            groupNodes: groupNodes,
+            serviceNodes: nodes.concat(Array.from(externalNodeMap.values())),
+            edges,
+            signature
+        },
+        serviceNodes: serviceNodeRecord,
+        externalNodes: externalNodeRecord
+    }
 }
 
 function createDirectionLookup(
-  entries: ExternalGroupServices[],
-  direction: ExternalConnectionDirection
+    entries: ExternalGroupServices[],
+    direction: ExternalConnectionDirection
 ): Map<string, ExternalGroupServices> {
-  return entries.reduce((lookup, entry) => {
-    if (entry.direction === direction && entry.group?.groupName) {
-      lookup.set(entry.group.groupName, entry)
-    }
-    return lookup
-  }, new Map<string, ExternalGroupServices>())
+    return entries.reduce((lookup, entry) => {
+        if (entry.direction === direction && entry.group?.groupName) {
+            lookup.set(entry.group.groupName, entry)
+        }
+        return lookup
+    }, new Map<string, ExternalGroupServices>())
 }
 
+//TODO: Figure out wtf this method does.
 function ensureExternalNode(
-  direction: ExternalConnectionDirection,
-  groupId: string,
-  serviceId: string,
-  lookup: Map<string, ExternalGroupServices>,
-  nodeMap: Map<string, RawFlowNode>,
-  record: Record<string, { service: ServiceDefinition; group: GroupInfo }>
+    direction: ExternalConnectionDirection,
+    group: GroupInfo,
+    serviceId: string,
+    lookup: Map<string, ExternalGroupServices>,
+    nodeMap: Map<string, Node<FlowNodeData>>,
+    record: Record<string, { service: ServiceDefinition; group: GroupInfo }>
 ): string | null {
-  const key = `${direction}_${groupId}_${serviceId}`
-  if (nodeMap.has(key)) {
-    return key
-  }
-
-  const externalMeta = findExternalService(direction, groupId, serviceId, lookup)
-  if (!externalMeta) {
-    return null
-  }
-
-  nodeMap.set(key, {
-    id: key,
-    width: 220,
-    height: 120,
-    data: {
-      label: externalMeta.service.friendlyName,
-      subLabel: externalMeta.group.name,
-      iconPath: getAwsIconPath(externalMeta.service.serviceType),
-      groupId: externalMeta.group.groupName,
-      serviceId: externalMeta.service.identifier,
-      kind: 'external',
-      direction
+    const key = `${direction}_${group.id}_${serviceId}`
+    if (nodeMap.has(key)) {
+        return key
     }
-  })
-  record[key] = { service: externalMeta.service, group: externalMeta.group }
 
-  return key
+    const externalMeta = findExternalService(direction, group.id, serviceId, lookup)
+    if (!externalMeta) {
+        return null
+    }
+
+    nodeMap.set(key, {
+        id: key,
+        width: 220,
+        height: 120,
+        type: 'external',
+        data: {
+            label: externalMeta.service.friendlyName,
+            subLabel: externalMeta.group.name,
+            iconPath: getAwsIconPath(externalMeta.service.serviceType),
+            groupId: externalMeta.group.groupName,
+            serviceId: externalMeta.service.identifier,
+            kind: 'external',
+            direction
+        },
+        extent: "parent",
+        position: {x: 0, y: 0},
+        parentId: `group_${group.groupName}`,
+    })
+    record[key] = {service: externalMeta.service, group: externalMeta.group}
+
+    return key
 }
 
 function findExternalService(
-  direction: ExternalConnectionDirection,
-  groupId: string,
-  serviceId: string,
-  lookup: Map<string, ExternalGroupServices>
+    direction: ExternalConnectionDirection,
+    groupId: string,
+    serviceId: string,
+    lookup: Map<string, ExternalGroupServices>
 ): ExternalNodeMeta | null {
-  const entry = lookup.get(groupId)
-  if (!entry || entry.direction !== direction) {
-    return null
-  }
-  const service = entry.services.find(item => item.identifier === serviceId)
-  if (!service) {
-    return null
-  }
-  return { direction, group: entry.group, service }
+    const entry = lookup.get(groupId)
+    if (entry?.direction !== direction) {
+        return null
+    }
+    const service = entry.services.find(item => item.identifier === serviceId)
+    if (!service) {
+        return null
+    }
+    return {direction, group: entry.group, service}
 }
 
 function buildEdge(
-  sourceId: string,
-  targetId: string,
-  connectionType: ConnectionType,
-  direction: 'incoming' | 'outgoing' | 'internal' = 'internal'
-): RawFlowEdge {
-  const color = edgeColorForConnection(connectionType)
-  return {
-    id: `edge_${sourceId}_${targetId}_${direction}`,
-    source: sourceId,
-    target: targetId,
-    label: connectionType,
-    style: { stroke: color },
-    data: { label: connectionType, connectionType, direction }
-  }
+    sourceId: string,
+    targetId: string,
+    connectionType?: ConnectionType,
+    direction: 'incoming' | 'outgoing' | 'internal' = 'internal'
+): Edge<FlowEdgeData> {
+    const color = edgeColorForConnection(connectionType)
+    //TODO: Add class here.
+    return {
+        id: `edge_${sourceId}_${targetId}_${direction}`,
+        source: sourceId,
+        target: targetId,
+        type: 'smoothstep',
+        label: connectionType || "",
+        data: {label: connectionType, connectionType, direction}
+    }
 }

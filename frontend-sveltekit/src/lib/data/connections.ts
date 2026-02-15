@@ -21,20 +21,20 @@ export async function getConnectionsToService(serviceKey: string | null | undefi
   return ensureArray(await connectionsService.getConnectionsToService(serviceKey))
 }
 
-export async function getConnectionsFromGroup(groupId: string | null | undefined): Promise<ServiceConnection[]> {
+export async function getConnectionsFromGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {
   console.debug('[data/connections] getConnectionsFromGroup', groupId)
   if (!groupId) {
     return []
   }
-  return ensureArray(await connectionsService.getConnectionsFromGroup(groupId))
+  return await connectionsService.getConnectionsFromGroup(groupId)
 }
 
-export async function getConnectionsToGroup(groupId: string | null | undefined): Promise<ServiceConnection[]> {
+export async function getConnectionsToGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {
   console.debug('[data/connections] getConnectionsToGroup', groupId)
   if (!groupId) {
     return []
   }
-  return ensureArray(await connectionsService.getConnectionsToGroup(groupId))
+  return await connectionsService.getConnectionsToGroup(groupId)
 }
 
 export async function getAllGroupConnections(includeSelfConnections = false): Promise<GroupConnection[]> {
@@ -57,11 +57,11 @@ export async function getServiceConnections(serviceKey: string | null | undefine
 export async function getGroupConnectionsSummary(groupId: string | null | undefined) {
   console.debug('[data/connections] getGroupConnectionsSummary', groupId)
   if (!groupId) {
-    return { from: [] as ServiceConnection[], to: [] as ServiceConnection[] }
+    return { from: [] as GroupConnection[], to: [] as GroupConnection[] }
   }
   const [from, to] = await Promise.all([
     connectionsService.getConnectionsFromGroup(groupId),
     connectionsService.getConnectionsToGroup(groupId)
   ])
-  return { from: ensureArray(from), to: ensureArray(to) }
+  return { from, to }
 }

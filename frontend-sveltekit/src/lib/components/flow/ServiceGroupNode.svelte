@@ -1,12 +1,11 @@
 <script lang="ts">
     import type {FlowNodeData} from '$lib/utils/flow/types'
     import {Handle, Position} from '@xyflow/svelte'
-    import {getAwsIconPath} from '$lib/utils/awsIcons'
 
     export let id!: string
     export let data!: FlowNodeData
     export let selected = false
-    export let type: string | undefined = 'service'
+    export let type: string | undefined = 'group'
     export let width: number | undefined = undefined
     export let height: number | undefined = undefined
     export let dragging: boolean | undefined = false
@@ -40,32 +39,9 @@
         positionAbsoluteY,
         zIndex
     }
-
-    const initials = data.label
-        ? data.label
-            .split(' ')
-            .map(part => part[0])
-            .join('')
-            .slice(0, 3)
-            .toUpperCase()
-        : 'Svc'
-    //Todo: Figure out if we just want to hard-link the data format to the nodes
-    //@ts-ignore
-    const iconPath = getAwsIconPath(data.serviceType)
 </script>
 
-<Handle type="target" position={Position.Left}/>
-<Handle type="source" position={Position.Right}/>
-<div class="flex items-center gap-3">
-    {#if iconPath}
-        <img src={iconPath} alt={data.label} class="h-10 w-10 rounded-lg bg-white/5 object-contain"
-             loading="lazy"/>
-    {:else}
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-xs font-semibold text-gray-200">
-            {initials}
-        </div>
-    {/if}
-    <div class="flex-1">
-        <div class="text-sm font-semibold text-white">{data.label}</div>
-    </div>
+<!--Todo: Add custom styling depending on what kind of group it is -->
+<div class="custom-group-node" style:width="{width}px" style:height="{height}px">
+    <div class="big-title">{data.label}</div>
 </div>

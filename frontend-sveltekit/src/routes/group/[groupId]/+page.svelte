@@ -13,6 +13,8 @@
   export let data: PageData
 
   const group = data.group
+  const allGroups = data.groups
+  const groupConnections = data.connections
   const services: ServiceDefinition[] = data.services ?? []
   const externalServices: ExternalGroupServices[] = data.externalServices ?? []
   const teams: Record<string, Team> | null = data.teams ?? null
@@ -32,7 +34,7 @@
   }
 
   $: if (group) {
-    const result = buildGroupServicesGraph(group, services, externalServices)
+    const result = buildGroupServicesGraph(group, services, allGroups, groupConnections, externalServices)
     groupGraph = result.graph
     serviceNodeLookup = result.serviceNodes
     externalServiceLookup = result.externalNodes
@@ -44,7 +46,6 @@
       group: group.groupName,
       services: services.length,
       externalEntries: externalServices.length,
-      nodeCount: groupGraph.nodes.length
     })
   } else {
     groupGraph = null
@@ -53,7 +54,7 @@
     externalGroupNodeLookup = {}
   }
 
-  $: hasDiagramContent = !!(groupGraph && groupGraph.nodes.length > 0)
+  $: hasDiagramContent = !!(groupGraph && groupGraph.serviceNodes.length > 0)
 
   function handleNodeClick(event: CustomEvent<string>) {
     const nodeId = event.detail
