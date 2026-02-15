@@ -10,7 +10,8 @@
     type Node,
     type NodeTypes,
     Panel,
-    SvelteFlow
+    SvelteFlow, useEdges,
+    useSvelteFlow
   } from '@xyflow/svelte'
   import Legend from '$lib/components/Legend.svelte'
   import {layoutFlowGraph} from '$lib/utils/flow/layout'
@@ -32,6 +33,8 @@
     nodeDoubleClick: string
     goHome: void
   }>()
+
+  const { getNodes, getEdges } = useSvelteFlow()
 
   const nodeTypes = { group: GroupNode, service: ServiceNode, external: ExternalNode, serviceGroup: ServiceGroupNode } as NodeTypes
   const edgeTypes = { snake: SnakeEdge } as EdgeTypes
@@ -109,6 +112,54 @@
     }
   }
 
+  function handleNodeDragStart(event: CustomEvent<{ node: Node }>) {
+    let edges = useEdges();
+    const nodeId = event.detail.node.id
+    const currentEdges = getEdges()
+    const updatedEdges = currentEdges.map(edge => {
+      if (edge.source === nodeId || edge.target === nodeId) {
+        return { ...edge, data: { ...edge.data, points: [] } }
+      }
+      return edge
+    })
+    edges.set(updatedEdges)
+  }
+
+  async function triggerLayout() {
+    if (!graph) return
+    const currentNodes = getNodes()
+    const currentEdges = getEdges()
+
+    const graphInput: FlowGraphInput = {
+      ...graph,
+      serviceNodes: currentNodes
+        .filter(n => n.type === 'service' || n.type === 'external')
+        .map(n => ({
+          id: n.id,
+          width: n.width,
+          height: n.height,
+          parentId: n.parentId,
+          ...n.data
+        })),
+      groupNodes: currentNodes
+        .filter(n => n.type === 'group')
+        .map(n => ({
+          id: n.id,
+          width: n.width,
+          height: n.height,
+          ...n.data
+        })),
+      edges: currentEdges.map(e => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        ...e.data
+      })),
+      signature: `layout-${Date.now()}`
+    }
+    runLayout(graphInput, graphInput.signature)
+  }
+
   //TODO: Fix me
   function handleFlowNodeClick(event: CustomEvent<{ node?: { id?: string } }>) {
     const nodeId = event.detail?.node?.id
@@ -142,6 +193,8 @@
           bind:edges
           {nodeTypes}
           {edgeTypes}
+          on:nodedragstart={handleNodeDragStart}
+          on:nodedragstop={triggerLayout}
           nodesDraggable
           nodesConnectable={false}
           panOnDrag

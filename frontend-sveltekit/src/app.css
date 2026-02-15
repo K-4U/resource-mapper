@@ -50,3 +50,11 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
 .svelte-flow__edge.edge-incoming {
     @apply stroke-green-400 dark:stroke-green-600 stroke-2 rounded-lg
 }
+
+.edge-label {
+    @apply absolute bg-slate-900 text-slate-400 px-2 py-0.5 rounded
+    text-[10px] font-bold border border-slate-700 whitespace-nowrap
+    shadow-lg pointer-events-none;
+    /* Custom background to ensure it masks the line perfectly */
+    background-color: #1a1b1e;
+}
