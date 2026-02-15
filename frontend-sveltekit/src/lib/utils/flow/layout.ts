@@ -15,7 +15,6 @@ const ELK_OPTIONS: Record<string, string> = {
     'elk.portConstraints': 'FREE',
     'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
     'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-    'elk.componentLayout.active': 'true', // Helps with disconnected components
 };
 
 function convertEdgesToElkEdges(input: FlowGraphInput) {
@@ -28,8 +27,6 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
     }));
 }
 
-
-
 export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly:boolean = false): Promise<FlowGraphOutput> {
     const elkEdges = convertEdgesToElkEdges(input);
     console.debug('[layoutFlowGraph] Starting layout with input:', { input, edgesOnly });
@@ -38,7 +35,10 @@ export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly:boolean =
         ...node,
         x: node.position?.x ?? 0,
         y: node.position?.y ?? 0,
-        layoutOptions: edgesOnly ? { 'elk.noLayout': 'true' } : {}
+        layoutOptions: edgesOnly ?{
+            'elk.noLayout': 'true',
+            'elk.position': `( ${node.position?.x ?? 0}, ${node.position?.y ?? 0} )`
+        } : {}
     })
 
     // 1. Build the nested ELK structure
@@ -49,7 +49,10 @@ export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly:boolean =
         layoutOptions: {
             ...ELK_OPTIONS,
             'elk.padding': `[top=60,left=${PADDING},bottom=${PADDING},right=${PADDING}]`,
-            ...(edgesOnly ? { 'elk.noLayout': 'true' } : {}),
+            ...(edgesOnly ? {
+                'elk.noLayout': 'true',
+                'elk.position': `( ${parent.position?.x ?? 0}, ${parent.position?.y ?? 0} )`
+            } : {}),
         },
         children: input.serviceNodes.filter(child => child.parentId === parent.id).map(prepareElkNode)
     }));
@@ -69,6 +72,7 @@ export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly:boolean =
     console.log(JSON.stringify(elkGraph, null, 2))
 
     return elk.layout(elkGraph).then((layoutedGraph) => {
+        console.debug('[layoutFlowGraph] Layout completed:', { layoutedGraph });
         const flattenedNodes: Node<FlowNodeData>[] = [];
         const allLayoutedEdges: (ElkExtendedEdge & { originalEdge: Edge<FlowEdgeData> })[] = [];
 
