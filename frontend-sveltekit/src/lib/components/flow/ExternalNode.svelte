@@ -41,8 +41,8 @@
     }
 </script>
 
-<Handle type="target" position={Position.Left}/>
-<Handle type="source" position={Position.Right}/>
+<Handle type="target" position={Position.Left} id="input" />
+<Handle type="source" position={Position.Right} id="output"/>
 
 <div class="flex items-center justify-between text-xs uppercase tracking-wide text-amber-200">
     <span>External</span>

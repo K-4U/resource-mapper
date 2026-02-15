@@ -26,7 +26,7 @@ body {
 TODO: The styles below are for all nodes, style them based on the type of node, e.g. .svelte-flow__node[data-type="custom"] { ... }
  */
 .svelte-flow__node {
-    @apply gap-1 rounded-2xl border px-4 py-3 dark:bg-gray-600 border-black bg-gray-100 transition-all duration-200 ease-in-out;
+    @apply gap-1 rounded-2xl border px-4 py-3 dark:bg-gray-600 border-black bg-gray-100 transition-colors duration-200 ease-in-out;
 }
 
 .svelte-flow__node.selected {
@@ -35,12 +35,12 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
 
 /* Internal service nodes */
 .svelte-flow__node-service {
-    @apply bg-green-100 dark:bg-green-600 transition-all duration-200 ease-in-out;
+    @apply bg-green-100 dark:bg-green-600 transition-colors duration-200 ease-in-out;
 }
 
 /* External service nodes */
 .svelte-flow__node-external {
-    @apply bg-yellow-100 dark:bg-yellow-600 transition-all duration-200 ease-in-out;
+    @apply bg-yellow-100 dark:bg-yellow-600 transition-colors duration-200 ease-in-out;
 }
 
 .svelte-flow__edge {
@@ -54,7 +54,7 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
 .edge-label {
     @apply absolute bg-slate-900 text-slate-400 px-2 py-0.5 rounded
     text-[10px] font-bold border border-slate-700 whitespace-nowrap
-    shadow-lg pointer-events-none transition-all duration-200 ease-in-out;
+    shadow-lg pointer-events-none transition-colors duration-200 ease-in-out;
 }
 
 .edge-label.selected {
@@ -63,7 +63,7 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
 
 /* The actual SVG path of the edge */
 .snake-edge-path {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-colors duration-200 ease-in-out;
     stroke: #64748b; /* slate-500 */
     stroke-width: 2px;
     stroke-linejoin: round;

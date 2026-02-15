@@ -105,7 +105,9 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
         }
 
         // 3. Globalize Edge Points
-        const finalEdges: Edge<FlowEdgeData>[] = allLayoutedEdges.map((edge) => {
+        const finalEdges: Edge<FlowEdgeData>[] = allLayoutedEdges
+            .filter((edge) => edge.originalEdge.data?.connectionType !== 'group')
+            .map((edge) => {
             const section = edge.sections?.[0];
             const points: ElkPoint[] = [];
 
