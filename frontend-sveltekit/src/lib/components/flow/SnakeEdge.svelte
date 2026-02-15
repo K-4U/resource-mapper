@@ -1,18 +1,31 @@
 <script lang="ts">
-    import { BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel } from '@xyflow/svelte';
+    import {BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel, useNodes} from '@xyflow/svelte';
 
     let {
         id,
         data,
+        source,
+        target,
         sourceX,
         sourceY,
         sourcePosition,
         targetX,
         targetY,
         targetPosition,
-        label, // Svelte Flow passes label here if defined in the edge object
+        label,
         style,
+        selected
     }: EdgeProps = $props();
+
+    const nodes = useNodes();
+
+    let isConnectedNodeSelected = $derived.by(() => {
+        const sourceNode = nodes.current.find((n) => n.id === source);
+        const targetNode = nodes.current.find((n) => n.id === target);
+        return sourceNode?.selected || targetNode?.selected;
+    });
+
+    let isEffectivelySelected = $derived(selected || isConnectedNodeSelected);
 
     // 1. Derive the path
     let path = $derived.by(() => {
@@ -51,9 +64,10 @@
 </script>
 
 <BaseEdge
+        class={isEffectivelySelected ? 'snake-edge-path selected' : 'snake-edge-path'}
         {id}
         {path}
-        style="{style}; stroke: #888; stroke-width: 2px; stroke-linejoin: round; stroke-linecap: round;"
+        {style}
 />
 
 {#if label}
@@ -61,6 +75,7 @@
         <div
                 style:transform="translate(-50%, -50%) translate({labelPos.x}px, {labelPos.y}px)"
                 class="edge-label"
+                class:selected={isEffectivelySelected}
         >
             {label}
         </div>
