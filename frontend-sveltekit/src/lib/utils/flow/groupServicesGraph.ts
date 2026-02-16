@@ -188,7 +188,7 @@ export function buildGroupServicesGraph(
     groupConnections.forEach(connection => {
         const sourceId = `group_${connection.sourceGroup}`
         const targetId = `group_${connection.targetGroup}`
-        edges.push(buildEdge(sourceId, targetId, 'group'))
+        edges.push(buildEdge(sourceId, targetId, 'service-group'))
     });
 
     const signature = createGraphSignature('group-services', {
@@ -289,7 +289,7 @@ function findExternalService(
 function buildEdge(
     sourceId: string,
     targetId: string,
-    connectionType?: ConnectionType | 'group',
+    connectionType?: ConnectionType | 'service-group',
     direction: 'incoming' | 'outgoing' | 'internal' = 'internal'
 ): Edge<FlowEdgeData> {
     return {

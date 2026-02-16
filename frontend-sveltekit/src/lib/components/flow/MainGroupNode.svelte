@@ -1,6 +1,7 @@
 <script lang="ts">
     import type {FlowNodeData} from '$lib/utils/flow/types'
     import {Handle, Position} from '@xyflow/svelte'
+    import Icon from '@iconify/svelte'
 
     export let id!: string
     export let data!: FlowNodeData
@@ -41,9 +42,18 @@
     }
 </script>
 
-<Handle type="target" position={Position.Left}/>
-<Handle type="source" position={Position.Right}/>
-<div class="big-title">{data.label}</div>
-{#if data.subLabel}
-    <p class="text-xs text-gray-400">{data.subLabel}</p>
-{/if}
+
+<Handle type="target" position={Position.Left} hidden/>
+<Handle type="source" position={Position.Right} hidden/>
+<div class="relative">
+    {data.label}
+    {#if selected}
+        <span class="absolute top-1 right-1">
+            <Icon icon="mdi:external-link" width="10" height="10" />
+        </span>
+    {/if}
+</div>
+
+<!--{#if data.subLabel}-->
+<!--    <p class="text-xs text-gray-400">{data.subLabel}</p>-->
+<!--{/if}-->

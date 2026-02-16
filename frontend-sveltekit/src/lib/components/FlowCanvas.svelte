@@ -16,7 +16,7 @@
     import Legend from '$lib/components/Legend.svelte'
     import {layoutFlowGraph} from '$lib/utils/flow/layout'
     import type {FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
-    import GroupNode from '$lib/components/flow/GroupNode.svelte'
+    import MainGroupNode from '$lib/components/flow/MainGroupNode.svelte'
     import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
     import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
     import {isDarkMode, logDiagramAction, showLegend} from '$lib/stores/diagram';
@@ -37,7 +37,7 @@
     const {getNodes, getEdges} = useSvelteFlow()
 
     const nodeTypes = {
-        group: GroupNode,
+        mainGroup: MainGroupNode,
         service: ServiceNode,
         external: ExternalNode,
         serviceGroup: ServiceGroupNode
@@ -154,7 +154,7 @@
             ...graph,
             // Pass the full node object, just ensuring width/height are captured
             serviceNodes: currentNodes
-                .filter(n => n.type === 'service' || n.type === 'external') as Node<FlowNodeData>[],
+                .filter(n => n.type === 'service' || n.type === 'external' || n.type === 'mainGroup') as Node<FlowNodeData>[],
             groupNodes: currentNodes
                 .filter(n => n.type === 'serviceGroup') as Node<FlowNodeData>[],
             edges: currentEdges, // No need to map these if types match

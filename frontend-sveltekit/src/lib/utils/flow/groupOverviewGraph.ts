@@ -35,24 +35,28 @@ export function buildGroupOverviewGraph(
 
   // Convert each group into a diagram node
   const nodes: Node<FlowNodeData>[] = Object.entries(groups).map(([groupId, groupInfo]) => ({
-    id: sanitizeNodeId(groupId, 'group'),
+    id: sanitizeNodeId(groupId, 'mainGroup'),
+    type: 'mainGroup',
     data: {
       label: groupInfo.name,
       subLabel: groupInfo.description ?? groupId,
       groupId,
-      kind: 'group'
+      kind: 'mainGroup'
     },
+    width: 120,
+    height: 80,
     position: { x: 0, y: 0 },
   }))
 
   // Convert each connection into a diagram edge
   const edges: Edge<FlowEdgeData>[] = connections.map((connection, index) => {
-    const sourceId = sanitizeNodeId(connection.sourceGroup, 'group')
-    const targetId = sanitizeNodeId(connection.targetGroup, 'group')
+    const sourceId = sanitizeNodeId(connection.sourceGroup, 'mainGroup')
+    const targetId = sanitizeNodeId(connection.targetGroup, 'mainGroup')
     return {
       id: `edge_${sourceId}_${targetId}_${index}`,
       source: sourceId,
       target: targetId,
+      type: 'snake',
       label: formatConnectionLabel(connection.connectionCount),
       data: {
         label: formatConnectionLabel(connection.connectionCount),
@@ -70,7 +74,7 @@ export function buildGroupOverviewGraph(
     }))
   })
 
-  const graph: FlowGraphInput = { nodes, edges, signature }
+  const graph: FlowGraphInput = { groupNodes: [], serviceNodes: nodes, edges, signature }
   // Map diagram node IDs back to group IDs for UI interaction
   const nodeToGroupMap = nodes.reduce<Record<string, string>>((lookup, node) => {
     if (node.data.groupId) {

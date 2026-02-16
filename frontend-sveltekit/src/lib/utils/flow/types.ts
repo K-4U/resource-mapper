@@ -1,7 +1,7 @@
 import type { Edge, Node } from '@xyflow/svelte'
 import type { GroupInfo, ServiceDefinition } from '$lib/types'
 
-export type FlowNodeKind = 'group' | 'service' | 'external'
+export type FlowNodeKind = 'group' | 'service' | 'external' | 'mainGroup'
 
 export interface FlowNodeData extends Record<string, unknown> {
   label: string

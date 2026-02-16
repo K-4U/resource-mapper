@@ -38,7 +38,7 @@
     }
 
     $: isLoading = !groups || !groupConnections
-    $: hasDiagramContent = !!(graphInput && graphInput.nodes.length > 0)
+    $: hasDiagramContent = true
 
     function handleNodeDoubleClick(event: CustomEvent<string>) {
         const groupId = nodeGroupMap[event.detail]
