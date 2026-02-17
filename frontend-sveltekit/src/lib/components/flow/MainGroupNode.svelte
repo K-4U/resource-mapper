@@ -48,9 +48,14 @@
 <div class="relative">
     {data.label}
     {#if selected}
-        <span class="absolute top-1 right-1">
-            <Icon icon="mdi:external-link" width="10" height="10" />
-        </span>
+        <a
+            class="absolute top-1 right-1 cursor-pointer"
+            href={`/group/${data.groupId}`}
+            on:click|stopPropagation
+            title="Go to group page"
+        >
+            <Icon icon="mdi:external-link" width="8" height="8" />
+        </a>
     {/if}
 </div>
 

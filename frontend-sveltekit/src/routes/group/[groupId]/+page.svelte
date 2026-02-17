@@ -18,11 +18,8 @@
     const groupConnections = data.connections
     const services: ServiceDefinition[] = data.services ?? []
     const externalServices: ExternalGroupServices[] = data.externalServices ?? []
-    const teams: Record<string, Team> | null = data.teams ?? null
     const groupId = data.groupId
 
-    let selectedServiceId: string | null = null
-    let selectedExternalService: { service: ServiceDefinition; group: GroupInfo } | null = null
     let serviceNodeLookup: Record<string, ServiceDefinition> = {}
     let externalServiceLookup: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
     let externalGroupNodeLookup: Record<string, string> = {}
@@ -57,24 +54,6 @@
 
     $: hasDiagramContent = !!(groupGraph && groupGraph.serviceNodes.length > 0)
 
-    function handleNodeClick(event: CustomEvent<string>) {
-        const nodeId = event.detail
-        console.debug('[group.svelte] nodeClick', nodeId)
-        if (serviceNodeLookup[nodeId]) {
-            selectedServiceId = nodeId
-            selectedExternalService = null
-            return
-        }
-        const external = externalServiceLookup[nodeId]
-        if (external) {
-            selectedServiceId = null
-            selectedExternalService = external
-            return
-        }
-        selectedServiceId = null
-        selectedExternalService = null
-    }
-
     function handleNodeDoubleClick(event: CustomEvent<string>) {
         const nodeId = event.detail
         const externalGroupId = externalGroupNodeLookup[nodeId]
@@ -101,34 +80,19 @@
 {:else if !hasDiagramContent}
     <EmptyState title="No services" message="This group has no service diagram to display yet."/>
 {:else}
-    <SvelteFlowProvider>
-        <div class="flex h-full min-h-0 flex-1 flex-col gap-6 lg:flex-row">
-            <div class="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-black/20 shadow-xl">
-                <FlowCanvas
-                        graph={groupGraph}
-                        pending={false}
-                        label={group.name}
-                        on:nodeClick={handleNodeClick}
-                        on:nodeDoubleClick={handleNodeDoubleClick}
-                        on:goHome={() => {
-          console.debug('[group.svelte] goHome triggered')
-          goto('/')
-        }}
-                />
-            </div>
-            <div class="flex h-full min-h-0 w-full lg:w-[420px] xl:w-[480px]">
-                <ServiceDetailSidebar
-                        {group}
-                        service={selectedServiceId ? serviceNodeLookup[selectedServiceId] ?? null : selectedExternalService?.service ?? null}
-                        serviceGroup={selectedServiceId ? group : selectedExternalService?.group ?? null}
-                        teams={teams}
-                        on:clearSelection={() => {
-          console.debug('[group.svelte] clearSelection triggered')
-          selectedServiceId = null
-          selectedExternalService = null
-        }}
-                />
-            </div>
-        </div>
-    </SvelteFlowProvider>
+    <div class="flex h-full w-full gap-1 lg:flex-row">
+        <SvelteFlowProvider>
+            <FlowCanvas
+                    graph={groupGraph}
+                    pending={false}
+                    on:nodeDoubleClick={handleNodeDoubleClick}
+            />
+<!--            on:nodeClick={handleNodeClick}-->
+
+            <ServiceDetailSidebar
+                    {group}
+                    {serviceNodeLookup}
+            />
+        </SvelteFlowProvider>
+    </div>
 {/if}

@@ -18,7 +18,7 @@ body {
     flex-direction: column;
 }
 
-.big-title {
+@utility big-title {
     @apply uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400;
 }
 
@@ -77,4 +77,21 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
     /* This creates a subtle SVG filter-based glow if desired,
        or you can just rely on the stroke color */
     filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
+}
+
+
+.sidebar-card {
+    @apply rounded-xl border border-gray-200    dark:border-gray-700 bg-gray-50    dark:bg-slate-700 p-4 mt-4
+}
+
+.sidebar-card-subtitle {
+    @apply text-xl font-semibold text-gray-900 dark:text-white
+}
+
+.sidebar-card-title {
+    @apply big-title
+}
+
+.sidebar-card-contents {
+    @apply mt-2 text-sm text-gray-700 dark:text-gray-300
 }

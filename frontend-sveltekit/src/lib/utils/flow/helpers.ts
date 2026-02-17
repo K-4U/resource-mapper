@@ -5,7 +5,7 @@ const sanitizeRegEx = /[^a-zA-Z0-9_]/g
 
 export const sanitizeNodeId = (value: string, prefix = 'node') => {
     const safe = (value || prefix).replace(sanitizeRegEx, '_')
-    return `${prefix}_${safe}`
+    return `${prefix}::${safe}`
 }
 
 export const formatConnectionLabel = (connectionCount: number) =>

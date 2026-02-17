@@ -29,9 +29,7 @@
     export let pending = false
 
     const dispatch = createEventDispatcher<{
-        nodeClick: string
         nodeDoubleClick: string
-        goHome: void
     }>()
 
     const {getNodes, getEdges} = useSvelteFlow()
