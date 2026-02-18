@@ -1,9 +1,0 @@
-friendlyName: "DynamoDB Notifications Table"
-description: |
-  DynamoDB table tracking notification delivery status and queued messages.
-  
-  Manages notification queue with TTL for automatic cleanup of processed notifications.
-  Provides audit trail for compliance and debugging notification issues.
-serviceType: DYNAMODB
-outgoingConnections: []
-

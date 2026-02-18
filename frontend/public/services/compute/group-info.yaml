@@ -1,7 +1,0 @@
-name: "Compute Services"
-description: |
-  Manages containerized applications, load balancers, and compute resources.
-  This group handles ECS clusters, container services, and application load balancers
-  for running stateful and long-running applications.
-teamId: "cloud-shepherds"
-

@@ -1,9 +1,0 @@
-friendlyName: "S3 Static Website Bucket"
-description: |
-  S3 bucket hosting static website assets including HTML, CSS, JavaScript, and images.
-  
-  Configured with website hosting enabled, versioning for rollback capability,
-  and lifecycle policies for cost optimization. Serves as the origin for CloudFront distribution.
-serviceType: S3
-outgoingConnections: []
-

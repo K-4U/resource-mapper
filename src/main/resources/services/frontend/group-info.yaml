@@ -1,7 +1,0 @@
-name: "Frontend Infrastructure"
-description: |
-  Manages static website hosting, CDN, and DNS for the web application.
-  This group handles all frontend-facing AWS services including S3 buckets
-  for static assets, CloudFront for global content delivery, and Route53 for DNS management.
-teamId: "interface-architects"
-
