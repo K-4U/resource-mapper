@@ -4,9 +4,15 @@
 
     import {useOnSelectionChange} from '@xyflow/svelte';
 
-    let selectedNodes = [];
-    let selectedEdges = [];
-    let groupId: string | null = null
+    const {groupMap, groups, placeholderMessage} = $props<{
+        groupMap: Record<string, string>;
+        groups: Record<string, GroupInfo>;
+        placeholderMessage: string;
+    }>()
+    
+    let selectedNodes = $state<string[]>([]);
+    let selectedEdges = $state<string[]>([]);
+    let groupId: string | null = $state(null)
 
     useOnSelectionChange(({nodes, edges}) => {
         selectedNodes = nodes.map((node) => node.id);
@@ -18,13 +24,8 @@
             groupId = null;
         }
     });
-
-    export let groupMap: Record<string, string> = {}
-    export let groups: Record<string, GroupInfo> = {}
-    export let teams: Record<string, Team> | null = null
-    export let placeholderMessage = 'Select a group to see details.'
-
-    $: groupInfo = groupId ? groups[groupId] ?? null : null
+    
+    let groupInfo = $derived(groupId ? groups[groupId] ?? null : null)
 </script>
 
 <aside data-testid="group-sidebar"
@@ -50,7 +51,7 @@
 
         {#if groupInfo.teamId}
             <div class="mt-4">
-                <TeamContactCard teamId={groupInfo.teamId} teams={teams ?? undefined}/>
+                <TeamContactCard teamId={groupInfo.teamId}/>
             </div>
         {/if}
     {/if}

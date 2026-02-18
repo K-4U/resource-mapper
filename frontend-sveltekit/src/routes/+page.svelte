@@ -10,35 +10,29 @@
     import {goto, invalidateAll} from '$app/navigation'
     import {SvelteFlowProvider} from "@xyflow/svelte";
 
-    export let data: PageData
+    let { data } = $props<{ data: PageData }>()
 
-    const groups = data.groups
-    const teams = data.teams
-    const groupConnections = data.groupConnections
-    const errorMessage = data.errorMessage
+    const groups = $derived(data.groups)
+    const teams = $derived(data.teams)
+    const groupConnections = $derived(data.groupConnections)
+    const errorMessage = $derived(data.errorMessage)
 
-    let graphInput: FlowGraphInput | null = null
-    let nodeGroupMap: Record<string, string> = {}
-    let isLoading = true
-    let hasDiagramContent = false
+    let { graphInput, nodeGroupMap } = $derived.by(() => {
+        if (groups && groupConnections) {
+            const {graph, nodeToGroupMap} = buildGroupOverviewGraph(groups, groupConnections)
+            console.debug('[overview.svelte] built flow graph', {
+                groups: Object.keys(groups).length,
+                connections: groupConnections.length,
+                nodeCount: Object.keys(nodeToGroupMap).length,
+                hasGraph: !!graph
+            })
+            return { graphInput: graph, nodeGroupMap: nodeToGroupMap }
+        }
+        return { graphInput: null, nodeGroupMap: {} }
+    })
 
-    $: if (groups && groupConnections) {
-        const {graph, nodeToGroupMap} = buildGroupOverviewGraph(groups, groupConnections)
-        console.debug('[overview.svelte] built flow graph', {
-            groups: Object.keys(groups).length,
-            connections: groupConnections.length,
-            nodeCount: Object.keys(nodeToGroupMap).length,
-            hasGraph: !!graph
-        })
-        graphInput = graph
-        nodeGroupMap = nodeToGroupMap
-    } else {
-        graphInput = null
-        nodeGroupMap = {}
-    }
-
-    $: isLoading = !groups || !groupConnections
-    $: hasDiagramContent = true
+    let isLoading = $derived(!groups || !groupConnections)
+    let hasDiagramContent = $derived(true)
 
     function handleNodeDoubleClick(event: CustomEvent<string>) {
         const groupId = nodeGroupMap[event.detail]

@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let message: string = 'Loading...'
+  let { message = 'Loading...' } = $props<{ message?: string }>()
 </script>
 
 <div class="flex h-full w-full items-center justify-center p-8 text-center">

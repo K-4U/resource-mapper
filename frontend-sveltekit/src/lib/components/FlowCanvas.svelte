@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {createEventDispatcher, onMount} from 'svelte'
+    import {onMount} from 'svelte'
     import {
         Background,
         BackgroundVariant,
@@ -25,12 +25,18 @@
 
     const DOUBLE_CLICK_THRESHOLD = 400
 
-    export let graph: FlowGraphInput | null = null
-    export let pending = false
-
-    const dispatch = createEventDispatcher<{
-        nodeDoubleClick: string
-    }>()
+    // Svelte 5 Props
+    let {
+        graph = null,
+        pending = false,
+        onnodeClick,
+        onnodeDoubleClick
+    } = $props<{
+        graph?: FlowGraphInput | null;
+        pending?: boolean;
+        onnodeClick?: (nodeId: string) => void;
+        onnodeDoubleClick?: (nodeId: string) => void;
+    }>();
 
     const {getNodes, getEdges} = useSvelteFlow()
 
@@ -42,41 +48,48 @@
     } as NodeTypes
     const edgeTypes = {snake: SnakeEdge} as EdgeTypes
 
-    let nodes: Node[] = []
-    let edges: Edge[] = []
+    // Svelte 5 State
+    let nodes: Node[] = $state([])
+    let edges: Edge[] = $state([])
     let allEdges = useEdges();
 
-    let emptyStateLabel = 'No diagram available.'
-    let lastClickedNode: string | null = null
-    let lastClickTimestamp = 0
-    let layoutError = ''
-    let layoutBusy = false
-    let graphReady = false
-    let currentSignature = ''
-    let showOverlay = true
-    let hasGraphData = false
+    let emptyStateLabel = $state('No diagram available.')
+    let lastClickedNode: string | null = $state(null)
+    let lastClickTimestamp = $state(0)
+    let layoutError = $state('')
+    let layoutBusy = $state(false)
+    let graphReady = $state(false)
+    let currentSignature = $state('')
+
+    // Svelte 5 Derived
+    let hasGraphData = $derived(!!graph && graph.serviceNodes.length > 0)
+    let showOverlay = $derived(pending || layoutBusy || !graphReady)
+
+    // TODO: This console.debug might be better as an effect or just removed if not needed for production
+    $effect(() => {
+        console.debug('[FlowCanvas] overlay state', {showOverlay, pending, layoutBusy, graphReady})
+    })
 
     onMount(() => {
         let lastLogAction = 0;
-        logDiagramAction.subscribe((n) => {
+        // TODO: Consider converting logDiagramAction store to a rune-based state if possible, or use $effect
+        const unsubscribe = logDiagramAction.subscribe((n) => {
             if (n !== lastLogAction) {
                 lastLogAction = n;
                 logDiagram();
             }
         });
+        return unsubscribe;
     })
 
     // 3. Fix the Reactive Trigger
     // Ensure this ONLY triggers when the parent passes a brand new graph
-    $: {
+    $effect(() => {
         const newTargetSignature = graph?.signature ?? '';
         if (newTargetSignature !== '' && newTargetSignature !== currentSignature) {
             runLayout(graph, newTargetSignature, false);
         }
-    }
-    $: hasGraphData = !!graph && graph.serviceNodes.length > 0
-    $: showOverlay = pending || layoutBusy || !graphReady
-    $: console.debug('[FlowCanvas] overlay state', {showOverlay, pending, layoutBusy, graphReady})
+    });
 
     async function runLayout(sourceGraph: FlowGraphInput | null, signature: string, edgesOnly = false) {
         layoutError = ''
@@ -151,6 +164,7 @@
         const graphInput: FlowGraphInput = {
             ...graph,
             // Pass the full node object, just ensuring width/height are captured
+            // TODO: Optimization - filter logic is repeated and could be simplified
             serviceNodes: currentNodes
                 .filter(n => n.type === 'service' || n.type === 'external' || n.type === 'mainGroup') as Node<FlowNodeData>[],
             groupNodes: currentNodes
@@ -162,22 +176,23 @@
         runLayout(graphInput, graphInput.signature, true);
     }
 
-    //TODO: Fix me
+    //TODO: This handleFlowNodeClick function seems to be unused in the template. If it's intended for Node components, consider passing it down.
     function handleFlowNodeClick(event: CustomEvent<{ node?: { id?: string } }>) {
         const nodeId = event.detail?.node?.id
         if (!nodeId) return
         const now = Date.now()
         if (lastClickedNode === nodeId && now - lastClickTimestamp <= DOUBLE_CLICK_THRESHOLD) {
-            dispatch('nodeDoubleClick', nodeId)
+            onnodeDoubleClick?.(nodeId)
             lastClickedNode = null
             lastClickTimestamp = 0
             return
         }
         lastClickedNode = nodeId
         lastClickTimestamp = now
-        dispatch('nodeClick', nodeId)
+        onnodeClick?.(nodeId)
     }
 
+    // TODO: logDiagram is only called from logDiagramAction subscription, verify if this is actually needed.
     function logDiagram() {
         console.log('[FlowCanvas] Diagram log triggered', {
             nodes,

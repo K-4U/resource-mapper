@@ -1,10 +1,19 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
 
-  export let title = 'Nothing to show'
-  export let message = ''
-  export let actionLabel: string | null = null
-  export let onAction: (() => void) | null = null
+  interface Props {
+    title?: string
+    message?: string
+    actionLabel?: string | null
+    onAction?: (() => void) | null
+  }
+
+  let {
+    title = 'Nothing to show',
+    message = '',
+    actionLabel = null,
+    onAction = null
+  }: Props = $props()
 </script>
 
 <div class="flex h-full w-full items-center justify-center p-8">

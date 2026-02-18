@@ -11,48 +11,52 @@
     import {goto} from '$app/navigation'
     import {SvelteFlowProvider} from '@xyflow/svelte';
 
-    export let data: PageData
+    let { data }: { data: PageData } = $props()
 
-    const group = data.group
-    const allGroups = data.groups
-    const groupConnections = data.connections
-    const services: ServiceDefinition[] = data.services ?? []
-    const externalServices: ExternalGroupServices[] = data.externalServices ?? []
-    const groupId = data.groupId
+    let group = $derived(data.group)
+    let allGroups = $derived(data.groups)
+    let groupConnections = $derived(data.connections)
+    let services: ServiceDefinition[] = $derived(data.services ?? [])
+    let externalServices: ExternalGroupServices[] = $derived(data.externalServices ?? [])
+    let groupId = $derived(data.groupId)
 
-    let serviceNodeLookup: Record<string, ServiceDefinition> = {}
-    let externalServiceLookup: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
-    let externalGroupNodeLookup: Record<string, string> = {}
-    let groupGraph: FlowGraphInput | null = null
-    let loadError: string | null = null
-    let hasDiagramContent = false
+    let serviceNodeLookup = $state<Record<string, ServiceDefinition>>({})
+    let externalServiceLookup = $state<Record<string, { service: ServiceDefinition; group: GroupInfo }>>({})
+    let externalGroupNodeLookup = $state<Record<string, string>>({})
+    let groupGraph = $state<FlowGraphInput | null>(null)
+    let loadError = $state<string | null>(null)
+    let hasDiagramContent = $derived(!!(groupGraph && groupGraph.serviceNodes.length > 0))
 
-    if (!group) {
-        loadError = groupId ? `Unable to load group '${groupId}'.` : 'Missing group identifier.'
-    }
+    $effect(() => {
+        if (!group) {
+            loadError = groupId ? `Unable to load group '${groupId}'.` : 'Missing group identifier.'
+        } else {
+            loadError = null
+        }
+    })
 
-    $: if (group) {
-        const result = buildGroupServicesGraph(group, services, allGroups, groupConnections, externalServices)
-        groupGraph = result.graph
-        serviceNodeLookup = result.serviceNodes
-        externalServiceLookup = result.externalNodes
-        externalGroupNodeLookup = Object.entries(result.externalNodes).reduce<Record<string, string>>((acc, [nodeId, entry]) => {
-            acc[nodeId] = entry.group.groupName
-            return acc
-        }, {})
-        console.debug('[group.svelte] built flow graph', {
-            group: group.groupName,
-            services: services.length,
-            externalEntries: externalServices.length,
-        })
-    } else {
-        groupGraph = null
-        serviceNodeLookup = {}
-        externalServiceLookup = {}
-        externalGroupNodeLookup = {}
-    }
-
-    $: hasDiagramContent = !!(groupGraph && groupGraph.serviceNodes.length > 0)
+    $effect(() => {
+        if (group) {
+            const result = buildGroupServicesGraph(group, services, allGroups, groupConnections, externalServices)
+            groupGraph = result.graph
+            serviceNodeLookup = result.serviceNodes
+            externalServiceLookup = result.externalNodes
+            externalGroupNodeLookup = Object.entries(result.externalNodes).reduce<Record<string, string>>((acc, [nodeId, entry]) => {
+                acc[nodeId] = entry.group.groupName
+                return acc
+            }, {})
+            console.debug('[group.svelte] built flow graph', {
+                group: group.groupName,
+                services: services.length,
+                externalEntries: externalServices.length,
+            })
+        } else {
+            groupGraph = null
+            serviceNodeLookup = {}
+            externalServiceLookup = {}
+            externalGroupNodeLookup = {}
+        }
+    })
 
     function handleNodeDoubleClick(event: CustomEvent<string>) {
         const nodeId = event.detail

@@ -1,20 +1,31 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
 
-  export let title = 'Something went wrong'
-  export let message = 'An unexpected error occurred.'
-  export let checkList: string[] = []
-  export let technicalDetails: string | Record<string, unknown> | null = null
-  export let onRetry: (() => void) | null = null
-  export let onBack: (() => void) | null = null
+  let {
+    title = 'Something went wrong',
+    message = 'An unexpected error occurred.',
+    checkList = [],
+    technicalDetails = null,
+    onRetry = null,
+    onBack = null
+  } = $props<{
+    title?: string;
+    message?: string;
+    checkList?: string[];
+    technicalDetails?: string | Record<string, unknown> | null;
+    onRetry?: (() => void) | null;
+    onBack?: (() => void) | null;
+  }>();
 
-  $: formattedDetails = technicalDetails
-    ? typeof technicalDetails === 'string'
-      ? technicalDetails
-      : JSON.stringify(technicalDetails, null, 2)
-    : ''
+  let formattedDetails = $derived(
+    technicalDetails
+      ? typeof technicalDetails === 'string'
+        ? technicalDetails
+        : JSON.stringify(technicalDetails, null, 2)
+      : ''
+  );
 
-  let copied = false
+  let copied = $state(false)
 
   async function copyDetails() {
     if (!formattedDetails) return
@@ -47,7 +58,7 @@
       <div class="mt-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-slate-800 p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Technical details</span>
-          <button class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300" on:click={copyDetails}>
+          <button class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300" onclick={copyDetails}>
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
@@ -57,12 +68,12 @@
 
     <div class="mt-6 flex flex-wrap gap-3">
       {#if onRetry}
-        <button class="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500" on:click={onRetry}>
+        <button class="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500" onclick={onRetry}>
           Retry
         </button>
       {/if}
       {#if onBack}
-        <button class="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" on:click={onBack}>
+        <button class="rounded-md border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" onclick={onBack}>
           Back
         </button>
       {/if}

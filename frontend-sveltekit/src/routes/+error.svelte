@@ -2,8 +2,7 @@
 import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
 import { page } from '$app/stores';
 
-export let error: Error;
-export let status: number;
+let { error, status } = $props<{ error: Error; status: number }>();
 
 const checkList = [
   "Check your internet connection",
@@ -11,12 +10,12 @@ const checkList = [
   "Contact support if the issue persists"
 ];
 
-const technicalDetails = {
+const technicalDetails = $derived({
   status,
   message: error?.message,
   stack: error?.stack,
   url: $page.url.pathname
-};
+});
 
 function handleRetry() {
   location.reload();
