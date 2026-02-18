@@ -50,7 +50,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
         return null
       }
       const service = validateServiceDefinition(parsed, serviceId)
-      service.groupName = groupId
+      service.groupId = groupId
       service.identifier = serviceId
       return service
     } catch (error) {
@@ -186,7 +186,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
         }
         const incomingEntry: ServiceIncomingLink = {
           connectionType: connection.connectionType,
-          sourceIdentifier: { groupId: service.groupName, serviceId: service.identifier },
+          sourceIdentifier: { groupId: service.groupId, serviceId: service.identifier },
           description: connection.description
         }
         targetService.incomingConnections?.push(incomingEntry)

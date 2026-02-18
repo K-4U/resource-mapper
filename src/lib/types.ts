@@ -158,7 +158,7 @@ export interface ServiceDefinition {
   identifier: string
   outgoingConnections?: ServiceLink[]
   incomingConnections?: ServiceIncomingLink[]
-  groupName: string
+  groupId: string
 }
 
 export const TEAM_REACH_CHANNELS = [
@@ -284,7 +284,7 @@ export function validateServiceDefinition(data: any, identifier: string): Servic
       description: conn.description
     })),
     incomingConnections: [],
-    groupName: ''
+    groupId: ''
   }
 }
 

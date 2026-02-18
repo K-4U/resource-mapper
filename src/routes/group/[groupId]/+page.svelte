@@ -7,7 +7,7 @@
     import EmptyState from '$lib/components/EmptyState.svelte'
     import ServiceDetailSidebar from '$lib/components/ServiceDetailSidebar.svelte'
     import type {FlowGraphInput} from '$lib/utils/flow/types'
-    import {buildGroupServicesGraph} from '$lib/utils/flow/groupServicesGraph'
+    import {buildGroupServicesGraph} from '$lib/utils/flow/servicesGraph'
     import {goto} from '$app/navigation'
     import {SvelteFlowProvider} from '@xyflow/svelte';
 

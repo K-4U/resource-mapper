@@ -73,9 +73,9 @@ class ConnectionsService {
     console.debug('[ConnectionsService] ensureLoaded building graph')
     const services = await servicesService.getAllServices()
     Object.values(services).forEach(service => {
-      const startServiceKey = `${service.groupName}/${service.identifier}`
-      const startTemplate: ServiceIdentifier = { groupId: service.groupName, serviceId: service.identifier }
-      this.addServiceToGroup(service.groupName, startServiceKey)
+      const startServiceKey = `${service.groupId}/${service.identifier}`
+      const startTemplate: ServiceIdentifier = { groupId: service.groupId, serviceId: service.identifier }
+      this.addServiceToGroup(service.groupId, startServiceKey)
 
       service.outgoingConnections?.forEach(connection => {
         const edge: ServiceConnection = {

@@ -33,7 +33,7 @@ export interface FlowGraphOutput {
   signature: string
 }
 
-export interface GroupServicesGraphResult {
+export interface ServicesGraphResult {
   graph: FlowGraphInput
   serviceNodes: Record<string, ServiceDefinition>
   externalNodes: Record<string, { service: ServiceDefinition; group: GroupInfo }>
