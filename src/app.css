@@ -26,31 +26,39 @@ body {
 TODO: The styles below are for all nodes, style them based on the type of node, e.g. .svelte-flow__node[data-type="custom"] { ... }
  */
 .svelte-flow__node {
-    @apply gap-1 border px-4 py-3 dark:bg-gray-600 border-black bg-gray-100 transition-colors duration-200 ease-in-out;
+    @apply gap-1 px-4 py-3 dark:text-white text-black transition-all duration-300 ease-in-out;
     @apply shadow-sm;
+    @apply rounded-lg;
+    @apply bg-linear-to-tr from-gray-50 to-gray-100 dark:from-gray-500 dark:to-gray-700;
+}
+
+.svelte-flow__node-serviceGroup {
+    
 }
 
 .svelte-flow__node.selected {
-    @apply border-blue-400/80 bg-blue-500 dark:bg-blue-950 shadow-lg;
+    @apply border-blue-400/80 shadow-lg;
+    @apply from-blue-400 to-blue-700 dark:from-blue-900 dark:to-blue-950;
 }
 
 /* Internal service nodes */
 .svelte-flow__node-service {
-    @apply bg-green-100 dark:bg-green-600 transition-colors duration-200 ease-in-out;
+    @apply transition-all duration-300 ease-in-out;
+    @apply from-green-50 to-green-100 dark:from-green-500 dark:to-green-800;
 }
 
 /* External service nodes */
 .svelte-flow__node-external {
-    @apply bg-yellow-100 dark:bg-yellow-600 transition-colors duration-200 ease-in-out;
+    @apply transition-all duration-300 ease-in-out;
+    @apply from-yellow-50 to-yellow-100 dark:from-yellow-500 dark:to-yellow-800;
 }
 
-.svelte-flow__edge {
-    @apply stroke-3;
+/* Service group nodes (partially transparent) */
+.svelte-flow__node-serviceGroup {
+    @apply transition-all duration-300 ease-in-out opacity-60 dark:opacity-40;
 }
 
-.svelte-flow__edge.edge-incoming {
-    @apply stroke-green-400 dark:stroke-green-600 stroke-2 rounded-lg
-}
+
 
 .edge-label {
     @apply absolute bg-slate-900 text-slate-400 px-2 py-0.5 rounded
@@ -79,6 +87,21 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
     filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
 }
 
+.snake-edge-path.internal {
+    @apply stroke-blue-400 dark:stroke-blue-600
+}
+
+.svelte-flow__edge {
+    @apply stroke-3;
+}
+
+.snake-edge-path.incoming {
+    @apply stroke-green-400 dark:stroke-green-600;
+}
+
+.snake-edge-path.outgoing {
+    @apply stroke-sky-400 dark:stroke-sky-600
+}
 
 .sidebar-card {
     @apply rounded-xl border border-gray-200    dark:border-gray-700 bg-gray-50    dark:bg-slate-700 p-4 mt-4

@@ -1,6 +1,7 @@
 <script lang="ts">
     import {BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel, useNodes, useEdges, Position} from '@xyflow/svelte';
     import {calculateEdgeOffset} from '$lib/utils/flow/layout';
+    import { page } from '$app/state';
 
     let {
         id,
@@ -77,10 +78,34 @@
 
     let path = $derived(edgePathData.path);
     let labelPos = $derived({ x: edgePathData.labelX, y: edgePathData.labelY });
+
+    let incomingOrOutgoingOrInternal = $derived.by(() => {
+        const urlGroupId = page.params.groupId;
+
+        if (!urlGroupId) {
+            return null;
+        }
+
+        // Determine if the edge is incoming, outgoing, or internal based on the handle ids, and if the group is the same.
+        //Assume that a node id is in the format of "svc::<group>::<service>".
+        const sourceGroup = source.split('::')[1];
+        const targetGroup = target.split('::')[1];
+
+        if (sourceGroup === targetGroup) {
+            return 'internal';
+        } else if (sourceHandleId === 'output' && sourceGroup === urlGroupId) {
+            return 'outgoing';
+        } else if (targetHandleId === 'input' && targetGroup === urlGroupId) {
+            return 'incoming';
+        } else {
+            return 'internal';
+        }
+    });
+
 </script>
 
 <BaseEdge
-        class={isEffectivelySelected ? 'snake-edge-path selected' : 'snake-edge-path'}
+        class={`${isEffectivelySelected ? 'snake-edge-path selected' : 'snake-edge-path'} ${incomingOrOutgoingOrInternal ?? ''}`}
         {id}
         {path}
         {style}
