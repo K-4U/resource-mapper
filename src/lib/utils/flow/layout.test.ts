@@ -119,4 +119,34 @@ describe('layoutFlowGraph', () => {
     expect(childOut?.position?.x).toBeDefined()
     expect(childOut?.position?.y).toBeDefined()
   })
+
+  it('recalculates edges but preserves node positions when edgesOnly is true', async () => {
+    const s1 = serviceNode('s1', 'S1', 'lambda', { x: 100, y: 100 })
+    const s2 = serviceNode('s2', 'S2', 'sqs', { x: 500, y: 500 })
+    const e1 = edge('e1', 's1', 's2')
+
+    const input: FlowGraphInput = {
+      groupNodes: [],
+      serviceNodes: [s1, s2],
+      edges: [e1],
+      signature: 'sig-edges-only'
+    }
+
+    const out = await layoutFlowGraph(input, true)
+
+    const outS1 = out.nodes.find((n) => n.id === 's1')
+    const outS2 = out.nodes.find((n) => n.id === 's2')
+
+    // Node positions should be EXACTLY what we fed it
+    expect(outS1?.position?.x).toBe(100)
+    expect(outS1?.position?.y).toBe(100)
+    expect(outS2?.position?.x).toBe(500)
+    expect(outS2?.position?.y).toBe(500)
+
+    // Edge should have points
+    const outE1 = out.edges.find((e) => e.id === 'e1')
+    expect(outE1?.data?.points).toBeDefined()
+    expect(Array.isArray(outE1?.data?.points)).toBe(true)
+    expect((outE1?.data?.points as any[]).length).toBeGreaterThanOrEqual(2)
+  })
 })
