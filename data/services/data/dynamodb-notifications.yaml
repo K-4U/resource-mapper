@@ -5,5 +5,8 @@ description: |
   Manages notification queue with TTL for automatic cleanup of processed notifications.
   Provides audit trail for compliance and debugging notification issues.
 serviceType: DYNAMODB
-outgoingConnections: []
+outgoingConnections:
+  - targetIdentifier: "api/lambda-orders"
+    description: "Triggers order processing Lambda function"
+    connectionType: STREAM
 

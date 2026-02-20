@@ -1,11 +1,14 @@
 <script lang="ts">
-    import {BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel, useNodes, Position} from '@xyflow/svelte';
+    import {BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel, useNodes, useEdges, Position} from '@xyflow/svelte';
+    import {calculateEdgeOffset} from '$lib/utils/flow/layout';
 
     let {
         id,
         data,
         source,
         target,
+        sourceHandleId,
+        targetHandleId,
         sourceX,
         sourceY,
         sourcePosition,
@@ -18,6 +21,7 @@
     }: EdgeProps = $props();
 
     const nodes = useNodes();
+    const edges = useEdges();
 
     let isConnectedNodeSelected = $derived.by(() => {
         const sourceNode = nodes.current.find((n) => n.id === source);
@@ -27,14 +31,52 @@
 
     let isEffectivelySelected = $derived(selected || isConnectedNodeSelected);
 
-    // 1. Derive the path
-    let path = $derived.by(() => {
-        return getSmoothStepPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition })[0];
+    let sourceOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, true));
+    let targetOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, false));
+    let trunkOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, true, true));
+
+    // 1. Derive the path and label position
+    let edgePathData = $derived.by(() => {
+        let sX = sourceX;
+        let sY = sourceY;
+        let tX = targetX;
+        let tY = targetY;
+
+        if (sourcePosition === Position.Left || sourcePosition === Position.Right) {
+            sY += sourceOffset;
+        } else {
+            sX += sourceOffset;
+        }
+
+        if (targetPosition === Position.Left || targetPosition === Position.Right) {
+            tY += targetOffset;
+        } else {
+            tX += targetOffset;
+        }
+
+        const params: any = {
+            sourceX: sX,
+            sourceY: sY,
+            sourcePosition,
+            targetX: tX,
+            targetY: tY,
+            targetPosition
+        };
+
+        // If it's a left/right connection, apply trunkOffset to the centerX to split the vertical trunk
+        if (sourcePosition === Position.Left || sourcePosition === Position.Right) {
+            params.centerX = (sX + tX) / 2 + trunkOffset;
+        } else {
+            // For top/bottom, apply to the centerY to split the horizontal trunk
+            params.centerY = (sY + tY) / 2 + trunkOffset;
+        }
+
+        const [path, labelX, labelY] = getSmoothStepPath(params);
+        return {path, labelX, labelY};
     });
 
-    let labelPos: { x: number; y: number } = $derived.by(() => {
-        return { x: (sourceX + targetX) / 2, y: (sourceY + targetY) / 2 };
-    });
+    let path = $derived(edgePathData.path);
+    let labelPos = $derived({ x: edgePathData.labelX, y: edgePathData.labelY });
 </script>
 
 <BaseEdge

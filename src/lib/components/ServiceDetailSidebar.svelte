@@ -8,17 +8,12 @@
     let selectedNodes = [];
     let selectedEdges = [];
 
-    const nodes = useNodes().current;
-    const selectedNode = nodes.find((node) => node.selected);
+    const nodes = useNodes();
+    let selectedNode = $derived(nodes.current.find((node) => node.selected));
 
-    useOnSelectionChange(({nodes, edges}) => {
-        selectedNodes = nodes.map((node) => node.id);
+    useOnSelectionChange(({nodes: n, edges}) => {
+        selectedNodes = n.map((node) => node.id);
         selectedEdges = edges.map((edge) => edge.id);
-        if (selectedNodes.length > 0) {
-            service = serviceNodeLookup[selectedNodes[0]] ?? null;
-        } else {
-            service = null;
-        }
     });
 
     const {group, serviceNodeLookup} = $props<{
@@ -33,6 +28,8 @@
     $effect(() => {
         if (selectedNode) {
             service = serviceNodeLookup[selectedNode.id] ?? null;
+        } else {
+            service = null;
         }
     });
 
@@ -66,6 +63,12 @@
             {#if service}
                 <GenericSidebarCard title="Service" subtitle={service.friendlyName} description={service.description}
                                     iconPath={iconPath?? undefined} iconAlt={initials}/>
+            {/if}
+            {#if selectedNode}
+                <div>
+                    <h3 class="mt-4 text-sm font-medium text-gray-500 uppercase tracking-wide">Node ID</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">{selectedNode.id} -- x: {selectedNode.position.x} -- y: {selectedNode.position.y}</p>
+                </div>
             {/if}
             <!--{#if isExternalService() && serviceGroup}
                 <div class="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4">

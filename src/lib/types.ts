@@ -6,7 +6,8 @@ export enum ConnectionType {
   TCP = 'TCP',
   PUBLISHES = 'PUBLISHES',
   CALLS = 'CALLS',
-  TRIGGERS = 'TRIGGERS'
+  TRIGGERS = 'TRIGGERS',
+  STREAM = 'STREAM',
 }
 
 export enum ServiceType {

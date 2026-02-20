@@ -1,10 +1,138 @@
 import ELK, {type ElkExtendedEdge} from 'elkjs/lib/elk.bundled.js';
-import type {Edge, Node} from '@xyflow/svelte';
+import {type Edge, type Node, Position} from '@xyflow/svelte';
 import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$lib/utils/flow/types';
 import type {ElkNode} from "elkjs/lib/elk-api";
 
 const elk = new ELK();
 const PADDING = 10;
+export const OFFSET_STEP = 8;
+
+/**
+ * Helper to calculate absolute position of a node by traversing its parent chain.
+ */
+function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: number, y: number } {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return { x: 0, y: 0 };
+
+    let x = node.position?.x ?? 0;
+    let y = node.position?.y ?? 0;
+
+    if (node.parentId) {
+        const parentPos = getAbsolutePosition(node.parentId, nodes);
+        x += parentPos.x;
+        y += parentPos.y;
+    }
+
+    return { x, y };
+}
+
+/**
+ * Calculates a deterministic offset for an edge to prevent overlapping.
+ * This function handles two types of offsets:
+ * 1. Handle Offset: For multiple edges sharing the same handle on a node.
+ * 2. Trunk Offset: For edges that don't share a handle but might have overlapping
+ *    paths (trunks) in the same "lane".
+ */
+export function calculateEdgeOffset(
+    edgeId: string,
+    nodes: Node<FlowNodeData>[],
+    edges: Edge<FlowEdgeData>[],
+    isSource: boolean,
+    isTrunk: boolean = false
+): number {
+    const edge = edges.find(e => e.id === edgeId);
+    if (!edge) return 0;
+
+    const nodeId = isSource ? edge.source : edge.target;
+    const handleId = isSource ? edge.sourceHandle : edge.targetHandle;
+
+    const sourcePos = getAbsolutePosition(edge.source, nodes);
+    const targetPos = getAbsolutePosition(edge.target, nodes);
+    const handle = isSource ? edge.sourceHandle : edge.targetHandle;
+    const isVertical = handle?.toLowerCase().includes('top') || handle?.toLowerCase().includes('bottom');
+
+    let finalSiblings: Edge<FlowEdgeData>[] = [];
+    let usedAreaFallback = false;
+
+    if (isTrunk) {
+        // TRUNK OFFSET: Consider ALL edges that might share this "lane"
+        usedAreaFallback = true;
+        finalSiblings = edges.filter(e => {
+            const sPos = getAbsolutePosition(e.source, nodes);
+            const tPos = getAbsolutePosition(e.target, nodes);
+
+            if (isVertical) {
+                // Vertical trunk: shared Y-range and roughly same mid-X?
+                // For now, simpler: overlapping Y-range is the "lane"
+                const minY = Math.min(sourcePos.y, targetPos.y);
+                const maxY = Math.max(sourcePos.y, targetPos.y);
+                const eMinY = Math.min(sPos.y, tPos.y);
+                const eMaxY = Math.max(sPos.y, tPos.y);
+                return Math.max(minY, eMinY) < Math.min(maxY, eMaxY);
+            } else {
+                // Horizontal trunk: shared X-range?
+                const minX = Math.min(sourcePos.x, targetPos.x);
+                const maxX = Math.max(sourcePos.x, targetPos.x);
+                const eMinX = Math.min(sPos.x, tPos.x);
+                const eMaxX = Math.max(sPos.x, tPos.x);
+                return Math.max(minX, eMinX) < Math.min(maxX, eMaxX);
+            }
+        });
+    } else {
+        // HANDLE OFFSET: Siblings on the same node and same handle
+        const siblings = edges.filter(e =>
+            (isSource ? e.source : e.target) === nodeId &&
+            (isSource ? e.sourceHandle : e.targetHandle) === handleId
+        );
+
+        if (siblings.length <= 1) {
+            // Fallback for bidirectional or single edges between same nodes
+            usedAreaFallback = true;
+            const otherId = isSource ? edge.target : edge.source;
+            finalSiblings = edges.filter(e => {
+                const isSamePair = (e.source === nodeId && e.target === otherId) ||
+                                   (e.source === otherId && e.target === nodeId);
+                return isSamePair && (e.source === nodeId || e.target === nodeId);
+            });
+        } else {
+            finalSiblings = siblings;
+        }
+    }
+
+    if (finalSiblings.length <= 1) return 0;
+
+    // Sort:
+    finalSiblings.sort((a, b) => {
+        if (usedAreaFallback) {
+            // For horizontal paths (Left/Right), we split them vertically by their overall Y midpoint
+            const aSPos = getAbsolutePosition(a.source, nodes);
+            const aTPos = getAbsolutePosition(a.target, nodes);
+            const bSPos = getAbsolutePosition(b.source, nodes);
+            const bTPos = getAbsolutePosition(b.target, nodes);
+
+            if (isVertical) {
+                const midA = (aSPos.x + aTPos.x) / 2;
+                const midB = (bSPos.x + bTPos.x) / 2;
+                if (midA !== midB) return midA - midB;
+            } else {
+                const midA = (aSPos.y + aTPos.y) / 2;
+                const midB = (bSPos.y + bTPos.y) / 2;
+                if (midA !== midB) return midA - midB;
+            }
+            return a.id.localeCompare(b.id);
+        }
+        const otherIdA = isSource ? a.target : a.source;
+        const otherIdB = isSource ? b.target : b.source;
+        const posA = getAbsolutePosition(otherIdA, nodes);
+        const posB = getAbsolutePosition(otherIdB, nodes);
+        const primary = isVertical ? (posA.x - posB.x) : (posA.y - posB.y);
+        if (primary !== 0) return primary;
+        return a.id.localeCompare(b.id);
+    });
+
+    const index = finalSiblings.findIndex(e => e.id === edgeId);
+    return (index - (finalSiblings.length - 1) / 2) * OFFSET_STEP;
+}
 
 const ELK_OPTIONS: Record<string, string> = {
     'elk.algorithm': 'layered',
