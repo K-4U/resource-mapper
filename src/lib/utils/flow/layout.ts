@@ -1,7 +1,7 @@
 import ELK, {type ElkExtendedEdge} from 'elkjs/lib/elk.bundled.js';
 import type {Edge, Node} from '@xyflow/svelte';
 import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$lib/utils/flow/types';
-import type {ElkNode, ElkPoint} from "elkjs/lib/elk-api";
+import type {ElkNode} from "elkjs/lib/elk-api";
 
 const elk = new ELK();
 const PADDING = 10;
@@ -10,9 +10,9 @@ const ELK_OPTIONS: Record<string, string> = {
     'elk.algorithm': 'layered',
     'elk.direction': 'RIGHT',
     //Horizontal
-    'elk.spacing.nodeNodeBetweenLayers': '100',
+    'elk.spacing.nodeNodeBetweenLayers': '80',
     //Vertical
-    'elk.spacing.nodeNode': '100',
+    'elk.spacing.nodeNode': '80',
 
     'elk.spacing.edgeNode': '60',               // Gap between lines and boxes
     'elk.spacing.edgeEdge': '40',               // Gap between parallel lines
@@ -34,32 +34,35 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
     }));
 }
 
-export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly: boolean = false): Promise<FlowGraphOutput> {
+/**
+ * Helper to get the dimensions of a node, prioritizing measured values from Svelte Flow.
+ */
+function getNodeDimensions(node: Node<FlowNodeData>): { w: number, h: number } {
+    const w = Math.round(node.measured?.width ?? node.width ?? 150);
+    const h = Math.round(node.measured?.height ?? node.height ?? 40);
+    return { w, h };
+}
+
+
+export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphOutput> {
     const elkEdges = convertEdgesToElkEdges(input);
-    console.debug('[layoutFlowGraph] Starting layout with input:', {input, edgesOnly});
-    // Helper: Build node properties and handle the "noLayout" flag
-    const prepareElkNode = (node: any) => ({
-        ...node,
-        x: node.position?.x ?? 0,
-        y: node.position?.y ?? 0,
-        layoutOptions: edgesOnly ? {
-            'elk.noLayout': 'true',
-            'elk.position': `( ${node.position?.x ?? 0}, ${node.position?.y ?? 0} )`
-        } : {}
-    })
+    console.debug('[layoutFlowGraph] Starting layout with input:', {input});
+    // Helper: Build node properties and handle dimensions
+    const prepareElkNode = (node: Node<FlowNodeData>) => {
+        const { w, h } = getNodeDimensions(node);
+        return {
+            ...node,
+            width: w,
+            height: h
+        };
+    };
 
     // 1. Build the nested ELK structure
     const elkChildren: ElkNode[] = input.groupNodes.map(parent => ({
-        ...parent,
-        x: parent.position.x ?? 0,
-        y: parent.position.y ?? 0,
+        ...prepareElkNode(parent),
         layoutOptions: {
             ...ELK_OPTIONS,
             'elk.padding': `[top=60,left=${PADDING},bottom=${PADDING},right=${PADDING}]`,
-            ...(edgesOnly ? {
-                'elk.noLayout': 'true',
-                'elk.position': `( ${parent.position?.x ?? 0}, ${parent.position?.y ?? 0} )`
-            } : {}),
         },
         children: input.serviceNodes.filter(child => child.parentId === parent.id).map(prepareElkNode)
     }));
@@ -76,9 +79,7 @@ export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly: boolean 
         edges: elkEdges
     };
 
-    console.log(JSON.stringify(elkGraph, null, 2))
-
-    return elk.layout(elkGraph).then((layoutedGraph) => {
+    return elk.layout(elkGraph).then(async (layoutedGraph) => {
         console.debug('[layoutFlowGraph] Layout completed:', {layoutedGraph});
         const flattenedNodes: Node<FlowNodeData>[] = [];
         const allLayoutedEdges: (ElkExtendedEdge & { originalEdge: Edge<FlowEdgeData> })[] = [];
@@ -134,57 +135,10 @@ export async function layoutFlowGraph(input: FlowGraphInput, edgesOnly: boolean 
 
         console.debug(allLayoutedEdges);
 
-        // 3. Globalize Edge Points
-        const finalEdges: Edge<FlowEdgeData>[] = allLayoutedEdges
-            .filter((edge) => edge.originalEdge.data?.connectionType !== 'service-group')
-            .map((edge) => {
-                const section = edge.sections?.[0];
-                const points: ElkPoint[] = [];
-
-                if (section) {
-                    console.debug('[layoutFlowGraph] Processing edge for points', {edge, section});
-
-                    const sourceId = edge.sources[0];
-                    const targetId = edge.targets[0];
-
-                    const sourceParentId = nodeToParent.get(sourceId);
-                    const targetParentId = nodeToParent.get(targetId);
-
-                    let offset = {x: 0, y: 0};
-
-                    if (sourceParentId && sourceParentId === targetParentId) {
-                        const parentPos = parentPosLookup.get(sourceParentId);
-                        if (parentPos) {
-                            offset = parentPos;
-                        }
-                    }
-
-                    const translate = (p: ElkPoint) => ({
-                        x: p.x + offset.x,
-                        y: p.y + offset.y
-                    });
-
-                    points.push(translate(section.startPoint));
-                    if (section.bendPoints) {
-                        points.push(...section.bendPoints.map(translate));
-                    }
-                    points.push(translate(section.endPoint));
-                }
-
-                return {
-                    ...edge.originalEdge,
-                    source: edge.sources[0],
-                    target: edge.targets[0],
-                    data: {
-                        ...edge.originalEdge.data,
-                        points
-                    }
-                };
-            });
-
+        // 3. Just return the edges as is; Svelte Flow will handle the rendering
         return {
             nodes: flattenedNodes,
-            edges: finalEdges,
+            edges: input.edges,
             signature: input.signature
         };
     });

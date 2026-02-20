@@ -7,11 +7,10 @@
         type Edge,
         type EdgeTypes,
         MiniMap,
-        type Node, type NodeTargetEventWithPointer,
+        type Node,
         type NodeTypes,
         Panel,
-        SvelteFlow, useEdges,
-        useSvelteFlow
+        SvelteFlow
     } from '@xyflow/svelte'
     import Legend from '$lib/components/Legend.svelte'
     import {layoutFlowGraph} from '$lib/utils/flow/layout'
@@ -29,16 +28,13 @@
     let {
         graph = null,
         pending = false,
-        onnodeClick,
         onnodeDoubleClick
     } = $props<{
         graph?: FlowGraphInput | null;
         pending?: boolean;
-        onnodeClick?: (nodeId: string) => void;
         onnodeDoubleClick?: (nodeId: string) => void;
     }>();
 
-    const {getNodes, getEdges} = useSvelteFlow()
 
     const nodeTypes = {
         mainGroup: MainGroupNode,
@@ -51,7 +47,6 @@
     // Svelte 5 State
     let nodes: Node[] = $state([])
     let edges: Edge[] = $state([])
-    let allEdges = useEdges();
 
     let emptyStateLabel = $state('No diagram available.')
     let lastClickedNode: string | null = $state(null)
@@ -87,16 +82,14 @@
     $effect(() => {
         const newTargetSignature = graph?.signature ?? '';
         if (newTargetSignature !== '' && newTargetSignature !== currentSignature) {
-            runLayout(graph, newTargetSignature, false);
+            runLayout(graph, newTargetSignature);
         }
     });
 
-    async function runLayout(sourceGraph: FlowGraphInput | null, signature: string, edgesOnly = false) {
+    async function runLayout(sourceGraph: FlowGraphInput | null, signature: string) {
         layoutError = ''
 
-        if(!edgesOnly) {
-            graphReady = false
-        }
+        graphReady = false
 
         console.debug('[FlowCanvas] runLayout start', {hasGraph: !!sourceGraph, signature})
         if (!sourceGraph) {
@@ -109,8 +102,8 @@
         }
         layoutBusy = true
         try {
-            const result = await layoutFlowGraph(sourceGraph, edgesOnly)
-            if (result.signature !== signature && !edgesOnly) {
+            const result = await layoutFlowGraph(sourceGraph)
+            if (result.signature !== signature) {
                 console.debug('[FlowCanvas] runLayout result ignored due to stale signature', {
                     expected: signature,
                     received: result.signature
@@ -120,10 +113,7 @@
             nodes = result.nodes as Node[]
             edges = result.edges as Edge[]
 
-            // Only update the "official" signature if it was a full layout
-            if (!edgesOnly) {
-                currentSignature = result.signature;
-            }
+            currentSignature = result.signature;
 
             graphReady = true
             console.debug('[FlowCanvas] runLayout complete', {
@@ -142,40 +132,6 @@
         }
     }
 
-    function handleNodeDragStart(event: NodeTargetEventWithPointer<MouseEvent | TouchEvent>) {
-        //@ts-ignore
-        const nodeId = event.targetNode.id
-        const currentEdges = getEdges()
-        //Set all edges back to their default straight paths to prevent weird edge behavior during dragging
-        const updatedEdges = currentEdges.map(edge => {
-            if (edge.source === nodeId || edge.target === nodeId) {
-                return {...edge, data: {...edge.data, points: []}}
-            }
-            return edge
-        })
-        allEdges.set(updatedEdges)
-    }
-
-    async function triggerLayout() {
-        if (!graph) return;
-        const currentNodes = getNodes();
-        const currentEdges = getEdges();
-
-        const graphInput: FlowGraphInput = {
-            ...graph,
-            // Pass the full node object, just ensuring width/height are captured
-            // TODO: Optimization - filter logic is repeated and could be simplified
-            serviceNodes: currentNodes
-                .filter(n => n.type === 'service' || n.type === 'external' || n.type === 'mainGroup') as Node<FlowNodeData>[],
-            groupNodes: currentNodes
-                .filter(n => n.type === 'serviceGroup') as Node<FlowNodeData>[],
-            edges: currentEdges, // No need to map these if types match
-            signature: `layout-${Date.now()}`
-        };
-
-        runLayout(graphInput, graphInput.signature, true);
-    }
-
     //TODO: This handleFlowNodeClick function seems to be unused in the template. If it's intended for Node components, consider passing it down.
     function handleFlowNodeClick(event: CustomEvent<{ node?: { id?: string } }>) {
         const nodeId = event.detail?.node?.id
@@ -189,7 +145,6 @@
         }
         lastClickedNode = nodeId
         lastClickTimestamp = now
-        onnodeClick?.(nodeId)
     }
 
     // TODO: logDiagram is only called from logDiagramAction subscription, verify if this is actually needed.
@@ -211,8 +166,6 @@
                 bind:edges
                 {nodeTypes}
                 {edgeTypes}
-                onnodedragstart={handleNodeDragStart}
-                onnodedragstop={triggerLayout}
                 nodesDraggable
                 nodesConnectable={false}
                 panOnDrag
