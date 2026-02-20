@@ -78,23 +78,23 @@ export function buildGroupServicesGraph(
 
     const addConnections = (
         serviceNodeId: string,
-        connections: (ServiceLink | ServiceIncomingLink)[] | undefined,
-        direction: ExternalConnectionDirection
+        connections: (ServiceLink | ServiceIncomingLink)[] | undefined
     ) => {
         connections?.forEach(conn => {
-            const remoteIdentifier = 'targetIdentifier' in conn ? conn.targetIdentifier : conn.sourceIdentifier
+            const isOutgoing = 'targetIdentifier' in conn
+            const remoteIdentifier = isOutgoing ? conn.targetIdentifier : conn.sourceIdentifier
             if (remoteIdentifier.groupId === currentGroup.groupName) {
                 const remoteNodeId = remoteIdentifier.serviceId ? serviceNodeLookup.get(remoteIdentifier.serviceId) : undefined
                 if (remoteNodeId) {
-                    const sourceId = direction === 'outgoing' ? serviceNodeId : remoteNodeId
-                    const targetId = direction === 'outgoing' ? remoteNodeId : serviceNodeId
+                    const sourceId = isOutgoing ? serviceNodeId : remoteNodeId
+                    const targetId = isOutgoing ? remoteNodeId : serviceNodeId
                     edges.push(buildEdge(sourceId, targetId, conn.connectionType, 'internal'))
                 }
             } else if (remoteIdentifier.groupId && remoteIdentifier.serviceId) {
-                const extNodeId = ensureExternalNode(direction, remoteIdentifier.groupId, remoteIdentifier.serviceId, externalLookup, externalNodeMap, externalNodeRecord)
+                const extNodeId = ensureExternalNode(remoteIdentifier.groupId, remoteIdentifier.serviceId, externalLookup, externalNodeMap, externalNodeRecord)
                 if (extNodeId) {
-                    const sourceId = direction === 'outgoing' ? serviceNodeId : extNodeId
-                    const targetId = direction === 'outgoing' ? extNodeId : serviceNodeId
+                    const sourceId = isOutgoing ? serviceNodeId : extNodeId
+                    const targetId = isOutgoing ? extNodeId : serviceNodeId
                     edges.push(buildEdge(sourceId, targetId, conn.connectionType, 'external'))
                 }
             }
@@ -106,12 +106,14 @@ export function buildGroupServicesGraph(
         serviceNodeLookup.set(service.identifier, nodeId)
         serviceNodeRecord[nodeId] = service
         nodes.push(createServiceNode(nodeId, service))
+    })
 
+    currentServices.forEach(service => {
         const currentServiceNodeId = serviceNodeLookup.get(service.identifier)
         if (!currentServiceNodeId) return
 
-        addConnections(currentServiceNodeId, service.outgoingConnections, 'outgoing')
-        addConnections(currentServiceNodeId, service.incomingConnections, 'incoming')
+        addConnections(currentServiceNodeId, service.outgoingConnections)
+        addConnections(currentServiceNodeId, service.incomingConnections)
     })
 
     // 4. Create Group Container Nodes
@@ -158,30 +160,39 @@ export function buildGroupServicesGraph(
 
 function createDirectionLookup(
     entries: ExternalGroupServices[]
-): Map<string, ExternalGroupServices> {
+): Map<string, { incoming?: ExternalGroupServices; outgoing?: ExternalGroupServices }> {
     return entries.reduce((lookup, entry) => {
-        if (entry.group?.groupName) {
-            lookup.set(entry.group.groupName, entry)
+        const key = entry.group?.groupName
+        if (!key) return lookup
+        const existing = lookup.get(key) || {}
+        if (entry.direction === 'incoming') {
+            existing.incoming = entry
+        } else if (entry.direction === 'outgoing') {
+            existing.outgoing = entry
         }
+        lookup.set(key, existing)
         return lookup
-    }, new Map<string, ExternalGroupServices>())
+    }, new Map<string, { incoming?: ExternalGroupServices; outgoing?: ExternalGroupServices }>())
 }
 
-//TODO: Figure out wtf this method does.
+// Registers an external node in the nodeMap and externalNodeRecord.
+// It uses a consistent svc::<groupId>::<serviceId> naming scheme.
 function ensureExternalNode(
-    direction: ExternalConnectionDirection,
     groupId: string,
     serviceId: string,
-    lookup: Map<string, ExternalGroupServices>,
+    lookup: Map<string, { incoming?: ExternalGroupServices; outgoing?: ExternalGroupServices }>,
     nodeMap: Map<string, Node<FlowNodeData>>,
     record: Record<string, { service: ServiceDefinition; group: GroupInfo }>
 ): string | null {
-    const key = `${direction}_${groupId}_${serviceId}`
+    const key = `svc::${groupId}::${serviceId}`
     if (nodeMap.has(key)) {
         return key
     }
 
-    const externalMeta = findExternalService(direction, groupId, serviceId, lookup)
+    // Try to find the service in either direction
+    const externalMeta = findExternalService('outgoing', groupId, serviceId, lookup) ||
+        findExternalService('incoming', groupId, serviceId, lookup)
+
     if (!externalMeta) {
         return null
     }
@@ -212,17 +223,15 @@ function findExternalService(
     direction: ExternalConnectionDirection,
     groupId: string,
     serviceId: string,
-    lookup: Map<string, ExternalGroupServices>
+    lookup: Map<string, { incoming?: ExternalGroupServices; outgoing?: ExternalGroupServices }>
 ) {
-    const entry = lookup.get(groupId)
-    if (entry?.direction !== direction) {
-        return null
-    }
-    const service = entry.services.find(item => item.identifier === serviceId)
-    if (!service) {
-        return null
-    }
-    return {group: entry.group, service}
+    const entries = lookup.get(groupId)
+    if (!entries) return null
+    const dirEntry = entries[direction]
+    if (!dirEntry) return null
+    const service = dirEntry.services.find(item => item.identifier === serviceId)
+    if (!service) return null
+    return { group: dirEntry.group, service }
 }
 
 function buildEdge(
@@ -231,6 +240,7 @@ function buildEdge(
     connectionType?: ConnectionType | 'service-group',
     edgeType: 'external' | 'internal' = 'internal' //TODO: Name me better
 ): Edge<FlowEdgeData> {
+    console.debug(`Creating edge from ${sourceId} to ${targetId} of type ${connectionType} (${edgeType})`)
     return {
         id: `edge_${sourceId}_${targetId}`,
         source: sourceId,

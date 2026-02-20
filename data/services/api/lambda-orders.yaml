@@ -9,6 +9,9 @@ outgoingConnections:
   - targetIdentifier: "data/dynamodb-orders"
     description: "Order data storage"
     connectionType: CALLS
+  - targetIdentifier: "data/dynamodb-notifications"
+    description: "Order data storage"
+    connectionType: CALLS
   - targetIdentifier: "data/rds-postgres"
     description: "Transactional order processing"
     connectionType: TCP

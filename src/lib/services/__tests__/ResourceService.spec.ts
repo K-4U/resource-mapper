@@ -16,6 +16,7 @@ describe('ResourceService', () => {
     const group = await groupService.getGroup('api')
 
     expect(group).toEqual({
+      id: 'api',
       groupName: 'api',
       name: 'API Services',
       description: 'Core entrypoints',

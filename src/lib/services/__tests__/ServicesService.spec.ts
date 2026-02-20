@@ -27,7 +27,7 @@ describe('ServicesService', () => {
 
     expect(result).toEqual(
       expect.objectContaining({
-        groupName: 'api',
+        groupId: 'api',
         identifier: 'gateway',
         friendlyName: 'API Gateway',
         serviceType: 'API_GATEWAY',
@@ -100,6 +100,26 @@ describe('ServicesService', () => {
         description: 'Calls payments'
       })
     ])
+  })
+
+  it('returns both incoming and outgoing entries when the same service has bidirectional links to the same external service', async () => {
+    // Same internal service participates in both directions with the same external service
+    __setServiceFileMocks({
+      [servicePath('api', 'lambda-orders')]: `friendlyName: Order Processing Lambda\nserviceType: LAMBDA\noutgoingConnections:\n  - connectionType: TCP\n    targetIdentifier: data/rds-postgres\n    description: orders -> rds\n`,
+      [servicePath('data', 'rds-postgres')]: `friendlyName: RDS Postgres\nserviceType: RDS\noutgoingConnections:\n  - connectionType: TCP\n    targetIdentifier: api/lambda-orders\n    description: rds -> orders\n`
+    })
+
+    const result = await servicesService.getExternalServicesForGroup('api')
+
+    // Expect one outgoing entry for group 'data' that includes rds-postgres
+    const outEntry = result.find(e => e.direction === 'outgoing' && e.group.groupName === 'data')
+    expect(outEntry).toBeTruthy()
+    expect(outEntry?.services.some(s => s.identifier === 'rds-postgres')).toBe(true)
+
+    // And one incoming entry for group 'data' that includes rds-postgres
+    const inEntry = result.find(e => e.direction === 'incoming' && e.group.groupName === 'data')
+    expect(inEntry).toBeTruthy()
+    expect(inEntry?.services.some(s => s.identifier === 'rds-postgres')).toBe(true)
   })
 
   it("rejects legacy brace-based target identifiers", async () => {
