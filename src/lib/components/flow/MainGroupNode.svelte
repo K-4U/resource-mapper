@@ -11,8 +11,8 @@
 </script>
 
 
-<Handle type="target" position={Position.Left} hidden/>
-<Handle type="source" position={Position.Right} hidden/>
+<Handle type="target" position={Position.Left} id="input" />
+<Handle type="source" position={Position.Right} id="output" />
 <div class="relative">
     {data.label}
     {#if selected}

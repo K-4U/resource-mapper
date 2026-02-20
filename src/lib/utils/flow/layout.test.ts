@@ -225,6 +225,43 @@ describe('calculateEdgeOffset', () => {
     expect(offset2_neg).toBe(-OFFSET_STEP / 2)
     expect(offset1_neg).toBe(OFFSET_STEP / 2)
   })
+
+  it('correctly calculates absolute coordinates for deeply nested nodes', () => {
+    const nodes: Node<FlowNodeData>[] = [
+      groupNode('g1', 'G1', { x: 100, y: 100 }),
+      { ...groupNode('g2', 'G2', { x: 50, y: 50 }), parentId: 'g1' } as Node<FlowNodeData>,
+      { ...serviceNode('n1', 'N1', undefined, { x: 10, y: 10 }), parentId: 'g2' } as Node<FlowNodeData>
+    ]
+    // n1 abs position should be: g1(100,100) + g2(50,50) + n1(10,10) = (160, 160)
+    
+    // Since getAbsolutePosition is internal, we can test it indirectly via calculateEdgeOffset
+    // OR we can make it exported for testing. Let's keep it simple and test via calculateEdgeOffset.
+    
+    // We'll create another node n2 and an edge n1 -> n2.
+    const nodesFull = [
+      ...nodes,
+      serviceNode('n2', 'N2', undefined, { x: 500, y: 500 })
+    ]
+    const edges = [edge('e1', 'n1', 'n2', { label: 'E1' })]
+    
+    // If n1 is at (160, 160) and n2 is at (500, 500), trunk should overlap with another edge n3 -> n4 in same area
+    const n3 = serviceNode('n3', 'N3', undefined, { x: 160, y: 170 })
+    const n4 = serviceNode('n4', 'N4', undefined, { x: 500, y: 510 })
+    const nodesExtra = [...nodesFull, n3, n4]
+    const edgesExtra = [...edges, edge('e2', 'n3', 'n4', { label: 'E2' })]
+    
+    // n1 -> n2: (160, 160) -> (500, 500)
+    // n3 -> n4: (160, 170) -> (500, 510)
+    // Both have overlapping X-spans [160, 500].
+    // Their mid-Y: e1: (160+500)/2 = 330, e2: (170+510)/2 = 340.
+    // e1 should get offset -4, e2 offset 4.
+    
+    const o1 = calculateEdgeOffset('e1', nodesExtra, edgesExtra, true, true)
+    const o2 = calculateEdgeOffset('e2', nodesExtra, edgesExtra, true, true)
+    
+    expect(o1).toBe(-OFFSET_STEP / 2)
+    expect(o2).toBe(OFFSET_STEP / 2)
+  })
 })
 
 

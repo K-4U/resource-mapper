@@ -53,8 +53,8 @@ class GroupService extends YamlEntityService<GroupInfo> {
   }
 }
 
-export const resourceService = new GroupService()
+export const groupService = new GroupService()
 
 export function __setGroupFileMocks(files: Record<string, string>) {
-  resourceService.__setGroupFileMocks(files)
+  groupService.__setGroupFileMocks(files)
 }

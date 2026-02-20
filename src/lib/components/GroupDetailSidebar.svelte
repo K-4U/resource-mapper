@@ -1,31 +1,20 @@
 <script lang="ts">
-    import type {GroupInfo, Team} from '$lib/types'
+    import type {GroupInfo} from '$lib/types'
     import TeamContactCard from '$lib/components/TeamContactCard.svelte'
-
-    import {useOnSelectionChange} from '@xyflow/svelte';
+    import {useNodes} from '@xyflow/svelte';
 
     const {groupMap, groups, placeholderMessage} = $props<{
         groupMap: Record<string, string>;
         groups: Record<string, GroupInfo>;
         placeholderMessage: string;
     }>()
-    
-    let selectedNodes = $state<string[]>([]);
-    let selectedEdges = $state<string[]>([]);
-    let groupId: string | null = $state(null)
 
-    useOnSelectionChange(({nodes, edges}) => {
-        selectedNodes = nodes.map((node) => node.id);
-        selectedEdges = edges.map((edge) => edge.id);
-        if (selectedNodes.length > 0) {
-            console.debug('[GroupDetailSidebar] selection changed', {selectedNodes, selectedEdges})
-            groupId = groupMap[selectedNodes[0]] ?? null;
-        } else {
-            groupId = null;
-        }
-    });
-    
-    let groupInfo = $derived(groupId ? groups[groupId] ?? null : null)
+    // Derive selection directly from XYFlow state to avoid subscription loops
+    const nodes = useNodes();
+    let selectedNodeId = $derived(nodes.current.find(n => n.selected)?.id ?? null);
+
+    let groupId = $derived(selectedNodeId ? (groupMap[selectedNodeId] ?? null) : null);
+    let groupInfo = $derived(groupId ? (groups[groupId] ?? null) : null);
 </script>
 
 <aside data-testid="group-sidebar"

@@ -210,7 +210,6 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
     return elk.layout(elkGraph).then(async (layoutedGraph) => {
         console.debug('[layoutFlowGraph] Layout completed:', {layoutedGraph});
         const flattenedNodes: Node<FlowNodeData>[] = [];
-        const allLayoutedEdges: (ElkExtendedEdge & { originalEdge: Edge<FlowEdgeData> })[] = [];
 
         // Lookup maps to handle the coordinate system bridge
         const parentPosLookup = new Map<string, { x: number, y: number }>();
@@ -255,13 +254,6 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
                 } as Node<FlowNodeData>);
             }
         });
-
-        // Collect edges found at the root level
-        if (layoutedGraph.edges) {
-            allLayoutedEdges.push(...(layoutedGraph.edges as any));
-        }
-
-        console.debug(allLayoutedEdges);
 
         // 3. Just return the edges as is; Svelte Flow will handle the rendering
         return {

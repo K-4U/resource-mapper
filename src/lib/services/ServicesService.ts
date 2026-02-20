@@ -8,7 +8,7 @@ import {
   type ServiceIncomingLink
 } from '$lib/types'
 import { YamlEntityService } from './YamlEntityService'
-import { resourceService } from './ResourceService'
+import { groupService } from './GroupService'
 
 class ServicesService extends YamlEntityService<ServiceDefinition> {
   private incomingConnectionsPopulated = false
@@ -137,7 +137,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
         if (!resolvedServices.length) {
           continue
         }
-        const group = (await resourceService.getGroup(externalGroupId)) ?? this.createFallbackGroup(externalGroupId)
+        const group = (await groupService.getGroup(externalGroupId)) ?? this.createFallbackGroup(externalGroupId)
         results.push({ group, services: resolvedServices, direction })
       }
     }

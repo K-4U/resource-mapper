@@ -5,7 +5,6 @@
     import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
     import EmptyState from '$lib/components/EmptyState.svelte'
     import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
-    import type {FlowGraphInput} from '$lib/utils/flow/types'
     import {buildGroupOverviewGraph} from '$lib/utils/flow/groupOverviewGraph'
     import {goto, invalidateAll} from '$app/navigation'
     import {SvelteFlowProvider} from "@xyflow/svelte";
@@ -13,7 +12,6 @@
     let { data } = $props<{ data: PageData }>()
 
     const groups = $derived(data.groups)
-    const teams = $derived(data.teams)
     const groupConnections = $derived(data.groupConnections)
     const errorMessage = $derived(data.errorMessage)
 
@@ -56,7 +54,7 @@
             title="Error loading groups"
             message="Failed to load the group overview diagram."
             checkList={[
-      'Ensure YAML data exists under src/lib/data/services',
+      'Ensure YAML data exists under /data/services',
       'Check the browser console for more details'
     ]}
             technicalDetails={errorMessage}
@@ -80,7 +78,6 @@
             <GroupDetailSidebar
                     groupMap={nodeGroupMap}
                     groups={groups ?? {}}
-                    teams={teams ?? null}
                     placeholderMessage="Select a group to see details"
             />
         </SvelteFlowProvider>

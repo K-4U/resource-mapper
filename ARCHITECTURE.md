@@ -21,7 +21,7 @@ Resource Mapper is a fully static Svelte 5 + SvelteFlow application that turns Y
 ### `YamlEntityService`
 Abstract base that normalizes the raw glob files, extracts entity IDs, caches parsed results, and exposes mock capabilities for Vitest suites.
 
-### `ResourceService` (`src/lib/services/ResourceService.ts`)
+### `ResourceService` (`src/lib/services/GroupService.ts`)
 - Loads each `group-info.yaml` to produce `GroupInfo` objects keyed by folder name.
 - Used by group lookups and detail sidebars.
 

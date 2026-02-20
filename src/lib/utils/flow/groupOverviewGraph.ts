@@ -48,21 +48,23 @@ export function buildGroupOverviewGraph(
     position: { x: 0, y: 0 },
   }))
 
-  // Convert each connection into a diagram edge
-  const edges: Edge<FlowEdgeData>[] = connections.map((connection, index) => {
-    const sourceId = sanitizeNodeId(connection.sourceGroup, 'mainGroup')
-    const targetId = sanitizeNodeId(connection.targetGroup, 'mainGroup')
-    return {
-      id: `edge_${sourceId}_${targetId}_${index}`,
-      source: sourceId,
-      target: targetId,
-      type: 'snake',
-      label: formatConnectionLabel(connection.connectionCount),
-      data: {
-        label: formatConnectionLabel(connection.connectionCount),
-      }
-    }
-  })
+    // Convert each connection into a diagram edge
+    const edges: Edge<FlowEdgeData>[] = connections.map((connection, index) => {
+        const sourceId = sanitizeNodeId(connection.sourceGroup, 'mainGroup')
+        const targetId = sanitizeNodeId(connection.targetGroup, 'mainGroup')
+        return {
+            id: `edge_${sourceId}_${targetId}_${index}`,
+            source: sourceId,
+            sourceHandle: 'output',
+            target: targetId,
+            targetHandle: 'input',
+            type: 'snake',
+            label: formatConnectionLabel(connection.connectionCount),
+            data: {
+                label: formatConnectionLabel(connection.connectionCount),
+            }
+        }
+    })
 
   // Create a unique signature for the graph for caching/change detection
   const signature = createGraphSignature('group-overview', {
