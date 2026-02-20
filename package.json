@@ -19,7 +19,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@aws-amplify/backend": "^1.16.1",
+    "@aws-amplify/backend": "^1.21.0",
     "@aws-amplify/backend-cli": "^1.8.0",
     "@primevue/nuxt-module": "4.1.0",
     "aws-cdk-lib": "^2.189.1",
