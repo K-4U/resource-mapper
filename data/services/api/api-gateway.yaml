@@ -1,0 +1,18 @@
+friendlyName: "API Gateway"
+description: |
+  RESTful API Gateway managing HTTP requests and routing to backend Lambda functions.
+  
+  Provides request/response transformation, authorization, throttling, and API versioning.
+  Configured with custom domain, CORS, and request validation.
+serviceType: API_GATEWAY
+outgoingConnections:
+  - targetIdentifier: "api/lambda-users"
+    description: "Routes user management requests"
+    connectionType: CALLS
+  - targetIdentifier: "api/lambda-orders"
+    description: "Routes order processing requests"
+    connectionType: CALLS
+  - targetIdentifier: "api/lambda-products"
+    description: "Routes product catalog requests"
+    connectionType: CALLS
+

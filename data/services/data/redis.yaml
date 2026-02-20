@@ -1,0 +1,10 @@
+friendlyName: "Redis Cache Server"
+description: |
+  High-performance in-memory data store used for caching and session management.
+  
+  This Redis instance provides fast data access for session storage, reducing
+  database load and improving application performance. Configured with persistence
+  enabled for data durability.
+serviceType: VALKEY
+outgoingConnections: []
+

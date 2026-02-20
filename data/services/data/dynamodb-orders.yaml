@@ -1,0 +1,9 @@
+friendlyName: "DynamoDB Orders Table"
+description: |
+  DynamoDB table storing order history and real-time order status tracking.
+  
+  Optimized for high-throughput reads and writes with TTL for order archival.
+  Uses DynamoDB Streams for event-driven order processing workflows.
+serviceType: DYNAMODB
+outgoingConnections: []
+

@@ -1,0 +1,97 @@
+@import '@xyflow/svelte/dist/style.css';
+@import "tailwindcss";
+
+@plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
+
+html,
+body,
+#svelte {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+@utility big-title {
+    @apply uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400;
+}
+
+/**
+TODO: The styles below are for all nodes, style them based on the type of node, e.g. .svelte-flow__node[data-type="custom"] { ... }
+ */
+.svelte-flow__node {
+    @apply gap-1 border px-4 py-3 dark:bg-gray-600 border-black bg-gray-100 transition-colors duration-200 ease-in-out;
+    @apply shadow-sm;
+}
+
+.svelte-flow__node.selected {
+    @apply border-blue-400/80 bg-blue-500 dark:bg-blue-950 shadow-lg;
+}
+
+/* Internal service nodes */
+.svelte-flow__node-service {
+    @apply bg-green-100 dark:bg-green-600 transition-colors duration-200 ease-in-out;
+}
+
+/* External service nodes */
+.svelte-flow__node-external {
+    @apply bg-yellow-100 dark:bg-yellow-600 transition-colors duration-200 ease-in-out;
+}
+
+.svelte-flow__edge {
+    @apply stroke-3;
+}
+
+.svelte-flow__edge.edge-incoming {
+    @apply stroke-green-400 dark:stroke-green-600 stroke-2 rounded-lg
+}
+
+.edge-label {
+    @apply absolute bg-slate-900 text-slate-400 px-2 py-0.5 rounded
+    text-[10px] font-bold border border-slate-700 whitespace-nowrap
+    shadow-lg pointer-events-none transition-colors duration-200 ease-in-out;
+}
+
+.edge-label.selected {
+    @apply text-blue-400 border-blue-500 bg-slate-800;
+}
+
+/* The actual SVG path of the edge */
+.snake-edge-path {
+    @apply transition-colors duration-200 ease-in-out;
+    stroke: #64748b; /* slate-500 */
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.snake-edge-path.selected {
+    @apply stroke-blue-500;
+    stroke-width: 3px;
+    /* This creates a subtle SVG filter-based glow if desired,
+       or you can just rely on the stroke color */
+    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
+}
+
+
+.sidebar-card {
+    @apply rounded-xl border border-gray-200    dark:border-gray-700 bg-gray-50    dark:bg-slate-700 p-4 mt-4
+}
+
+.sidebar-card-subtitle {
+    @apply text-xl font-semibold text-gray-900 dark:text-white
+}
+
+.sidebar-card-title {
+    @apply big-title
+}
+
+.sidebar-card-contents {
+    @apply mt-2 text-sm text-gray-700 dark:text-gray-300
+}
