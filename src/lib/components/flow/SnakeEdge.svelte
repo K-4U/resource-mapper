@@ -1,7 +1,17 @@
 <script lang="ts">
-    import {BaseEdge, type EdgeProps, EdgeLabel, useNodes, useEdges, Position} from '@xyflow/svelte';
+    import {
+        BaseEdge,
+        type EdgeProps,
+        EdgeLabel,
+        useNodes,
+        useEdges,
+        Position,
+        type Edge,
+        useInternalNode
+    } from '@xyflow/svelte';
     import {calculateEdgeOffset, routeWithLibAvoid} from '$lib/utils/flow/layout';
     import { page } from '$app/state';
+    import type {FlowEdgeData} from "$lib/utils/flow/types";
 
     let {
         id,
@@ -39,11 +49,14 @@
     let edgePathData = $derived.by(async () => {
         const sourceNode = nodes.current.find((n) => n.id === source);
         const targetNode = nodes.current.find((n) => n.id === target);
+        const edge = edges.current.find((e) => e.id === id);
 
         let sX = sourceX;
         let sY = sourceY;
         let tX = targetX;
         let tY = targetY;
+
+        console.debug('sourceX:', sourceX, 'sourceY:', sourceY, 'targetX:', targetX, 'targetY:', targetY, id);
 
         if (sourcePosition === Position.Left || sourcePosition === Position.Right) {
             sY += sourceOffset;
@@ -57,11 +70,11 @@
             tX += targetOffset;
         }
 
-        const pts = await routeWithLibAvoid(sourceNode, targetNode, sX, sY, sourcePosition, tX, tY, targetPosition, nodes.current, id);
+        const pts = await routeWithLibAvoid(sourceNode, targetNode, {x: sX, y: sY}, sourcePosition, {x: tX, y: tY}, targetPosition, nodes.current, edge);
         if (!pts || pts.length === 0) {
-            console.debug(`Routing failed for edge ${id}, falling back to straight line.`);
             return { path: `M ${sX} ${sY} L ${tX} ${tY}`, labelX: (sX + tX) / 2, labelY: (sY + tY) / 2 };
         }
+
         // Generate direct SVG path from points
         let d = `M ${pts[0].x} ${pts[0].y}`;
         for (let i = 1; i < pts.length; i++) {

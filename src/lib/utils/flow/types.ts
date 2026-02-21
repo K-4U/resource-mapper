@@ -17,7 +17,9 @@ export interface FlowNodeData extends Record<string, unknown> {
 export interface FlowEdgeData extends Record<string, unknown> {
   label?: string
   connectionType?: string
-  direction?: 'incoming' | 'outgoing' | 'internal'
+  direction?: 'incoming' | 'outgoing' | 'internal',
+  sourcePosition?: { x: number; y: number },
+  targetPosition?: { x: number; y: number },
 }
 
 export interface FlowGraphInput {
