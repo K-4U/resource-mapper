@@ -1,17 +1,16 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
-import {type Edge, type Node, useEdges, useInternalNode, type XYPosition} from '@xyflow/svelte';
+import {type Edge, type Node} from '@xyflow/svelte';
 import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$lib/utils/flow/types';
 import type {ElkNode} from "elkjs/lib/elk-api";
-import {type Avoid, AvoidLib, type ConnDirFlags, type Router, type ShapeRef} from 'libavoid-js';
 
 const elk = new ELK();
 const PADDING = 10;
-export const OFFSET_STEP = 8;
+export const OFFSET_STEP = 20;
 
 /**
  * Helper to calculate absolute position of a node by traversing its parent chain.
  */
-function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: number, y: number } {
+export function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: number, y: number } {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return {x: 0, y: 0};
 
@@ -139,7 +138,7 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
 /**
  * Helper to get the dimensions of a node, prioritizing measured values from Svelte Flow.
  */
-function getNodeDimensions(node: Node<FlowNodeData>): { w: number, h: number } {
+export function getNodeDimensions(node: Node<FlowNodeData>): { w: number, h: number } {
     const w = Math.round(node.measured?.width ?? node.width ?? 150);
     const h = Math.round(node.measured?.height ?? node.height ?? 40);
     return {w, h};
@@ -238,120 +237,4 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
             signature: input.signature
         };
     });
-}
-
-let avoidLibPromise: Promise<void> | null = null;
-let avoidLibInstance: Avoid | null = null;
-
-
-async function ensureAvoidLibLoaded() {
-    if (avoidLibPromise) return avoidLibPromise;
-    // const wasmPath = typeof window !== 'undefined' ? '/libavoid.wasm' : undefined;
-    // avoidLibPromise = AvoidLib.load(wasmPath);
-    avoidLibPromise = AvoidLib.load();
-    return avoidLibPromise;
-}
-
-async function getAvoidLib() {
-    await ensureAvoidLibLoaded();
-    avoidLibInstance ??= AvoidLib.getInstance();
-    return avoidLibInstance;
-}
-
-const getDirFlag: any = (pos: string) => {
-    const p = pos.toLowerCase();
-    // These values are bit flags, so we can combine them for corners. The default (no match) is 15 (all directions allowed).
-    if (p === 'right') return 8;
-    if (p === 'left') return 4;
-    if (p === 'top') return 1;
-    if (p === 'bottom') return 2;
-    return 15;
-};
-
-const getShoulder = (x: number, y: number, pos: string, dist: number) => {
-    switch (pos) {
-        //@ts-ignore
-        case 'right': return new avoidLibInstance.Point(x + dist, y);
-        //@ts-ignore
-        case 'left': return new avoidLibInstance.Point(x - dist, y);
-        //@ts-ignore
-        case 'top': return new avoidLibInstance.Point(x, y - dist);
-        //@ts-ignore
-        case 'bottom': return new avoidLibInstance.Point(x, y + dist);
-        //@ts-ignore
-        default: return new avoidLibInstance.Point(x, y);
-    }
-};
-
-/**
- * Routes an edge using libavoid to avoid nodes.
- */
-export async function routeWithLibAvoid(
-    sNode: Node<FlowNodeData>,
-    tNode: Node<FlowNodeData>,
-    source: XYPosition,
-    sourcePosition: string,
-    target: XYPosition,
-    targetPosition: string,
-    nodes: Node<FlowNodeData>[],
-    edge: Edge<FlowEdgeData>
-): Promise<XYPosition[]> {
-    const avoid = await getAvoidLib();
-    const router = new avoid.Router(avoid.RouterFlag.OrthogonalRouting.value);
-
-    router.setRoutingParameter(avoid.RoutingParameter.reverseDirectionPenalty.valueOf(), 1000);
-    router.setRoutingParameter(avoid.RoutingParameter.portDirectionPenalty.valueOf(), 500);
-    router.setRoutingParameter(avoid.RoutingParameter.idealNudgingDistance.valueOf(), 25);
-    router.setRoutingParameter(avoid.RoutingParameter.segmentPenalty.valueOf(), 50);
-
-    const nodeToShape = new Map<string, any>();
-
-    console.log('Routing edge with libavoid:', {sNode, tNode, source, target, sourcePosition, targetPosition});
-    console.log(edge);
-
-    // Register obstacles
-    nodes.forEach(n => {
-        if (n.type === 'serviceGroup') return;
-        const absPos = getAbsolutePosition(n.id, nodes);
-        const w = n.measured?.width ?? 150;
-        const h = n.measured?.height ?? 40;
-        const poly = new avoid.Polygon(4);
-        poly.setPoint(0, new avoid.Point(absPos.x, absPos.y));
-        poly.setPoint(1, new avoid.Point(absPos.x + w, absPos.y));
-        poly.setPoint(2, new avoid.Point(absPos.x + w, absPos.y + h));
-        poly.setPoint(3, new avoid.Point(absPos.x, absPos.y + h));
-        nodeToShape.set(n.id, new avoid.ShapeRef(router, poly));
-    });
-
-    const createConnEnd = (x: number, y: number, node: Node, pos: string) => {
-        const shape = nodeToShape.get(node.id);
-        const abs = getAbsolutePosition(node.id, nodes);
-        const xProp = Math.max(0, Math.min(1, (x - abs.x) / (node.measured?.width ?? 150)));
-        const yProp = Math.max(0, Math.min(1, (y - abs.y) / (node.measured?.height ?? 40)));
-        const pinClass = Array.from(edge.id).reduce((a, b) => a + b.charCodeAt(0), 0);
-
-        const pin = new avoid.ShapeConnectionPin(shape, pinClass, xProp, yProp, true, 0, getDirFlag(pos));
-        pin.setExclusive(true);
-        return new avoid.ConnEnd(shape, pinClass);
-    };
-
-    const conn = new avoid.ConnRef(router, createConnEnd(source.x, source.y, sNode, sourcePosition), createConnEnd(target.x, target.y, tNode, targetPosition));
-
-    // Use the actual Checkpoint API
-    const checkpoints = new avoid.CheckpointVector();
-    checkpoints.push_back(new avoid.Checkpoint(getShoulder(source.x, source.y, sourcePosition, 40)));
-    checkpoints.push_back(new avoid.Checkpoint(getShoulder(target.x, target.y, targetPosition, 40)));
-
-    conn.setRoutingCheckpoints(checkpoints);
-
-    router.processTransaction();
-    const route = conn.displayRoute();
-
-    let points: XYPosition[] = [];
-    for (let i = 0; i < route.size(); i++) {
-        const p = route.at(i);
-        points.push({x: p.x, y: p.y});
-    }
-
-    return points;
 }

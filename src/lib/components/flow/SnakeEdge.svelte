@@ -1,17 +1,9 @@
 <script lang="ts">
-    import {
-        BaseEdge,
-        type EdgeProps,
-        EdgeLabel,
-        useNodes,
-        useEdges,
-        Position,
-        type Edge,
-        useInternalNode
-    } from '@xyflow/svelte';
-    import {calculateEdgeOffset, routeWithLibAvoid} from '$lib/utils/flow/layout';
-    import { page } from '$app/state';
-    import type {FlowEdgeData} from "$lib/utils/flow/types";
+    import {BaseEdge, EdgeLabel, type EdgeProps, Position, useEdges, useNodes} from '@xyflow/svelte';
+    import {calculateEdgeOffset, getAbsolutePosition, getNodeDimensions} from '$lib/utils/flow/layout';
+    import {page} from '$app/state';
+    import {routingStore} from '$lib/stores/routingStore';
+    import {onDestroy} from 'svelte';
 
     let {
         id,
@@ -45,18 +37,42 @@
     let sourceOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, true));
     let targetOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, false));
 
-    // 1. Derive the path and label position
-    let edgePathData = $derived.by(async () => {
-        const sourceNode = nodes.current.find((n) => n.id === source);
-        const targetNode = nodes.current.find((n) => n.id === target);
-        const edge = edges.current.find((e) => e.id === id);
+    // Register nodes and edges with the routing store
+    $effect(() => {
+        const sourceNode = nodes.current.find(n => n.id === source);
+        const targetNode = nodes.current.find(n => n.id === target);
+        
+        if (sourceNode) {
+            const absPos = getAbsolutePosition(sourceNode.id, nodes.current);
+            const { w, h } = getNodeDimensions(sourceNode);
+            routingStore.registerNode({
+                nodeId: sourceNode.id,
+                absPos,
+                width: w,
+                height: h,
+                isGroup: sourceNode.type === 'serviceGroup'
+            });
+        }
+        
+        if (targetNode) {
+            const absPos = getAbsolutePosition(targetNode.id, nodes.current);
+            const { w, h } = getNodeDimensions(targetNode);
+            routingStore.registerNode({
+                nodeId: targetNode.id,
+                absPos,
+                width: w,
+                height: h,
+                isGroup: targetNode.type === 'serviceGroup'
+            });
+        }
+    });
 
+    $effect(() => {
+        // We rely on XYFlow props for positions, but we apply our calculated offsets
         let sX = sourceX;
         let sY = sourceY;
         let tX = targetX;
         let tY = targetY;
-
-        console.debug('sourceX:', sourceX, 'sourceY:', sourceY, 'targetX:', targetX, 'targetY:', targetY, id);
 
         if (sourcePosition === Position.Left || sourcePosition === Position.Right) {
             sY += sourceOffset;
@@ -70,40 +86,80 @@
             tX += targetOffset;
         }
 
-        const pts = await routeWithLibAvoid(sourceNode, targetNode, {x: sX, y: sY}, sourcePosition, {x: tX, y: tY}, targetPosition, nodes.current, edge);
+        routingStore.registerEdge({
+            edgeId: id,
+            sourceNodeId: source,
+            targetNodeId: target,
+            sourcePos: { x: sX, y: sY },
+            sourceSide: sourcePosition ?? 'right',
+            targetPos: { x: tX, y: tY },
+            targetSide: targetPosition ?? 'left'
+        });
+    });
+
+    onDestroy(() => {
+        routingStore.unregisterEdge(id);
+    });
+
+    // 1. Derive the path and label position
+    let pts = $derived($routingStore[id] || []);
+    
+    let edgePathData = $derived.by(() => {
         if (!pts || pts.length === 0) {
-            return { path: `M ${sX} ${sY} L ${tX} ${tY}`, labelX: (sX + tX) / 2, labelY: (sY + tY) / 2 };
+            // Fallback if not routed yet
+            return { path: `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`, labelX: (sourceX + targetX) / 2, labelY: (sourceY + targetY) / 2 };
         }
 
-        // Generate direct SVG path from points
+        // Generate rounded SVG path from points
         let d = `M ${pts[0].x} ${pts[0].y}`;
-        for (let i = 1; i < pts.length; i++) {
-            d += ` L ${pts[i].x} ${pts[i].y}`;
+        const radius = 8;
+
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p = pts[i];
+            const next = pts[i + 1];
+            const prev = i > 0 ? pts[i - 1] : null;
+
+            if (prev && next) {
+                // Round this corner
+                const dPrev = { x: p.x - prev.x, y: p.y - prev.y };
+                const dNext = { x: next.x - p.x, y: next.y - p.y };
+                const lenPrev = Math.hypot(dPrev.x, dPrev.y);
+                const lenNext = Math.hypot(dNext.x, dNext.y);
+                const actualRadius = Math.min(radius, lenPrev / 2, lenNext / 2);
+
+                const startPoint = {
+                    x: p.x - (dPrev.x / lenPrev) * actualRadius,
+                    y: p.y - (dPrev.y / lenPrev) * actualRadius
+                };
+                const endPoint = {
+                    x: p.x + (dNext.x / lenNext) * actualRadius,
+                    y: p.y + (dNext.y / lenNext) * actualRadius
+                };
+
+                d += ` L ${startPoint.x} ${startPoint.y} Q ${p.x} ${p.y} ${endPoint.x} ${endPoint.y}`;
+            } else if (i > 0) {
+                d += ` L ${p.x} ${p.y}`;
+            }
         }
+        d += ` L ${pts[pts.length - 1].x} ${pts[pts.length - 1].y}`;
+
         // Label position: midpoint of the longest segment
         let longestLen = -1;
-        let label = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
+        let labelPos = { x: (sourceX + targetX) / 2, y: (sourceY + targetY) / 2 };
         for (let i = 0; i < pts.length - 1; i++) {
             const dx = pts[i + 1].x - pts[i].x;
             const dy = pts[i + 1].y - pts[i].y;
             const len = Math.hypot(dx, dy);
             if (len > longestLen) {
                 longestLen = len;
-                label = { x: pts[i].x + dx / 2, y: pts[i].y + dy / 2 };
+                labelPos = { x: pts[i].x + dx / 2, y: pts[i].y + dy / 2 };
             }
         }
-        return { path: d, labelX: label.x, labelY: label.y };
+        return { path: d, labelX: labelPos.x, labelY: labelPos.y };
     });
 
-    let path = $state('');
-    let labelPos = $state({ x: (sourceX + targetX) / 2, y: (sourceY + targetY) / 2 });
-
-    $effect(() => {
-        edgePathData.then(data => {
-            path = data.path;
-            labelPos = { x: data.labelX, y: data.labelY };
-        });
-    });
+    let path = $derived(edgePathData.path);
+    let labelPos = $derived({ x: edgePathData.labelX, y: edgePathData.labelY });
 
     let incomingOrOutgoingOrInternal = $derived.by(() => {
         const urlGroupId = page.params.groupId;
