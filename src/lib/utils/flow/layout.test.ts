@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { Edge, Node } from '@xyflow/svelte'
-import { layoutFlowGraph, calculateEdgeOffset, OFFSET_STEP } from './layout'
+import { layoutFlowGraph, calculateEdgeOffset, routeWithLibAvoid, OFFSET_STEP } from './layout'
 import type { FlowEdgeData, FlowGraphInput, FlowNodeData } from '$lib/utils/flow/types'
 
 // Basic helpers to build nodes/edges with minimal required data
@@ -8,7 +8,8 @@ function serviceNode(id: string, label = id, serviceType?: string, position = { 
   return {
     id,
     data: { label, kind: 'service', serviceType },
-    position
+    position,
+    type: 'service'
   } as unknown as Node<FlowNodeData>
 }
 
@@ -16,7 +17,8 @@ function groupNode(id: string, label = id, position = { x: 0, y: 0 }): Node<Flow
   return {
     id,
     data: { label, kind: 'group' },
-    position
+    position,
+    type: 'serviceGroup'
   } as unknown as Node<FlowNodeData>
 }
 
@@ -234,33 +236,144 @@ describe('calculateEdgeOffset', () => {
     ]
     // n1 abs position should be: g1(100,100) + g2(50,50) + n1(10,10) = (160, 160)
     
-    // Since getAbsolutePosition is internal, we can test it indirectly via calculateEdgeOffset
-    // OR we can make it exported for testing. Let's keep it simple and test via calculateEdgeOffset.
-    
     // We'll create another node n2 and an edge n1 -> n2.
     const nodesFull = [
       ...nodes,
       serviceNode('n2', 'N2', undefined, { x: 500, y: 500 })
     ]
-    const edges = [edge('e1', 'n1', 'n2', { label: 'E1' })]
+    const edges = [
+        { id: 'e1', source: 'n1', target: 'n2', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>,
+        { id: 'e2', source: 'n3', target: 'n4', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>
+    ]
     
-    // If n1 is at (160, 160) and n2 is at (500, 500), trunk should overlap with another edge n3 -> n4 in same area
+    // If n1 is at (160, 160) and n2 is at (500, 500)
     const n3 = serviceNode('n3', 'N3', undefined, { x: 160, y: 170 })
     const n4 = serviceNode('n4', 'N4', undefined, { x: 500, y: 510 })
     const nodesExtra = [...nodesFull, n3, n4]
-    const edgesExtra = [...edges, edge('e2', 'n3', 'n4', { label: 'E2' })]
     
-    // n1 -> n2: (160, 160) -> (500, 500)
-    // n3 -> n4: (160, 170) -> (500, 510)
-    // Both have overlapping X-spans [160, 500].
-    // Their mid-Y: e1: (160+500)/2 = 330, e2: (170+510)/2 = 340.
-    // e1 should get offset -4, e2 offset 4.
+    // e1 should be compared with other edges if they share handle or nodes
+    // Let's use same handle for easier testing of ordering
+    const edgesShared = [
+        { id: 'e1', source: 'n1', target: 'n2', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>,
+        { id: 'e2', source: 'n3', target: 'n2', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>
+    ]
     
-    const o1 = calculateEdgeOffset('e1', nodesExtra, edgesExtra, true, true)
-    const o2 = calculateEdgeOffset('e2', nodesExtra, edgesExtra, true, true)
+    // n1 abs y=160. n3 abs y=170.
+    // e1 should get -4, e2 should get 4.
+    
+    const o1 = calculateEdgeOffset('e1', nodesExtra, edgesShared, false)
+    const o2 = calculateEdgeOffset('e2', nodesExtra, edgesShared, false)
     
     expect(o1).toBe(-OFFSET_STEP / 2)
     expect(o2).toBe(OFFSET_STEP / 2)
+  })
+})
+
+describe('routeWithLibAvoid', () => {
+  const Position = { Left: 'left', Right: 'right', Top: 'top', Bottom: 'bottom' } as any;
+
+  it('generates a direct path when no collision occurs', async () => {
+    const nodes: Node<FlowNodeData>[] = [
+      serviceNode('n1', 'N1', undefined, { x: 0, y: 0 }),
+      serviceNode('n2', 'N2', undefined, { x: 200, y: 0 })
+    ]
+    // sX=150, sY=20, tX=200, tY=20
+    const res = await routeWithLibAvoid(150, 20, Position.Right, 200, 20, Position.Left, nodes);
+    // Expect at least two points (start and end) and a horizontal segment
+    expect(res.points.length).toBeGreaterThanOrEqual(2);
+    const start = res.points[0];
+    const end = res.points[res.points.length - 1];
+    expect(start.y).toBe(end.y);
+    expect(end.x).toBeGreaterThanOrEqual(start.x);
+  })
+
+  it('routes in a Right-Down-Right shape for offset nodes', async () => {
+    const nodes: Node<FlowNodeData>[] = [
+       serviceNode('n1', 'N1', undefined, { x: 0, y: 0 }),
+       serviceNode('n2', 'N2', undefined, { x: 400, y: 200 })
+    ]
+    // n1 Right handle is at (150, 20)
+    // n2 Left handle is at (400, 220)
+    const res = await routeWithLibAvoid(150, 20, Position.Right, 400, 220, Position.Left, nodes);
+
+    console.log('Generated path:', res.points);
+
+    // We expect at least 4 points: Start, Bend1, Bend2, End
+    expect(res.points.length).toBeGreaterThanOrEqual(4);
+
+    expect(res.points[0].x).toEqual(150);
+    expect(res.points[0].y).toEqual(20);
+
+    // The first segment should be horizontal (Right) due to the 30px lead-out
+    expect(res.points[1].x).toBeGreaterThanOrEqual(180);
+    expect(res.points[1].y).toBe(20);
+    
+    // The last segment should also be horizontal (Right into target Left)
+    const lastIdx = res.points.length - 1;
+    expect(res.points[lastIdx - 1].x).toBeLessThanOrEqual(370);
+    expect(res.points[lastIdx - 1].y).toBe(220);
+
+    expect(res.points[lastIdx].x).toEqual(400);
+    expect(res.points[lastIdx].y).toEqual(220);
+  })
+
+  it('provides distinct paths for parallel edges to different targets (avoiding overlaps)', async () => {
+    const nodes: Node<FlowNodeData>[] = [
+      serviceNode('a', 'A', undefined, { x: 0, y: 0 }),
+      serviceNode('b', 'B', undefined, { x: 50, y: 0 }),
+      serviceNode('c', 'C', undefined, { x: 400, y: 300 }),
+      serviceNode('d', 'D', undefined, { x: 450, y: 300 })
+    ];
+    // Measure nodes for libavoid
+    nodes.forEach(n => { n.measured = { width: 150, height: 40 }; });
+
+    const resAC = await routeWithLibAvoid(150, 20, Position.Right, 400, 320, Position.Left, nodes, 'edge_ac');
+    const resBD = await routeWithLibAvoid(200, 20, Position.Right, 450, 320, Position.Left, nodes, 'edge_bd');
+
+    // Sanity: both edges should have at least 4 points (R-D-R)
+    expect(resAC.points.length).toBeGreaterThanOrEqual(4);
+    expect(resBD.points.length).toBeGreaterThanOrEqual(4);
+
+    // Helper to find a vertical trunk x value away from start/end y's
+    const findTrunkX = (pts: {x:number;y:number}[]) => {
+      for (let i=1; i<pts.length; i++) {
+        const a = pts[i-1], b = pts[i];
+        if (Math.abs(a.x - b.x) < 0.5 && Math.abs(a.y - b.y) > 1) {
+          return a.x; // vertical segment x anywhere in the interior
+        }
+      }
+      return undefined;
+    };
+
+    const trunkX_AC = findTrunkX(resAC.points);
+    const trunkX_BD = findTrunkX(resBD.points);
+
+    expect(trunkX_AC).toBeDefined();
+    expect(trunkX_BD).toBeDefined();
+
+    // Distinct lanes (no overlap)
+    expect(Math.abs((trunkX_AC as number) - (trunkX_BD as number))).toBeGreaterThanOrEqual(OFFSET_STEP);
+
+    // Centered roughly between source and target
+    expect(trunkX_AC as number).toBeGreaterThan(150);
+    expect(trunkX_AC as number).toBeLessThan(400);
+  })
+
+  it('routes around a node in the way', async () => {
+    const obstacle = serviceNode('obs', 'OBSTACLE', undefined, { x: 200, y: 0 }); 
+    const nodes: Node<FlowNodeData>[] = [
+      serviceNode('n1', 'N1', undefined, { x: 0, y: 0 }),
+      serviceNode('n2', 'N2', undefined, { x: 400, y: 0 }),
+      { ...obstacle, measured: { width: 150, height: 40 } } as Node<FlowNodeData>
+    ];
+    
+    const res = await routeWithLibAvoid(150, 20, Position.Right, 400, 20, Position.Left, nodes);
+    
+    // Should not be a straight 2-point line; expect at least one bend
+    expect(res.points.length).toBeGreaterThan(2);
+    // Find at least one interior point that changes direction (vertical segment present)
+    const hasVertical = res.points.some((p, i) => i>0 && Math.abs(p.x - res.points[i-1].x) < 0.5 && Math.abs(p.y - res.points[i-1].y) > 0.5);
+    expect(hasVertical).toBe(true);
   })
 })
 
@@ -308,31 +421,5 @@ describe('calculateEdgeOffset - bidirectional edges', () => {
 
     const offsets = [o1, o2, o3].sort((a, b) => a - b)
     expect(offsets).toEqual([-OFFSET_STEP, 0, OFFSET_STEP])
-  })
-
-  it('provides distinct trunk offsets for independent edges in the same horizontal lane', () => {
-    // Edge 1: n1 -> n2 (x: 0->400, y: 100)
-    // Edge 2: n3 -> n4 (x: 50->350, y: 120)
-    // These edges are independent but their X-spans overlap, and they are in the same lane.
-    const nodes: Node<FlowNodeData>[] = [
-      serviceNode('n1', 'N1', undefined, { x: 0, y: 100 }),
-      serviceNode('n2', 'N2', undefined, { x: 400, y: 100 }),
-      serviceNode('n3', 'N3', undefined, { x: 50, y: 120 }),
-      serviceNode('n4', 'N4', undefined, { x: 350, y: 120 })
-    ]
-
-    const edges: Edge<FlowEdgeData>[] = [
-      { id: 'e1', source: 'n1', target: 'n2', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>,
-      { id: 'e2', source: 'n3', target: 'n4', sourceHandle: 'output', targetHandle: 'input' } as Edge<FlowEdgeData>
-    ]
-
-    // isTrunk = true
-    const o1 = calculateEdgeOffset('e1', nodes, edges, true, true)
-    const o2 = calculateEdgeOffset('e2', nodes, edges, true, true)
-
-    // Midpoints: e1 (y=100), e2 (y=120)
-    // Sorted: e1, e2. Offsets: -4, 4
-    expect(o1).toBe(-OFFSET_STEP / 2)
-    expect(o2).toBe(OFFSET_STEP / 2)
   })
 })

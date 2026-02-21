@@ -9,6 +9,10 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
+  optimizeDeps: {
+    exclude: ['libavoid-js']
+  },
+  assetsInclude: ['**/*.wasm'],
   test: {
     expect: {
       requireAssertions: true

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {BaseEdge, type EdgeProps, getSmoothStepPath, EdgeLabel, useNodes, useEdges, Position} from '@xyflow/svelte';
-    import {calculateEdgeOffset} from '$lib/utils/flow/layout';
+    import {BaseEdge, type EdgeProps, EdgeLabel, useNodes, useEdges, Position} from '@xyflow/svelte';
+    import {calculateEdgeOffset, routeWithLibAvoid} from '$lib/utils/flow/layout';
     import { page } from '$app/state';
 
     let {
@@ -34,10 +34,12 @@
 
     let sourceOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, true));
     let targetOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, false));
-    let trunkOffset = $derived(calculateEdgeOffset(id, nodes.current, edges.current, true, true));
 
     // 1. Derive the path and label position
-    let edgePathData = $derived.by(() => {
+    let edgePathData = $derived.by(async () => {
+        const sourceNode = nodes.current.find((n) => n.id === source);
+        const targetNode = nodes.current.find((n) => n.id === target);
+
         let sX = sourceX;
         let sY = sourceY;
         let tX = targetX;
@@ -55,29 +57,40 @@
             tX += targetOffset;
         }
 
-        const params: any = {
-            sourceX: sX,
-            sourceY: sY,
-            sourcePosition,
-            targetX: tX,
-            targetY: tY,
-            targetPosition
-        };
-
-        // If it's a left/right connection, apply trunkOffset to the centerX to split the vertical trunk
-        if (sourcePosition === Position.Left || sourcePosition === Position.Right) {
-            params.centerX = (sX + tX) / 2 + trunkOffset;
-        } else {
-            // For top/bottom, apply to the centerY to split the horizontal trunk
-            params.centerY = (sY + tY) / 2 + trunkOffset;
+        const pts = await routeWithLibAvoid(sourceNode, targetNode, sX, sY, sourcePosition, tX, tY, targetPosition, nodes.current, id);
+        if (!pts || pts.length === 0) {
+            console.debug(`Routing failed for edge ${id}, falling back to straight line.`);
+            return { path: `M ${sX} ${sY} L ${tX} ${tY}`, labelX: (sX + tX) / 2, labelY: (sY + tY) / 2 };
         }
-
-        const [path, labelX, labelY] = getSmoothStepPath(params);
-        return {path, labelX, labelY};
+        // Generate direct SVG path from points
+        let d = `M ${pts[0].x} ${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) {
+            d += ` L ${pts[i].x} ${pts[i].y}`;
+        }
+        // Label position: midpoint of the longest segment
+        let longestLen = -1;
+        let label = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
+        for (let i = 0; i < pts.length - 1; i++) {
+            const dx = pts[i + 1].x - pts[i].x;
+            const dy = pts[i + 1].y - pts[i].y;
+            const len = Math.hypot(dx, dy);
+            if (len > longestLen) {
+                longestLen = len;
+                label = { x: pts[i].x + dx / 2, y: pts[i].y + dy / 2 };
+            }
+        }
+        return { path: d, labelX: label.x, labelY: label.y };
     });
 
-    let path = $derived(edgePathData.path);
-    let labelPos = $derived({ x: edgePathData.labelX, y: edgePathData.labelY });
+    let path = $state('');
+    let labelPos = $state({ x: (sourceX + targetX) / 2, y: (sourceY + targetY) / 2 });
+
+    $effect(() => {
+        edgePathData.then(data => {
+            path = data.path;
+            labelPos = { x: data.labelX, y: data.labelY };
+        });
+    });
 
     let incomingOrOutgoingOrInternal = $derived.by(() => {
         const urlGroupId = page.params.groupId;

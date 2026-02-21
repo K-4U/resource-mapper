@@ -1,7 +1,8 @@
-import ELK, {type ElkExtendedEdge} from 'elkjs/lib/elk.bundled.js';
+import ELK from 'elkjs/lib/elk.bundled.js';
 import {type Edge, type Node, Position} from '@xyflow/svelte';
 import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$lib/utils/flow/types';
 import type {ElkNode} from "elkjs/lib/elk-api";
+import {AvoidLib, type ConnDirFlags, type ShapeRef} from 'libavoid-js';
 
 const elk = new ELK();
 const PADDING = 10;
@@ -12,7 +13,7 @@ export const OFFSET_STEP = 8;
  */
 function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: number, y: number } {
     const node = nodes.find(n => n.id === nodeId);
-    if (!node) return { x: 0, y: 0 };
+    if (!node) return {x: 0, y: 0};
 
     let x = node.position?.x ?? 0;
     let y = node.position?.y ?? 0;
@@ -23,11 +24,13 @@ function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: 
         y += parentPos.y;
     }
 
-    return { x, y };
+    return {x, y};
 }
 
 /**
  * Calculates a deterministic offset for an edge to prevent overlapping.
+ * TODO: Replace this method with elk's built-in edge routing and spacing options once we can guarantee it works well in all cases.
+ * This probably means that we'll have to replace it once libavoid is integrated into elk: https://github.com/kieler/elkjs/issues/210
  * This function handles two types of offsets:
  * 1. Handle Offset: For multiple edges sharing the same handle on a node.
  * 2. Trunk Offset: For edges that don't share a handle but might have overlapping
@@ -37,8 +40,7 @@ export function calculateEdgeOffset(
     edgeId: string,
     nodes: Node<FlowNodeData>[],
     edges: Edge<FlowEdgeData>[],
-    isSource: boolean,
-    isTrunk: boolean = false
+    isSource: boolean
 ): number {
     const edge = edges.find(e => e.id === edgeId);
     if (!edge) return 0;
@@ -46,57 +48,29 @@ export function calculateEdgeOffset(
     const nodeId = isSource ? edge.source : edge.target;
     const handleId = isSource ? edge.sourceHandle : edge.targetHandle;
 
-    const sourcePos = getAbsolutePosition(edge.source, nodes);
-    const targetPos = getAbsolutePosition(edge.target, nodes);
     const handle = isSource ? edge.sourceHandle : edge.targetHandle;
     const isVertical = handle?.toLowerCase().includes('top') || handle?.toLowerCase().includes('bottom');
 
     let finalSiblings: Edge<FlowEdgeData>[] = [];
     let usedAreaFallback = false;
 
-    if (isTrunk) {
-        // TRUNK OFFSET: Consider ALL edges that might share this "lane"
-        usedAreaFallback = true;
-        finalSiblings = edges.filter(e => {
-            const sPos = getAbsolutePosition(e.source, nodes);
-            const tPos = getAbsolutePosition(e.target, nodes);
+    // HANDLE OFFSET: Siblings on the same node and same handle
+    const siblings = edges.filter(e =>
+        (isSource ? e.source : e.target) === nodeId &&
+        (isSource ? e.sourceHandle : e.targetHandle) === handleId
+    );
 
-            if (isVertical) {
-                // Vertical trunk: shared Y-range and roughly same mid-X?
-                // For now, simpler: overlapping Y-range is the "lane"
-                const minY = Math.min(sourcePos.y, targetPos.y);
-                const maxY = Math.max(sourcePos.y, targetPos.y);
-                const eMinY = Math.min(sPos.y, tPos.y);
-                const eMaxY = Math.max(sPos.y, tPos.y);
-                return Math.max(minY, eMinY) < Math.min(maxY, eMaxY);
-            } else {
-                // Horizontal trunk: shared X-range?
-                const minX = Math.min(sourcePos.x, targetPos.x);
-                const maxX = Math.max(sourcePos.x, targetPos.x);
-                const eMinX = Math.min(sPos.x, tPos.x);
-                const eMaxX = Math.max(sPos.x, tPos.x);
-                return Math.max(minX, eMinX) < Math.min(maxX, eMaxX);
-            }
+    if (siblings.length <= 1) {
+        // Fallback for bidirectional or single edges between same nodes
+        usedAreaFallback = true;
+        const otherId = isSource ? edge.target : edge.source;
+        finalSiblings = edges.filter(e => {
+            const isSamePair = (e.source === nodeId && e.target === otherId) ||
+                (e.source === otherId && e.target === nodeId);
+            return isSamePair && (e.source === nodeId || e.target === nodeId);
         });
     } else {
-        // HANDLE OFFSET: Siblings on the same node and same handle
-        const siblings = edges.filter(e =>
-            (isSource ? e.source : e.target) === nodeId &&
-            (isSource ? e.sourceHandle : e.targetHandle) === handleId
-        );
-
-        if (siblings.length <= 1) {
-            // Fallback for bidirectional or single edges between same nodes
-            usedAreaFallback = true;
-            const otherId = isSource ? edge.target : edge.source;
-            finalSiblings = edges.filter(e => {
-                const isSamePair = (e.source === nodeId && e.target === otherId) ||
-                                   (e.source === otherId && e.target === nodeId);
-                return isSamePair && (e.source === nodeId || e.target === nodeId);
-            });
-        } else {
-            finalSiblings = siblings;
-        }
+        finalSiblings = siblings;
     }
 
     if (finalSiblings.length <= 1) return 0;
@@ -168,16 +142,16 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
 function getNodeDimensions(node: Node<FlowNodeData>): { w: number, h: number } {
     const w = Math.round(node.measured?.width ?? node.width ?? 150);
     const h = Math.round(node.measured?.height ?? node.height ?? 40);
-    return { w, h };
+    return {w, h};
 }
 
 
 export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphOutput> {
     const elkEdges = convertEdgesToElkEdges(input);
-    console.debug('[layoutFlowGraph] Starting layout with input:', {input});
+    // console.debug('[layoutFlowGraph] Starting layout with input:', {input});
     // Helper: Build node properties and handle dimensions
     const prepareElkNode = (node: Node<FlowNodeData>) => {
-        const { w, h } = getNodeDimensions(node);
+        const {w, h} = getNodeDimensions(node);
         return {
             ...node,
             width: w,
@@ -262,4 +236,118 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
             signature: input.signature
         };
     });
+}
+
+let avoidLibPromise: Promise<void> | null = null;
+
+export async function ensureAvoidLibLoaded() {
+    if (avoidLibPromise) return avoidLibPromise;
+    // const wasmPath = typeof window !== 'undefined' ? '/libavoid.wasm' : undefined;
+    // avoidLibPromise = AvoidLib.load(wasmPath);
+    avoidLibPromise = AvoidLib.load();
+    return avoidLibPromise;
+}
+
+/**
+ * Routes an edge using libavoid to avoid nodes.
+ */
+export async function routeWithLibAvoid(
+    sNode: Node<FlowNodeData>,
+    tNode: Node<FlowNodeData>,
+    sourceX: number,
+    sourceY: number,
+    sourcePosition: string,
+    targetX: number,
+    targetY: number,
+    targetPosition: string,
+    nodes: Node<FlowNodeData>[],
+    edgeId: string = '0'
+): Promise<{ x: number, y: number }[]> {
+    await ensureAvoidLibLoaded();
+    const avoid = AvoidLib.getInstance();
+    const router = new avoid.Router(avoid.RouterFlag.OrthogonalRouting.value);
+
+    // --- THE FIX: DIRECTIONAL PENALTIES ---
+    // 1. reverseDirectionPenalty: High value stops the "reverting" loop-de-loops.
+    router.setRoutingParameter(avoid.RoutingParameter.reverseDirectionPenalty.value, 1000);
+
+    // 2. portDirectionPenalty: Penalizes exiting the "wrong" way from a pin.
+    router.setRoutingParameter(avoid.RoutingParameter.portDirectionPenalty.value, 500);
+
+    // 3. standard distancing
+    router.setRoutingParameter(avoid.RoutingParameter.idealNudgingDistance.value, 25);
+    router.setRoutingParameter(avoid.RoutingParameter.segmentPenalty.value, 50);
+
+    const nodeToShape = new Map<string, any>();
+
+    // Register obstacles
+    nodes.forEach(n => {
+        if (n.type === 'serviceGroup') return;
+        const absPos = getAbsolutePosition(n.id, nodes);
+        const w = n.measured?.width ?? 150;
+        const h = n.measured?.height ?? 40;
+        const poly = new avoid.Polygon(4);
+        poly.setPoint(0, new avoid.Point(absPos.x, absPos.y));
+        poly.setPoint(1, new avoid.Point(absPos.x + w, absPos.y));
+        poly.setPoint(2, new avoid.Point(absPos.x + w, absPos.y + h));
+        poly.setPoint(3, new avoid.Point(absPos.x, absPos.y + h));
+        nodeToShape.set(n.id, new avoid.ShapeRef(router, poly));
+    });
+
+    const getDirFlag: any = (pos: string) => {
+        const p = pos.toLowerCase();
+        // These values are bit flags, so we can combine them for corners. The default (no match) is 15 (all directions allowed).
+        if (p === 'right') return 8;
+        if (p === 'left') return 4;
+        if (p === 'top') return 1;
+        if (p === 'bottom') return 2;
+        return 15;
+    };
+
+    const createConnEnd = (x: number, y: number, node: Node, pos: string) => {
+        const shape = nodeToShape.get(node.id);
+        const abs = getAbsolutePosition(node.id, nodes);
+        const xProp = Math.max(0, Math.min(1, (x - abs.x) / (node.measured?.width ?? 150)));
+        const yProp = Math.max(0, Math.min(1, (y - abs.y) / (node.measured?.height ?? 40)));
+        const pinClass = Array.from(edgeId).reduce((a, b) => a + b.charCodeAt(0), 0);
+
+        const pin = new avoid.ShapeConnectionPin(shape, pinClass, xProp, yProp, true, 0, getDirFlag(pos));
+        pin.setExclusive(true);
+        return new avoid.ConnEnd(shape, pinClass);
+    };
+
+    const conn = new avoid.ConnRef(router, createConnEnd(sourceX, sourceY, sNode, sourcePosition), createConnEnd(targetX, targetY, tNode, targetPosition));
+    //Create two checkpoints to force the router to consider the directionality of the pins and prevent looping paths.
+    const getShoulder = (x: number, y: number, pos: string, dist: number) => {
+        if (pos === 'right') return new avoid.Point(x + dist, y);
+        if (pos === 'left') return new avoid.Point(x - dist, y);
+        if (pos === 'top') return new avoid.Point(x, y - dist);
+        if (pos === 'bottom') return new avoid.Point(x, y + dist);
+        return new avoid.Point(x, y);
+    };
+
+    // Use the actual Checkpoint API
+    const checkpoints = new avoid.CheckpointVector();
+    checkpoints.push_back(new avoid.Checkpoint(getShoulder(sourceX, sourceY, sourcePosition, 40)));
+    checkpoints.push_back(new avoid.Checkpoint(getShoulder(targetX, targetY, targetPosition, 40)));
+
+    conn.setRoutingCheckpoints(checkpoints);
+
+    router.processTransaction();
+    const route = conn.displayRoute();
+
+    let points: { x: number, y: number }[] = [];
+    for (let i = 0; i < route.size(); i++) {
+        const p = route.at(i);
+        points.push({x: p.x, y: p.y});
+    }
+
+    // No manual stitching needed if the pin handles the lead-out correctly.
+    // But we keep the first/last point lock just for handle-snapping.
+    if (points.length >= 2) {
+        points[0] = {x: sourceX, y: sourceY};
+        points[points.length - 1] = {x: targetX, y: targetY};
+    }
+
+    return points;
 }
