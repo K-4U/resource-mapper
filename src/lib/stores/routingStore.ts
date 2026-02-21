@@ -65,26 +65,26 @@ const getShoulderPoint = (avoid: Avoid, x: number, y: number, pos: string, dist:
 
 function createRoutingStore() {
     const { subscribe, set, update } = writable<Record<string, XYPosition[]>>({});
-    
+
     let router: Router | null = null;
     let avoid: Avoid | null = null;
-    
+
     const nodes = new Map<string, ShapeRef>();
     const nodesMetadata = new Map<string, XYPosition>();
     const edges = new Map<string, ConnRef>();
-    
+
     let pendingTransaction = false;
 
     async function init() {
         if (router) return;
         avoid = await getAvoidLib();
         router = new avoid.Router(avoid.RouterFlag.OrthogonalRouting.value);
-        
+
         router.setRoutingParameter(avoid.RoutingParameter.reverseDirectionPenalty.valueOf(), 1000);
         router.setRoutingParameter(avoid.RoutingParameter.portDirectionPenalty.valueOf(), 500);
         router.setRoutingParameter(avoid.RoutingParameter.idealNudgingDistance.valueOf(), OFFSET_STEP);
         router.setRoutingParameter(avoid.RoutingParameter.segmentPenalty.valueOf(), 50);
-        
+
         // Options for nudging
         router.setRoutingOption(avoid.RoutingOption.nudgeOrthogonalSegmentsConnectedToShapes.valueOf(), true);
         router.setRoutingOption(avoid.RoutingOption.nudgeOrthogonalTouchingColinearSegments.valueOf(), true);
@@ -92,7 +92,7 @@ function createRoutingStore() {
 
     function processTransaction() {
         if (!router || pendingTransaction) return;
-        
+
         pendingTransaction = true;
         // Batch to next frame (16ms)
         setTimeout(() => {
@@ -100,9 +100,9 @@ function createRoutingStore() {
                 pendingTransaction = false;
                 return;
             }
-            
+
             router.processTransaction();
-            
+
             const results: Record<string, XYPosition[]> = {};
             edges.forEach((conn, id) => {
                 const route = conn.displayRoute();
@@ -113,7 +113,7 @@ function createRoutingStore() {
                 }
                 results[id] = pts;
             });
-            
+
             set(results);
             pendingTransaction = false;
         }, 16);
@@ -121,11 +121,11 @@ function createRoutingStore() {
 
     return {
         subscribe,
-        
+
         registerNode: async (data: NodeRoutingUpdate) => {
             await init();
             if (!router || !avoid) return;
-            
+
             if (data.isGroup) {
                 if (nodes.has(data.nodeId)) {
                     const shape = nodes.get(data.nodeId)!;
@@ -152,7 +152,7 @@ function createRoutingStore() {
                 const shape = new avoid.ShapeRef(router, poly);
                 nodes.set(data.nodeId, shape);
             }
-            
+
             processTransaction();
         },
 
@@ -162,18 +162,18 @@ function createRoutingStore() {
 
             const sShape = nodes.get(data.sourceNodeId);
             const tShape = nodes.get(data.targetNodeId);
-            
+
             if (!sShape || !tShape) return;
 
             const createConnEnd = (nodeId: string, x: number, y: number, side: string, shape: ShapeRef) => {
                 if (!avoid) throw new Error('Avoid not loaded');
                 const pinClass = Array.from(data.edgeId).reduce((a, b) => a + b.charCodeAt(0), 0);
-                
+
                 // Convert absolute coords to relative coords for the pin (libavoid expects relative to shape's top-left)
                 const abs = nodesMetadata.get(nodeId);
                 const xOff = x - (abs?.x ?? 0);
                 const yOff = y - (abs?.y ?? 0);
-                
+
                 const pin = new avoid.ShapeConnectionPin(shape, pinClass, xOff, yOff, false, -40, getDirFlag(side));
                 pin.setExclusive(true);
                 return new avoid.ConnEnd(shape, pinClass);
@@ -206,7 +206,7 @@ function createRoutingStore() {
             const conn = edges.get(id)!;
             router.deleteConnector(conn);
             edges.delete(id);
-            
+
             set(Object.fromEntries(
                 Array.from(edges.entries()).map(([id, conn]) => {
                     const route = conn.displayRoute();
@@ -218,7 +218,7 @@ function createRoutingStore() {
                     return [id, pts];
                 })
             ));
-            
+
             processTransaction();
         }
     };

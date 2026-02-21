@@ -5,6 +5,7 @@ import {getExternalServicesForGroup, getServicesByGroup} from '$lib/data/service
 import {getAllTeams} from '$lib/data/teams'
 import type {GroupInfo} from "$lib/types";
 import {getConnectionsFromGroup, getConnectionsToGroup} from "$lib/data/connections";
+import {selectedGroup} from "$lib/stores/diagram";
 
 export const load: PageLoad = async ({params}) => {
     const {groupId} = params
@@ -34,6 +35,8 @@ export const load: PageLoad = async ({params}) => {
         }
     })
     const allConnections = connectionsFrom.concat(connectionsTo);
+
+    selectedGroup.set(groupInfo)
 
     return {
         groupId,

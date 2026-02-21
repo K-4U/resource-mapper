@@ -2,6 +2,7 @@ import type { PageLoad } from './$types'
 import { getAllGroups } from '$lib/data/groups'
 import { getAllGroupConnections } from '$lib/data/connections'
 import { getAllTeams } from '$lib/data/teams'
+import {selectedGroup} from "$lib/stores/diagram";
 
 export const load: PageLoad = async () => {
   try {
@@ -16,6 +17,7 @@ export const load: PageLoad = async () => {
       groupConnections: groupConnections?.length ?? 0,
       teams: Object.keys(teams ?? {}).length
     })
+    selectedGroup.set(null);
     return { groups, groupConnections, teams }
   } catch (error) {
     console.error('[overview.load] failed to fetch data', error)

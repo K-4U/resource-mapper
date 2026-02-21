@@ -30,11 +30,11 @@
         <img src={iconPath} alt={data.label} class="h-10 w-10 rounded-lg bg-white/5 object-contain"
              loading="lazy"/>
     {:else}
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-xs font-semibold text-gray-200">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-xs font-semibold">
             {initials}
         </div>
     {/if}
     <div class="flex-1">
-        <div class="text-sm font-semibold text-white">{data.label}</div>
+        <div class="text-sm font-semibold">{data.label}</div>
     </div>
 </div>

@@ -4,6 +4,7 @@
         Background,
         BackgroundVariant,
         Controls,
+        ControlButton,
         type Edge,
         type EdgeTypes,
         MiniMap,
@@ -21,6 +22,8 @@
     import {isDarkMode, logDiagramAction, showLegend} from '$lib/stores/diagram';
     import ServiceGroupNode from "$lib/components/flow/ServiceGroupNode.svelte";
     import SnakeEdge from "$lib/components/flow/SnakeEdge.svelte";
+    import Icon from "@iconify/svelte";
+    import {goto} from "$app/navigation";
 
     const DOUBLE_CLICK_THRESHOLD = 400
 
@@ -155,6 +158,11 @@
             graph: graph
         });
     }
+
+    function goHome() {
+        goto('/');
+    }
+
 </script>
 
 <div data-testid="flow-canvas"
@@ -183,7 +191,12 @@
             if (n.type === 'external') return '#d97706'
             return '#9ca3af'
           }} position="bottom-left"/>
-            <Controls position="top-left"/>
+            <Controls position="top-left">
+                <!-- Go home button -->
+                <ControlButton onclick={goHome} title="Go Home" aria-label="Go to home page">
+                    <Icon icon="mdi:home"/>
+                </ControlButton>
+            </Controls>
             <Panel position="bottom-right">
                 {#if $showLegend && !showOverlay}
                     <Legend/>

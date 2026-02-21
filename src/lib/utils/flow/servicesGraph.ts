@@ -126,7 +126,8 @@ export function buildGroupServicesGraph(
             groupId: g.groupName,
             kind: 'group'
         },
-        position
+        position,
+        class: g.groupName === currentGroup.groupName ? 'current-group' : 'external-group'
     }))
 
     // 5. Add Group-to-Group Edges
