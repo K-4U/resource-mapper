@@ -13,3 +13,7 @@ reachability:
     detail: "+31 20 300 4000"
   - channel: pagerduty
     detail: "pagerduty://interface-architects"
+  - channel: teams
+    detail: "teams://interface-architects-room"
+  - channel: pigeon
+    detail: "Release the red pigeon from HQ rooftop"

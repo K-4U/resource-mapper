@@ -10,8 +10,9 @@
     import {buildGroupServicesGraph} from '$lib/utils/flow/servicesGraph'
     import {goto} from '$app/navigation'
     import {SvelteFlowProvider} from '@xyflow/svelte';
+    import {selectedGroup} from "$lib/stores/diagram";
 
-    let { data }: { data: PageData } = $props()
+    let {data}: { data: PageData } = $props()
 
     let group = $derived(data.group)
     let allGroups = $derived(data.groups)
@@ -27,11 +28,13 @@
     let loadError = $state<string | null>(null)
     let hasDiagramContent = $derived(!!(groupGraph && groupGraph.serviceNodes.length > 0))
 
+
     $effect(() => {
         if (!group) {
             loadError = groupId ? `Unable to load group '${groupId}'.` : 'Missing group identifier.'
         } else {
             loadError = null
+            selectedGroup.set(data.group)
         }
     })
 
@@ -91,11 +94,12 @@
                     pending={false}
                     on:nodeDoubleClick={handleNodeDoubleClick}
             />
-<!--            on:nodeClick={handleNodeClick}-->
+            <!--            on:nodeClick={handleNodeClick}-->
 
             <ServiceDetailSidebar
                     {group}
                     {serviceNodeLookup}
+                    {externalServiceLookup}
             />
         </SvelteFlowProvider>
     </div>

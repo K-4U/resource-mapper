@@ -4,6 +4,8 @@
     import type {GroupInfo, ServiceDefinition} from "$lib/types";
     import {getAwsIconPath} from "$lib/utils/awsIcons";
     import GenericSidebarCard from "$lib/components/GenericSidebarCard.svelte";
+    import {selectedGroup} from "$lib/stores/diagram";
+    import {getGroup} from "$lib/data/groups";
 
     let selectedNodes = [];
     let selectedEdges = [];
@@ -16,75 +18,77 @@
         selectedEdges = edges.map((edge) => edge.id);
     });
 
-    const {group, serviceNodeLookup} = $props<{
+    const {group, serviceNodeLookup, externalServiceLookup} = $props<{
         group: GroupInfo | null;
         serviceNodeLookup: Record<string, ServiceDefinition>;
+        externalServiceLookup: Record<string, { service: ServiceDefinition; group: GroupInfo }>;
     }>();
 
-    let service = $state<ServiceDefinition | null>(null)
-    let iconPath = $state<string | null>(null)
-    let initials = $state('');
+    let isExternal = $derived(!!selectedNode && selectedNode.id in externalServiceLookup);
+
+    let serviceInfo = $derived.by<ServiceDefinition | null>(() => {
+        if (!selectedNode) return null;
+
+        // Use the boolean to pick the source
+        return isExternal
+            ? externalServiceLookup[selectedNode.id]?.service
+            : serviceNodeLookup[selectedNode.id];
+    });
+
+    let activeGroup = $state<GroupInfo | null>(group);
 
     $effect(() => {
-        if (selectedNode) {
-            service = serviceNodeLookup[selectedNode.id] ?? null;
+        // If it's external and we have a groupId, go fetch it
+        if (isExternal && serviceInfo?.groupId) {
+            getGroup(serviceInfo.groupId).then(res => {
+                activeGroup = res;
+            });
         } else {
-            service = null;
+            // Otherwise, reset back to the group passed in via props
+            activeGroup = group;
         }
     });
 
-    $effect(() => {
-        if (service) {
-            iconPath = getAwsIconPath(service.serviceType)
-            initials = service.friendlyName
-                ? service.friendlyName
-                    .split(' ')
-                    .map(part => part[0])
-                    .join('')
-                    .slice(0, 3)
-                    .toUpperCase()
-                : 'Svc'
-        }
-    })
+    let displayGroup = $derived(activeGroup);
+    let displayTeamId = $derived(displayGroup?.teamId);
 
+    let iconPath = $derived(serviceInfo ? getAwsIconPath(serviceInfo.serviceType) : null);
+    let initials = $derived(
+        serviceInfo?.friendlyName
+            ? serviceInfo.friendlyName.split(' ').map(n => n[0]).join('').slice(0,3).toUpperCase()
+            : 'Svc'
+    );
 </script>
 
 <aside class="flex h-full w-96 flex-col border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100">
-    <div class="flex-1 overflow-y-auto p-4">
-        {#if !group}
+    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+
+        {#if !displayGroup}
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-700 p-4 text-sm text-gray-500 dark:text-gray-300">
                 Select a group to view details.
             </div>
         {:else}
-            <GenericSidebarCard title="Current Group" subtitle={group.name} description={group.description}/>
-            {#if group.teamId}
-                <TeamContactCard teamId={group.teamId}/>
+            <GenericSidebarCard
+                    title={isExternal ? "Group" : "Current Group"}
+                    subtitle={displayGroup.name}
+                    description={displayGroup.description}
+                    classes={isExternal ? "external" : ""}
+            />
+
+            {#if displayTeamId}
+                <TeamContactCard teamId={displayTeamId} classes={isExternal ? "external" : ""} />
             {/if}
-            {#if service}
-                <GenericSidebarCard title="Service" subtitle={service.friendlyName} description={service.description}
-                                    iconPath={iconPath?? undefined} iconAlt={initials}/>
+
+            {#if serviceInfo}
+                <GenericSidebarCard
+                        title="Service"
+                        subtitle={serviceInfo.friendlyName}
+                        description={serviceInfo.description}
+                        iconPath={iconPath ?? undefined}
+                        iconAlt={initials}
+                        classes={isExternal ? "external" : ""}
+                />
             {/if}
-            {#if selectedNode}
-                <div>
-                    <h3 class="mt-4 text-sm font-medium text-gray-500 uppercase tracking-wide">Node ID</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">{selectedNode.id} -- x: {selectedNode.position.x} -- y: {selectedNode.position.y}</p>
-                </div>
-            {/if}
-            <!--{#if isExternalService() && serviceGroup}
-                <div class="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4">
-                    <div class="text-xs uppercase tracking-wide text-amber-200">External Service</div>
-                    <h3 class="text-lg font-semibold text-white">{serviceGroup.name}</h3>
-                    {#if serviceGroup.description}
-                        <p class="mt-2 text-sm text-amber-100">{serviceGroup.description}</p>
-                    {/if}
-                    <p class="mt-3 text-xs text-amber-200/80">ID: {serviceGroup.groupName}</p>
-                    {#if serviceGroup.teamId}
-                        <div class="mt-4">
-                            <TeamContactCard teamId={serviceGroup.teamId} teams={teams ?? undefined}/>
-                        </div>
-                    {/if}
-                </div>
-            {/if}-->
         {/if}
     </div>
 </aside>

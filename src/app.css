@@ -108,6 +108,10 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
     @apply rounded-xl border border-gray-200    dark:border-gray-700 bg-gray-50    dark:bg-slate-700 p-4 mt-4
 }
 
+.sidebar-card.external {
+    @apply border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-800
+}
+
 .sidebar-card-subtitle {
     @apply text-xl font-semibold text-gray-900 dark:text-white
 }

@@ -2,23 +2,26 @@
 
     import type {Snippet} from "svelte";
 
-    const {title, subtitle, description, children, iconPath, iconAlt} = $props<{
+    const {title, subtitle, description, children, iconPath, iconAlt, classes} = $props<{
         title: string,
-        subtitle: string,
+        subtitle?: string,
         description?: string,
         children?: Snippet,
         iconPath?: string,
-        iconAlt?: string
+        iconAlt?: string,
+        classes?: string
     }>();
 
 
 </script>
 
-<div class="sidebar-card">
+<div class="sidebar-card {classes}">
     <div class="flex items-start justify-between">
         <div class="flex flex-col">
             <div class="sidebar-card-title">{title}</div>
-            <h3 class="sidebar-card-subtitle">{subtitle}</h3>
+            {#if subtitle}
+                <h3 class="sidebar-card-subtitle">{subtitle}</h3>
+            {/if}
         </div>
         {#if iconPath}
             <img
