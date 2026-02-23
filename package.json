@@ -14,7 +14,8 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"test:unit": "vitest --run"
+		"test:unit": "vitest --run",
+		"postinstall": "node scripts/download-aws-icons.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.2",
@@ -26,6 +27,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
+		"@types/adm-zip": "^0.5.7",
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^25",
 		"@vitest/browser-playwright": "^4.0.18",
@@ -49,6 +51,7 @@
 	},
 	"dependencies": {
 		"@xyflow/svelte": "^1.5.0",
+		"adm-zip": "^0.5.16",
 		"elkjs": "^0.11.0",
 		"libavoid-js": "^0.5.0-beta.3"
 	}

@@ -60,4 +60,5 @@ test-results
 *storybook.log
 storybook-static
 
-static/icons
+static/icons/*
+.aws-icons-last-updated
