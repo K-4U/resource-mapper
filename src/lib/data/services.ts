@@ -11,19 +11,6 @@ export async function getServicesByGroup(groupId: string | null | undefined): Pr
   return result
 }
 
-export async function getService(
-  groupId: string | null | undefined,
-  serviceId: string | null | undefined
-): Promise<ServiceDefinition | null> {
-  console.debug('[data/services] getService called', { groupId, serviceId })
-  if (!groupId || !serviceId) {
-    return null
-  }
-  const result = await servicesService.getService(groupId, serviceId)
-  console.debug('[data/services] getService result', { groupId, serviceId, found: !!result })
-  return result
-}
-
 export async function getExternalServicesForGroup(groupId: string | null | undefined): Promise<ExternalGroupServices[]> {
   console.debug('[data/services] getExternalServicesForGroup called', groupId)
   if (!groupId) {
