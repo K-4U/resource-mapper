@@ -1,5 +1,4 @@
 import type { GroupConnection, ServiceConnection, ServiceIdentifier } from '$lib/types'
-import { servicesService } from './ServicesService'
 
 const SERVICE_KEY_SEPARATOR = '/'
 
@@ -25,12 +24,17 @@ function cloneEdges(edges: ServiceConnection[]): ServiceConnection[] {
   return edges.map(cloneConnection)
 }
 
-class ConnectionsService {
-  private connectionsFromService = new Map<string, ServiceConnection[]>()
-  private connectionsToService = new Map<string, ServiceConnection[]>()
-  private servicesByGroup = new Map<string, Set<string>>()
-  private groupConnectionCounts = new Map<string, Map<string, number>>()
+export class ConnectionsService {
+  private readonly connectionsFromService = new Map<string, ServiceConnection[]>()
+  private readonly connectionsToService = new Map<string, ServiceConnection[]>()
+  private readonly servicesByGroup = new Map<string, Set<string>>()
+  private readonly groupConnectionCounts = new Map<string, Map<string, number>>()
   private loaded = false
+  private readonly servicesService: any;
+
+  constructor(servicesService: any) {
+    this.servicesService = servicesService;
+  }
 
   private addServiceToGroup(groupId: string, serviceKey: string) {
     console.debug('[ConnectionsService] addServiceToGroup', { groupId, serviceKey })
@@ -71,7 +75,7 @@ class ConnectionsService {
       return
     }
     console.debug('[ConnectionsService] ensureLoaded building graph')
-    const services = await servicesService.getAllServices()
+    const services = await this.servicesService.getAllServices()
     Object.values(services).forEach(service => {
       const startServiceKey = `${service.groupId}/${service.identifier}`
       const startTemplate: ServiceIdentifier = { groupId: service.groupId, serviceId: service.identifier }
@@ -191,6 +195,3 @@ class ConnectionsService {
     this.loaded = false
   }
 }
-
-export const connectionsService = new ConnectionsService()
-

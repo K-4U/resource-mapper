@@ -1,26 +1,18 @@
 import yaml from 'js-yaml'
-import { validateGroupInfo, type GroupInfo } from '$lib/types'
-import { YamlEntityService } from './YamlEntityService'
+import {type GroupInfo, validateGroupInfo} from '$lib/types'
+import {YamlEntityService} from './YamlEntityService'
 
-class GroupService extends YamlEntityService<GroupInfo> {
-  constructor() {
-    super(
-      import.meta.glob('../../../data/services/*/group-info.yaml', {
-        eager: true,
-        import: 'default',
-        query: '?raw'
-      }) as Record<string, string>
-    )
+export class GroupService extends YamlEntityService<GroupInfo> {
+  constructor(initialFiles: Record<string, string>) {
+    super(initialFiles)
     console.debug('[GroupService] initialized')
   }
 
+
   protected extractId(relativePath: string): string | null {
-    const segments = relativePath.split('/').filter(Boolean)
-    const servicesIndex = segments.lastIndexOf('services')
-    if (servicesIndex === -1 || servicesIndex + 1 >= segments.length) {
-      return null
-    }
-    return segments[servicesIndex + 1]
+    // Only index group-info.yaml files in services/*/group-info.yaml
+    const match = relativePath.match(/^services\/([^/]+)\/group-info\.yaml$/);
+    return match ? match[1] : null;
   }
 
   protected parseEntity(groupId: string, rawYaml: string): GroupInfo | null {
@@ -51,10 +43,4 @@ class GroupService extends YamlEntityService<GroupInfo> {
     console.debug('[GroupService] __setGroupFileMocks', Object.keys(files))
     this.setFileMocks(files)
   }
-}
-
-export const groupService = new GroupService()
-
-export function __setGroupFileMocks(files: Record<string, string>) {
-  groupService.__setGroupFileMocks(files)
 }

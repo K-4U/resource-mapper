@@ -1,15 +1,11 @@
 import type { GroupInfo } from '$lib/types'
-import { groupService } from '$lib/services/GroupService'
+import bakedData from '$lib/generated/data.json'
 
 export async function getAllGroups(): Promise<Record<string, GroupInfo>> {
-  console.debug('[data/groups] getAllGroups called')
-  return groupService.getAllGroups()
+  return bakedData.groups as Record<string, GroupInfo>;
 }
 
 export async function getGroup(groupId: string | null | undefined): Promise<GroupInfo | null> {
-  console.debug('[data/groups] getGroup called', groupId)
-  if (!groupId) {
-    return null
-  }
-  return groupService.getGroup(groupId)
+  if (!groupId) return null;
+  return ((bakedData.groups as Record<string, GroupInfo>)[groupId]) ?? null;
 }

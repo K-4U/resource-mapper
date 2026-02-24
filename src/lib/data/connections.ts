@@ -1,28 +1,26 @@
-import type { GroupConnection, ServiceConnection } from '$lib/types'
-import { connectionsService } from '$lib/services/ConnectionsService'
-
-function ensureArray<T>(value: T[] | null | undefined): T[] {
-  return Array.isArray(value) ? value : []
-}
-
+import type { GroupConnection } from '$lib/types'
+import bakedData from '$lib/generated/data.json'
 
 export async function getConnectionsFromGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {
-  console.debug('[data/connections] getConnectionsFromGroup', groupId)
-  if (!groupId) {
-    return []
-  }
-  return await connectionsService.getConnectionsFromGroup(groupId)
+  if (!groupId) return []
+  // Not pre-baked, so filter from all groupConnections
+  return (bakedData.groupConnections as GroupConnection[]).filter(c => c.sourceGroup === groupId)
 }
 
 export async function getConnectionsToGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {
-  console.debug('[data/connections] getConnectionsToGroup', groupId)
-  if (!groupId) {
-    return []
-  }
-  return await connectionsService.getConnectionsToGroup(groupId)
+  if (!groupId) return []
+  // Not pre-baked, so filter from all groupConnections
+  return (bakedData.groupConnections as GroupConnection[]).filter(c => c.targetGroup === groupId)
 }
 
-export async function getAllGroupConnections(includeSelfConnections = false): Promise<GroupConnection[]> {
-  console.debug('[data/connections] getAllGroupConnections', { includeSelfConnections })
-  return connectionsService.getAllGroupConnections(includeSelfConnections)
+export async function getAllGroupConnections(): Promise<GroupConnection[]> {
+  // Returns all group connections except self connections
+  return (bakedData.groupConnections as GroupConnection[]).filter(
+    c => c.sourceGroup !== c.targetGroup
+  )
+}
+
+export async function getAllGroupConnectionsWithSelf(): Promise<GroupConnection[]> {
+  // Returns all group connections including self connections
+  return bakedData.groupConnections as GroupConnection[]
 }

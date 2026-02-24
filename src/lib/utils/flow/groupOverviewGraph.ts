@@ -1,20 +1,3 @@
-// groupOverviewGraph.ts
-//
-// This module is responsible for transforming the raw group and connection data from the backend/services
-// into a format that is directly consumable by the SvelteFlow diagram engine. It is a key part of the data
-// layer that separates business logic from UI rendering logic.
-//
-// Why is this file needed?
-// - It acts as an adapter between the domain model (groups, connections) and the diagram view model (nodes, edges).
-// - It ensures that all IDs, labels, and edge data are properly sanitized and formatted for the diagram engine.
-// - It generates a unique signature for the graph, which is used for caching, change detection, and efficient updates.
-// - It provides a mapping from diagram node IDs back to group IDs, which is essential for UI interactions (e.g., clicking a node to show group details).
-// - Without this file, the UI would be tightly coupled to the backend/service data structures, making the code harder to maintain, test, and extend.
-// - This separation allows the diagram rendering to evolve independently from the backend data model, and vice versa.
-//
-// In summary: This file is VERY MUCH needed because it is the single source of truth for how group and connection data
-// is represented in the diagram, and it enables a clean, maintainable, and testable architecture.
-
 import type {GroupConnection, GroupInfo} from '$lib/types'
 import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
 import {createGraphSignature, formatConnectionLabel, sanitizeNodeId} from '$lib/utils/flow/helpers'
@@ -85,5 +68,6 @@ export function buildGroupOverviewGraph(
     return lookup
   }, {})
 
+    console.debug(graph)
   return { graph, nodeToGroupMap }
 }

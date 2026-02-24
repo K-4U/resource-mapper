@@ -2,28 +2,15 @@ import yaml from 'js-yaml'
 import { validateTeam, type Team } from '$lib/types'
 import { YamlEntityService } from './YamlEntityService'
 
-class TeamsService extends YamlEntityService<Team> {
-  constructor() {
-    const files = import.meta.glob('../../../data/teams/*.yaml', {
-      eager: true,
-      import: 'default',
-      query: '?raw'
-    }) as Record<string, string>
-    console.debug('[TeamsService] constructor globbed files', Object.keys(files).length)
-    super(files)
+export class TeamsService extends YamlEntityService<Team> {
+  constructor(initialFiles: Record<string, string>) {
+    super(initialFiles);
   }
 
   protected extractId(relativePath: string): string | null {
-    console.debug('[TeamsService] extractId', relativePath)
-    const segments = relativePath.split('/').filter(Boolean)
-    if (segments.length === 0) {
-      return null
-    }
-    const fileName = segments[segments.length - 1]
-    if (!fileName.endsWith('.yaml')) {
-      return null
-    }
-    return fileName.replace('.yaml', '')
+    // Only index files in teams/ and ignore all others
+    const match = relativePath.match(/^teams\/([^/]+)\.yaml$/);
+    return match ? match[1] : null;
   }
 
   protected parseEntity(teamId: string, rawYaml: string): Team | null {
@@ -54,10 +41,4 @@ class TeamsService extends YamlEntityService<Team> {
     console.debug('[TeamsService] __setTeamFileMocks override', Object.keys(files).length)
     this.setFileMocks(files)
   }
-}
-
-export const teamsService = new TeamsService()
-
-export function __setTeamFileMocks(files: Record<string, string>) {
-  teamsService.__setTeamFileMocks(files)
 }

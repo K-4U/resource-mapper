@@ -13,9 +13,9 @@ export const load: PageLoad = async () => {
       getAllTeams()
     ])
     console.debug('[overview.load] data fetched', {
-      groups: Object.keys(groups ?? {}).length,
-      groupConnections: groupConnections?.length ?? 0,
-      teams: Object.keys(teams ?? {}).length
+      groups,
+      groupConnections,
+      teams
     })
     selectedGroup.set(null);
     return { groups, groupConnections, teams }

@@ -8,19 +8,22 @@ import {
   type ServiceIncomingLink
 } from '$lib/types'
 import { YamlEntityService } from './YamlEntityService'
-import { groupService } from './GroupService'
+import type { GroupService } from './GroupService'
 
-class ServicesService extends YamlEntityService<ServiceDefinition> {
+export class ServicesService extends YamlEntityService<ServiceDefinition> {
   private incomingConnectionsPopulated = false
+  private groupService: GroupService
 
-  constructor() {
-    const files = import.meta.glob('../../../data/services/*/*.yaml', {
-      eager: true,
-      import: 'default',
-      query: '?raw'
-    }) as Record<string, string>
-    console.debug('[ServicesService] constructor globbed files', Object.keys(files).length)
-    super(files)
+  constructor(initialFiles: Record<string, string> | null = null, groupService: GroupService) {
+    super(
+        initialFiles ??
+        import.meta.glob('../../../data/services/*/*.yaml', {
+          eager: true,
+          import: 'default',
+          query: '?raw'
+        })
+    )
+    this.groupService = groupService
   }
 
   protected extractId(relativePath: string): string | null {
@@ -137,7 +140,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
         if (!resolvedServices.length) {
           continue
         }
-        const group = (await groupService.getGroup(externalGroupId)) ?? this.createFallbackGroup(externalGroupId)
+        const group = (await this.groupService.getGroup(externalGroupId)) ?? this.createFallbackGroup(externalGroupId)
         results.push({ group, services: resolvedServices, direction })
       }
     }
@@ -155,6 +158,7 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
   private createFallbackGroup(groupId: string): GroupInfo {
     console.warn('[ServicesService] createFallbackGroup for missing group', groupId)
     return {
+      id: groupId,
       name: groupId,
       description: undefined,
       teamId: undefined,
@@ -203,10 +207,4 @@ class ServicesService extends YamlEntityService<ServiceDefinition> {
     this.setFileMocks(files)
     this.incomingConnectionsPopulated = false
   }
-}
-
-export const servicesService = new ServicesService()
-
-export function __setServiceFileMocks(files: Record<string, string>) {
-  servicesService.__setServiceFileMocks(files)
 }
