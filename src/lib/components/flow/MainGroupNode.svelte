@@ -8,22 +8,17 @@
         selected = false,
     }: NodeProps<Node<FlowNodeData>> = $props()
 
+    //On double click, navigate to the group page.
+    const navigateToGroupPage = () => {
+        window.location.href = `/group/${data.groupId}`;
+    }
+
 </script>
 
 
 <Handle type="target" position={Position.Left} id="input" />
 <Handle type="source" position={Position.Right} id="output" />
-<div class="relative">
+<div class="relative" ondblclick={() => navigateToGroupPage()} aria-label="Group node" aria-roledescription="Group node">
     {data.label}
-    {#if selected}
-        <a
-            class="absolute top-1 right-1 cursor-pointer"
-            href={`/group/${data.groupId}`}
-            on:click|stopPropagation
-            title="Go to group page"
-        >
-            <Icon icon="mdi:external-link" width="8" height="8" />
-        </a>
-    {/if}
 </div>
 

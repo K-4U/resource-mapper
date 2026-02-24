@@ -20,12 +20,16 @@
     //@ts-ignore
     let iconPath = $derived(getAwsIconPath(data.serviceType))
 
+    function navigateToExternalGroupPage() {
+        window.location.href = `/group/${data.groupId}`;
+    }
+
 </script>
 
 <Handle type="target" position={Position.Left} id="input" />
 <Handle type="source" position={Position.Right} id="output"/>
 
-<div class="flex items-center gap-3">
+<div class="flex items-center gap-3" ondblclick={() => navigateToExternalGroupPage()} role="navigation">
     {#if iconPath}
         <img src={iconPath} alt={data.label} class="h-10 w-10 rounded-lg bg-white/5 object-contain"
              loading="lazy"/>
