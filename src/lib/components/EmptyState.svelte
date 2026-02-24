@@ -17,7 +17,7 @@
 </script>
 
 <div class="flex h-full w-full items-center justify-center p-8">
-  <div class="max-w-md rounded-xl border border-gray-200 bg-gray-100 dark:bg-slate-800 p-8 text-center shadow">
+  <div class="max-w-md rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-slate-800 p-8 text-center shadow">
     <div class="flex items-center justify-center mb-4">
       <Icon icon="mdi:package-variant" class="text-4xl text-gray-400 dark:text-gray-300" aria-hidden="true" />
     </div>

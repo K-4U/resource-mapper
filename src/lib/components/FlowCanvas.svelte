@@ -19,11 +19,12 @@
     import MainGroupNode from '$lib/components/flow/MainGroupNode.svelte'
     import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
     import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
-    import {isDarkMode, logDiagramAction, showLegend} from '$lib/stores/diagram';
+    import {logDiagramAction, showLegend} from '$lib/stores/diagram';
     import ServiceGroupNode from "$lib/components/flow/ServiceGroupNode.svelte";
     import SnakeEdge from "$lib/components/flow/SnakeEdge.svelte";
     import Icon from "@iconify/svelte";
     import {goto} from "$app/navigation";
+    import { theme } from '$lib/state/theme.svelte';
 
     const DOUBLE_CLICK_THRESHOLD = 400
 
@@ -179,12 +180,12 @@
                 panOnDrag
                 zoomOnScroll
                 selectionOnDrag={false}
-                colorMode={$isDarkMode ? 'dark' : 'light'}
+                colorMode={theme.isDark ? 'dark' : 'light'}
                 fitView
                 fitViewOptions={{ padding: 0.2 }}
         >
             <!-- Todo: See if we can use tailwind here-->
-            <Background bgColor={$isDarkMode ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Dots} gap={24}/>
+            <Background bgColor={theme.isDark ? '#1f2937' : '#e5e7eb'} variant={BackgroundVariant.Dots} gap={24}/>
             <MiniMap nodeColor={(n) => {
             if (n.type === 'group') return '#2563eb'
             if (n.type === 'service') return '#16a34a'

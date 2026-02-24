@@ -2,6 +2,7 @@
     import type {FlowNodeData} from '$lib/utils/flow/types'
     import {Handle, type NodeProps, Position, type Node} from '@xyflow/svelte'
     import {getAwsIconPath} from '$lib/utils/awsIcons'
+    import {goto} from '$app/navigation'
 
     let {
         data,
@@ -21,7 +22,7 @@
     let iconPath = $derived(getAwsIconPath(data.serviceType))
 
     function navigateToExternalGroupPage() {
-        window.location.href = `/group/${data.groupId}`;
+        goto(`/group/${data.groupId}`);
     }
 
 </script>

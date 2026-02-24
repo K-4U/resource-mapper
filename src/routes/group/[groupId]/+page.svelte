@@ -3,6 +3,7 @@
     import type {GroupInfo, ServiceDefinition, ExternalGroupServices, Team} from '$lib/types'
     import FlowCanvas from '$lib/components/FlowCanvas.svelte'
     import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
+    import LoadingOverlay from '$lib/components/LoadingOverlay.svelte'
     import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
     import EmptyState from '$lib/components/EmptyState.svelte'
     import ServiceDetailSidebar from '$lib/components/ServiceDetailSidebar.svelte'
@@ -83,7 +84,7 @@
             onBack={() => goto('/')}
     />
 {:else if !group}
-    <LoadingSpinner message="Loading group..."/>
+    <LoadingOverlay message="Loading group..."/>
 {:else if !hasDiagramContent}
     <EmptyState title="No services" message="This group has no service diagram to display yet."/>
 {:else}

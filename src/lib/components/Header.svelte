@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
-import { selectedGroup, showLegend, isDarkMode, logDiagramAction } from '$lib/stores/diagram';
+import { selectedGroup, showLegend, logDiagramAction } from '$lib/stores/diagram';
+import { theme } from '$lib/state/theme.svelte';
 import Icon from '@iconify/svelte';
 
 function goHome() {
@@ -12,7 +13,7 @@ function toggleLegend() {
 }
 
 function toggleDarkMode() {
-  isDarkMode.update((v: boolean) => !v);
+  theme.toggle();
 }
 
 function logDiagram() {
@@ -41,8 +42,8 @@ function logDiagram() {
           <Icon icon="mdi:eye-outline" width="24" height="24" />
         {/if}
       </span>
-      <span class="text-gray-700 dark:text-gray-200" on:click={toggleDarkMode} role="button" tabindex="0" on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleDarkMode()} title={$isDarkMode ? 'Light Mode' : 'Dark Mode'}>
-        {#if $isDarkMode}
+      <span class="text-gray-700 dark:text-gray-200" on:click={toggleDarkMode} role="button" tabindex="0" on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleDarkMode()} title={theme.isDark ? 'Light Mode' : 'Dark Mode'}>
+        {#if theme.isDark}
           <Icon icon="mdi:weather-sunny" width="24" height="24" />
         {:else}
           <Icon icon="mdi:weather-night" width="24" height="24" />

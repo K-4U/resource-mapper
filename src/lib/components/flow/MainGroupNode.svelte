@@ -1,6 +1,7 @@
 <script lang="ts">
     import type {FlowNodeData} from '$lib/utils/flow/types'
     import {Handle, type NodeProps, Position, type Node} from '@xyflow/svelte'
+    import {goto} from '$app/navigation'
     import Icon from "@iconify/svelte";
 
     let {
@@ -10,7 +11,7 @@
 
     //On double click, navigate to the group page.
     const navigateToGroupPage = () => {
-        window.location.href = `/group/${data.groupId}`;
+        goto(`/group/${data.groupId}`);
     }
 
 </script>

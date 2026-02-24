@@ -53,6 +53,7 @@
 		"@xyflow/svelte": "^1.5.0",
 		"adm-zip": "^0.5.16",
 		"elkjs": "^0.11.0",
-		"libavoid-js": "^0.5.0-beta.3"
+		"libavoid-js": "^0.5.0-beta.3",
+		"svelte-theme": "^1.4.3"
 	}
 }
