@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 import type { XYPosition } from '@xyflow/svelte';
 import { AvoidLib, type Avoid, type Router, type ShapeRef, type ConnRef } from 'libavoid-js';
 import {OFFSET_STEP} from "$lib/utils/flow/layout";
@@ -30,7 +30,7 @@ let avoidLibInstance: Avoid | null = null;
 
 async function ensureAvoidLibLoaded() {
     if (avoidLibPromise) return avoidLibPromise;
-    avoidLibPromise = AvoidLib.load("./libavoid.wasm");
+    avoidLibPromise = AvoidLib.load("/libavoid.wasm");
     return avoidLibPromise;
 }
 
@@ -64,7 +64,7 @@ const getShoulderPoint = (avoid: Avoid, x: number, y: number, pos: string, dist:
 // --- Store Implementation ---
 
 function createRoutingStore() {
-    const { subscribe, set, update } = writable<Record<string, XYPosition[]>>({});
+    const { subscribe, set } = writable<Record<string, XYPosition[]>>({});
 
     let router: Router | null = null;
     let avoid: Avoid | null = null;
@@ -167,7 +167,7 @@ function createRoutingStore() {
 
             const createConnEnd = (nodeId: string, x: number, y: number, side: string, shape: ShapeRef) => {
                 if (!avoid) throw new Error('Avoid not loaded');
-                const pinClass = Array.from(data.edgeId).reduce((a, b) => a + b.charCodeAt(0), 0);
+                const pinClass = Array.from(data.edgeId).reduce((a, b) => a + (b.codePointAt(0) ?? 0), 0);
 
                 // Convert absolute coords to relative coords for the pin (libavoid expects relative to shape's top-left)
                 const abs = nodesMetadata.get(nodeId);

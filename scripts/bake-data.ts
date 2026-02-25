@@ -81,20 +81,12 @@ async function compileYamlData() {
     }
 }
 
-async function copyLibAvoid() {
-    console.log('Copying libavoid WASM file.');
-    const wasmSource = path.resolve(__dirname, '../node_modules/libavoid-js/dist/libavoid.wasm');
-    const wasmDest = path.resolve(__dirname, '../static/libavoid.wasm');
-    fs.copyFileSync(wasmSource, wasmDest);
-    console.log('libavoid WASM file copied successfully.');
-}
-
 async function main() {
     await compileYamlData();
-    await copyLibAvoid();
 }
 
 main().catch(err => {
     console.error('Bake failed:', err);
     process.exit(1);
 });
+
