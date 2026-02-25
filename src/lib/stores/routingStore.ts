@@ -30,7 +30,7 @@ let avoidLibInstance: Avoid | null = null;
 
 async function ensureAvoidLibLoaded() {
     if (avoidLibPromise) return avoidLibPromise;
-    avoidLibPromise = AvoidLib.load();
+    avoidLibPromise = AvoidLib.load("./libavoid.wasm");
     return avoidLibPromise;
 }
 
