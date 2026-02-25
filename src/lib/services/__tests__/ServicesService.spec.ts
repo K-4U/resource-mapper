@@ -8,7 +8,7 @@ vi.mock('$lib/services/ResourceService', () => ({
   resourceService: resourceServiceMock
 }))
 
-import { __setServiceFileMocks, servicesService } from '$lib/services/ServicesService'
+import { __setServiceFileMocks, servicesService } from 'scripts/services/ServicesService'
 
 const servicePath = (groupId: string, file: string) => `../../../data/services/${groupId}/${file}.yaml`
 

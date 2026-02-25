@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { connectionsService } from '$lib/services/ConnectionsService'
-import { __setServiceFileMocks } from '$lib/services/ServicesService'
+import { connectionsService } from 'scripts/services/ConnectionsService'
+import { __setServiceFileMocks } from 'scripts/services/ServicesService'
 
 const servicePath = (groupId: string, file: string) => `../../../data/services/${groupId}/${file}.yaml`
 

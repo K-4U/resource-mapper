@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { __setTeamFileMocks, teamsService } from '$lib/services/TeamsService'
+import { __setTeamFileMocks, teamsService } from 'scripts/services/TeamsService'
 
 const buildTeamPath = (teamId: string) => `../../../data/teams/${teamId}.yaml`
 

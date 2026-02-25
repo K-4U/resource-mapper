@@ -7,7 +7,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import fs from "node:fs";
-import {normalizePath} from "vite";
+import { runBake } from './scripts/bake-logic';
+import { normalizePath } from 'vite';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 const wasmPath = normalizePath(path.resolve(dirname, 'node_modules/libavoid-js/dist/libavoid.wasm'));
@@ -19,6 +20,29 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     sveltekit(),
+    {
+      name: 'data-bake-plugin',
+      async buildStart() {
+        console.log('[Vite] Initializing Data Bake...');
+        try {
+          await runBake();
+          console.log('[Vite] Data Bake Successful.');
+        } catch (err) {
+          console.error('[Vite] Data Bake Failed:', err);
+        }
+      },
+      async handleHotUpdate({ file, server }) {
+        if (file.endsWith('.yaml')) {
+          console.log(`[Vite] YAML change detected: ${file}. Re-baking...`);
+          try {
+            await runBake();
+            server.ws.send({ type: 'full-reload' });
+          } catch (err) {
+            console.error('[Vite] Re-bake failed:', err);
+          }
+        }
+      }
+    },
     viteStaticCopy({
       targets: [
         {

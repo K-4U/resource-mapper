@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { __setGroupFileMocks, groupService } from '$lib/services/GroupService'
+import { __setGroupFileMocks, groupService } from 'scripts/services/GroupService'
 
 const buildPath = (groupId: string) => `../../../data/services/${groupId}/group-info.yaml`
 

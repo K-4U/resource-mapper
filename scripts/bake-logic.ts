@@ -1,19 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
-
-
-import {GroupService} from '../src/lib/services/GroupService.js';
-import {ServicesService} from '../src/lib/services/ServicesService.js';
-import {TeamsService} from '../src/lib/services/TeamsService.js';
-import {ConnectionsService} from '../src/lib/services/ConnectionsService.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const DATA_DIR = path.resolve(__dirname, '../data');
-const OUTPUT_PATH = path.resolve(__dirname, '../src/lib/generated/data.json');
-const OUTPUT_DIR = path.dirname(OUTPUT_PATH);
+import { GroupService } from '$lib/services/GroupService.js';
+import { ServicesService } from '$lib/services/ServicesService.js';
+import { TeamsService } from '$lib/services/TeamsService.js';
+import { ConnectionsService } from '$lib/services/ConnectionsService.js';
 
 function getAllYamlFiles(dir: string, baseDir = dir): Record<string, string> {
     const result: Record<string, string> = {};
@@ -25,17 +15,21 @@ function getAllYamlFiles(dir: string, baseDir = dir): Record<string, string> {
             Object.assign(result, getAllYamlFiles(p, baseDir));
         } else if (file.endsWith('.yaml')) {
             const relativePath = path.relative(baseDir, p).replaceAll('\\', '/');
-            const content = fs.readFileSync(p, 'utf-8');
-            result[relativePath] = content;
+            result[relativePath] = fs.readFileSync(p, 'utf-8');
         }
     }
     return result;
 }
 
-async function compileYamlData() {
+export async function runBake() {
+    // Path safety: always resolve from process.cwd()
+    const DATA_DIR = path.resolve(process.cwd(), 'data');
+    const OUTPUT_PATH = path.resolve(process.cwd(), 'src/lib/generated/data.json');
+    const OUTPUT_DIR = path.dirname(OUTPUT_PATH);
+
     // 1. Load YAML files
     const yamlFiles = getAllYamlFiles(DATA_DIR);
-    console.log(`Found ${Object.keys(yamlFiles).length} YAML files in ${DATA_DIR}`);
+    console.log(`[bake-logic] Found ${Object.keys(yamlFiles).length} YAML files in ${DATA_DIR}`);
 
     // 2. Initialize services
     const groupService = new GroupService(yamlFiles);
@@ -69,24 +63,15 @@ async function compileYamlData() {
     };
 
     // 6. Write output
-    console.log(`Resolved output path: ${OUTPUT_PATH}`);
+    console.log(`[bake-logic] Resolved output path: ${OUTPUT_PATH}`);
     if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, {recursive: true});
     }
     try {
         fs.writeFileSync(OUTPUT_PATH, JSON.stringify(masterData, null, 2));
-        console.log(`Data baked to ${OUTPUT_PATH}`);
+        console.log(`[bake-logic] Data baked to ${OUTPUT_PATH}`);
     } catch (err) {
-        console.error('Failed to write data.json:', err);
+        console.error('[bake-logic] Failed to write data.json:', err);
     }
 }
-
-async function main() {
-    await compileYamlData();
-}
-
-main().catch(err => {
-    console.error('Bake failed:', err);
-    process.exit(1);
-});
 
