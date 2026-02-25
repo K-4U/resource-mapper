@@ -1,4 +1,4 @@
-import type { GroupConnection, ServiceConnection, ServiceIdentifier } from '$lib/types'
+import type { GroupConnection, ServiceConnection, ServiceIdentifier } from '@mapper/shared'
 
 const SERVICE_KEY_SEPARATOR = '/'
 

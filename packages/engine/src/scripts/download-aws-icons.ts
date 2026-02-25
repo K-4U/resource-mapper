@@ -1,12 +1,22 @@
-import {existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, readdirSync, renameSync} from 'fs';
-import {join, dirname} from 'path';
-import {fileURLToPath} from 'url';
+import {existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync} from 'node:fs';
+import {dirname, join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import AdmZip from 'adm-zip';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// This makes the script flexible
+const getTargetDir = () => {
+    // If we're in the monorepo, we want packages/core/static
+    // In a final tool, this might just be './static'
+    const monorepoPath = resolve(process.cwd(), 'packages/core/static/icons/aws');
+    const localPath = resolve(process.cwd(), 'static/icons/aws');
+
+    return existsSync(resolve(process.cwd(), 'packages/core')) ? monorepoPath : localPath;
+};
+
+const TARGET_DIR = getTargetDir();
+const STATUS_FILE = join(dirname(TARGET_DIR), '..', '..', '.aws-icons-last-updated');
+
 const ICONS_URL = 'https://icon.icepanel.io/AWS/svg.zip';
-const TARGET_DIR = join(__dirname, '..', 'static', 'icons', 'aws');
-const STATUS_FILE = join(__dirname, '..', '.aws-icons-last-updated');
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 const TIMEOUT_MS = 30000; // 30 seconds
 

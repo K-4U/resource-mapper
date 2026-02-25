@@ -60,5 +60,6 @@ test-results
 *storybook.log
 storybook-static
 
-static/icons/*
 .aws-icons-last-updated
+dist
+.svelte-kit

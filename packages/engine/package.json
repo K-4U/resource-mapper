@@ -1,0 +1,12 @@
+{
+  "name": "@mapper/engine",
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": { "@mapper/shared": "*" },
+  "exports": {
+    "./bake-logic": "./src/scripts/bake-logic.js"
+  },
+  "scripts": {
+    "download-icons": "tsx src/scripts/download-aws-icons.ts"
+  }
+}

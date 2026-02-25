@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { GroupService } from '$lib/services/GroupService.js';
-import { ServicesService } from '$lib/services/ServicesService.js';
-import { TeamsService } from '$lib/services/TeamsService.js';
-import { ConnectionsService } from '$lib/services/ConnectionsService.js';
+import { GroupService } from '../services/GroupService.ts';
+import { ServicesService } from '../services/ServicesService.ts';
+import { TeamsService } from '../services/TeamsService.ts';
+import { ConnectionsService } from '../services/ConnectionsService.ts';
 
 function getAllYamlFiles(dir: string, baseDir = dir): Record<string, string> {
     const result: Record<string, string> = {};
@@ -74,4 +74,3 @@ export async function runBake() {
         console.error('[bake-logic] Failed to write data.json:', err);
     }
 }
-

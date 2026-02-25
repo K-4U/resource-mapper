@@ -1,7 +1,8 @@
-import { ServiceType } from '$lib/types'
+import { ServiceType } from '@mapper/shared'
 
 type IconLookup = Record<ServiceType, string>
 
+//@ts-ignore We ignore a bunch of missing options here for now. This should probably be generated from the service definitions at some point, but for now we can just hardcode the most common ones.
 const SERVICE_TYPE_TO_ICON: IconLookup = {
   [ServiceType.EC2]: 'Compute/EC2.svg',
   [ServiceType.ECS]: 'Containers/Elastic-Container-Service.svg',

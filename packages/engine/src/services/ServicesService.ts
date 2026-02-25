@@ -6,9 +6,9 @@ import {
   type GroupInfo,
   type ServiceDefinition,
   type ServiceIncomingLink
-} from '$lib/types'
-import { YamlEntityService } from './YamlEntityService'
-import type { GroupService } from './GroupService'
+} from '@mapper/shared'
+import { YamlEntityService } from './YamlEntityService.ts'
+import type { GroupService } from './GroupService.ts'
 
 export class ServicesService extends YamlEntityService<ServiceDefinition> {
   private incomingConnectionsPopulated = false
