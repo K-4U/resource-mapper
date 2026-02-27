@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { GroupService } from '../services/GroupService.ts';
-import { ServicesService } from '../services/ServicesService.ts';
-import { TeamsService } from '../services/TeamsService.ts';
-import { ConnectionsService } from '../services/ConnectionsService.ts';
+import { GroupService } from '../services/GroupService.js';
+import { ServicesService } from '../services/ServicesService.js';
+import { TeamsService } from '../services/TeamsService.js';
+import { ConnectionsService } from '../services/ConnectionsService.js';
+import {logger} from "../cli/utils/logger.js";
 
 function getAllYamlFiles(dir: string, baseDir = dir): Record<string, string> {
     const result: Record<string, string> = {};
+    if (!fs.existsSync(dir)) return result;
     const list = fs.readdirSync(dir);
     for (const file of list) {
         const p = path.join(dir, file);
@@ -21,15 +23,20 @@ function getAllYamlFiles(dir: string, baseDir = dir): Record<string, string> {
     return result;
 }
 
-export async function runBake() {
-    // Path safety: always resolve from process.cwd()
-    const DATA_DIR = path.resolve(process.cwd(), 'data');
-    const OUTPUT_PATH = path.resolve(process.cwd(), 'src/lib/generated/data.json');
+export async function runBake(opts?: { dataDir?: string; outputPath?: string }) {
+    // Dynamic pathing
+    const DATA_DIR = opts?.dataDir || path.resolve(process.cwd(), 'data');
+    const OUTPUT_PATH = opts?.outputPath || path.resolve(process.cwd(), '.mapper/data.json');
     const OUTPUT_DIR = path.dirname(OUTPUT_PATH);
+
+    if (!fs.existsSync(DATA_DIR)) {
+        logger.error(`[bake-logic] ERROR: Missing ./data directory at ${DATA_DIR}`);
+        throw new Error(`[bake-logic] ERROR: Missing ./data directory at ${DATA_DIR}`);
+    }
 
     // 1. Load YAML files
     const yamlFiles = getAllYamlFiles(DATA_DIR);
-    console.log(`[bake-logic] Found ${Object.keys(yamlFiles).length} YAML files in ${DATA_DIR}`);
+    logger.info(`[bake-logic] Found ${Object.keys(yamlFiles).length} YAML files in ${DATA_DIR}`);
 
     // 2. Initialize services
     const groupService = new GroupService(yamlFiles);
@@ -63,14 +70,14 @@ export async function runBake() {
     };
 
     // 6. Write output
-    console.log(`[bake-logic] Resolved output path: ${OUTPUT_PATH}`);
+    logger.success(`[bake-logic] Resolved output path: ${OUTPUT_PATH}`);
     if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, {recursive: true});
     }
     try {
         fs.writeFileSync(OUTPUT_PATH, JSON.stringify(masterData, null, 2));
-        console.log(`[bake-logic] Data baked to ${OUTPUT_PATH}`);
+        logger.success(`[bake-logic] Data baked to ${OUTPUT_PATH}`);
     } catch (err) {
-        console.error('[bake-logic] Failed to write data.json:', err);
+        logger.error(`[bake-logic] Failed to write data.json: ${err}`);
     }
 }

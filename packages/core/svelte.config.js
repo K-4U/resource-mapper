@@ -4,25 +4,27 @@ import { fileURLToPath } from 'node:url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const outDir = process.env.MAPPER_BUILD_OUT || 'build';
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
 		adapter: adapter({
-			pages: 'build',
-			assets: 'build',
+			pages: outDir,
+			assets: outDir,
 			fallback: "index.html",
 			precompress: true,
 			strict: true
 		}),
 		prerender: {
 			entries: ['*']
-		}
-	},
-	resolve: {
+		},
 		alias: {
 			$shared: path.resolve(dirname, '../shared/src'),
-		},
+		}
 	}
 };
+
+console.log(config);
 
 export default config;

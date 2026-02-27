@@ -1,0 +1,9 @@
+friendlyName: "DynamoDB Users Table"
+description: |
+  DynamoDB table storing user profiles and session data with global secondary indexes.
+  
+  Provides single-digit millisecond latency for user lookups and session management.
+  Configured with on-demand capacity and point-in-time recovery enabled.
+serviceType: DYNAMODB
+outgoingConnections: []
+

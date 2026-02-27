@@ -10,4 +10,9 @@ declare global {
 	}
 }
 
+declare module 'virtual:mapper-data' {
+	const data: any; //TODO: Figure out what this type needs to be
+	export default data;
+}
+
 export {};

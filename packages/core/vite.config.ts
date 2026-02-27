@@ -1,47 +1,30 @@
 /// <reference types="vitest/config" />
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vitest/config';
-import { playwright } from '@vitest/browser-playwright';
-import { sveltekit } from '@sveltejs/kit/vite';
+import {defineConfig} from 'vitest/config';
+import {playwright} from '@vitest/browser-playwright';
+import {sveltekit} from '@sveltejs/kit/vite';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import {fileURLToPath} from 'node:url';
+import {viteStaticCopy} from 'vite-plugin-static-copy';
 import fs from "node:fs";
-import { runBake } from '@mapper/engine/bake-logic';
-import { normalizePath } from 'vite';
+import {normalizePath} from 'vite';
+import {mapperDataPlugin} from "./plugins/mapper-data-plugin";
+
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
-const wasmPath = normalizePath(path.resolve(dirname, '../../node_modules/libavoid-js/dist/libavoid.wasm'));
+const wasmPath = normalizePath(path.resolve(dirname, '../../node_modules/libavoid-js/dist/libavoid.wasm')); //TODO: make me dynamic
 if (!fs.existsSync(wasmPath)) {
   throw new Error(`libavoid.wasm not found at ${wasmPath}. Please ensure libavoid-js is installed.`);
 }
 
+console.log('Dir path:', dirname);
+
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    sveltekit(),
-    {
-      name: 'data-bake-plugin',
-      async buildStart() {
-        console.log('[Vite] Initializing Data Bake...');
-        try {
-          await runBake();
-          console.log('[Vite] Data Bake Successful.');
-        } catch (err) {
-          console.error('[Vite] Data Bake Failed:', err);
-        }
-      },
-      async handleHotUpdate({ file, server }) {
-        if (file.endsWith('.yaml')) {
-          console.log(`[Vite] YAML change detected: ${file}. Re-baking...`);
-          try {
-            await runBake();
-            server.ws.send({ type: 'full-reload' });
-          } catch (err) {
-            console.error('[Vite] Re-bake failed:', err);
-          }
-        }
-      }
-    },
+    mapperDataPlugin(),
+    sveltekit({
+      configFile: path.resolve(dirname, 'svelte.config.js')
+    }),
     viteStaticCopy({
       targets: [
         {
@@ -51,6 +34,11 @@ export default defineConfig({
       ]
     })
   ],
+  server: {
+    fs: {
+      allow: ['.']
+    }
+  },
   optimizeDeps: {
     exclude: ['libavoid-js']
   },

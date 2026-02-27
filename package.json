@@ -10,5 +10,8 @@
 		"dev": "npm run dev -w @mapper/core",
 		"build": "npm run build -w @mapper/core",
 		"postinstall": "npm run download-icons -w @mapper/core"
+	},
+	"dependencies": {
+		"chokidar": "^5.0.0"
 	}
 }

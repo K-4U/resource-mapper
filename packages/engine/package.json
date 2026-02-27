@@ -1,12 +1,23 @@
 {
   "name": "@mapper/engine",
-  "version": "0.0.1",
+  "version": "0.0.34",
   "type": "module",
-  "dependencies": { "@mapper/shared": "*" },
+  "dependencies": {
+    "@mapper/shared": "*",
+    "execa": "^5.1.1",
+    "zod": "^4.3.6"
+  },
   "exports": {
     "./bake-logic": "./src/scripts/bake-logic.js"
   },
+  "bin": {
+    "mapper-engine": "./dist/cli.js"
+  },
   "scripts": {
+    "build": "tsup",
     "download-icons": "tsx src/scripts/download-aws-icons.ts"
+  },
+  "devDependencies": {
+    "tsup": "^7.0.0"
   }
 }

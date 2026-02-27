@@ -1,6 +1,6 @@
 import yaml from 'js-yaml'
 import { validateTeam, type Team } from '@mapper/shared'
-import { YamlEntityService } from './YamlEntityService.ts'
+import { YamlEntityService } from './YamlEntityService.js'
 
 export class TeamsService extends YamlEntityService<Team> {
   constructor(initialFiles: Record<string, string>) {

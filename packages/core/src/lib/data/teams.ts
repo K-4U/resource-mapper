@@ -1,5 +1,5 @@
 import type { Team } from '$lib/types'
-import bakedData from '$lib/generated/data.json'
+import bakedData from 'virtual:mapper-data'
 
 export async function getAllTeams(): Promise<Record<string, Team>> {
   return bakedData.teams as Record<string, Team>;

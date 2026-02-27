@@ -1,5 +1,5 @@
 import type { GroupInfo } from '$lib/types'
-import bakedData from '$lib/generated/data.json'
+import bakedData from 'virtual:mapper-data'
 
 export async function getAllGroups(): Promise<Record<string, GroupInfo>> {
   return bakedData.groups as Record<string, GroupInfo>;

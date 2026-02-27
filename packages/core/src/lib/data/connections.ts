@@ -1,5 +1,5 @@
 import type { GroupConnection } from '$lib/types'
-import bakedData from '$lib/generated/data.json'
+import bakedData from 'virtual:mapper-data'
 
 export async function getConnectionsFromGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {
   if (!groupId) return []

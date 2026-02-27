@@ -1,0 +1,15 @@
+{
+  "name": "my-test-map",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "mapper-engine",
+    "dev": "mapper-engine dev",
+    "build": "mapper-engine build"
+  },
+  "dependencies": {
+    "@mapper/engine": "workspace:*",
+    "@mapper/core": "workspace:*"
+  }
+}

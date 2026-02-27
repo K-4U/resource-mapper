@@ -1,5 +1,5 @@
 import type { ExternalGroupServices, ServiceDefinition } from '$lib/types'
-import bakedData from '$lib/generated/data.json'
+import bakedData from 'virtual:mapper-data'
 
 export async function getServicesByGroup(groupId: string | null | undefined): Promise<ServiceDefinition[]> {
   if (!groupId) return []

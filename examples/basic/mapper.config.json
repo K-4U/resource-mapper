@@ -1,0 +1,9 @@
+{
+  "build": {
+    "outDir": "./build-output"
+  },
+  "site": {
+    "title": "My AWS Infrastructure",
+    "logo": "/logo.png"
+  }
+}
