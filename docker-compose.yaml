@@ -5,4 +5,4 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./packages/core/build/:/usr/share/nginx/html
+      - ./packages/core/build-output/:/usr/share/nginx/html

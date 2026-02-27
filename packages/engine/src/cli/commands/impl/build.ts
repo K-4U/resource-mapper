@@ -1,6 +1,7 @@
 import {BaseCommand} from '../base.js';
 import {logger} from '../../utils/logger.js';
 import {bakeOrExit, getOutputPath} from '../../utils/bake-util.js';
+import path from "node:path";
 
 export class BuildCommand extends BaseCommand {
   protected viteProc?: import('node:child_process').ChildProcess;
@@ -15,7 +16,7 @@ export class BuildCommand extends BaseCommand {
 
     this.viteProc = this.launcher.launch('build', {
       VITE_MAPPER_DATA: getOutputPath(),
-      MAPPER_BUILD_OUT: this.config.build.outDir,
+      MAPPER_BUILD_OUT: path.resolve(process.cwd(), this.config.build.outDir),
     });
     this.setupCleanup();
   }
