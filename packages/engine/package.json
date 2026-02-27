@@ -2,6 +2,7 @@
   "name": "@mapper/engine",
   "version": "0.0.37",
   "type": "module",
+  "license": "MIT",
   "dependencies": {
     "@mapper/shared": "*",
     "execa": "^5.1.1",
