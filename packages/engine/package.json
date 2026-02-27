@@ -19,6 +19,6 @@
     "download-icons": "tsx src/scripts/download-aws-icons.ts"
   },
   "devDependencies": {
-    "tsup": "^7.0.0"
+    "tsup": "^8.5.1"
   }
 }
