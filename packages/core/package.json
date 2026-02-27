@@ -5,7 +5,7 @@
   "dependencies": {
     "@mapper/shared": "*",
     "@mapper/engine": "*",
-    "@xyflow/svelte": "^1.5.0",
+    "@xyflow/svelte": "^1.5.1",
     "adm-zip": "^0.5.16",
     "elkjs": "^0.11.0",
     "libavoid-js": "^0.5.0-beta.3",
