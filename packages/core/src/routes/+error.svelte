@@ -1,5 +1,5 @@
 <script lang="ts">
-import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
+import {ErrorDisplay} from '$lib/components';
 import { page } from '$app/stores';
 
 let { error, status } = $props<{ error: Error; status: number }>();

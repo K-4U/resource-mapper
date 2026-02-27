@@ -1,9 +1,22 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": [
+    "../../tsconfig.base.json",
+    "./.svelte-kit/tsconfig.json"
+  ],
   "compilerOptions": {
-    "outDir": "dist",
-    "module": "NodeNext"
+    "outDir": "dist"
   },
-  "include": ["src"],
-  "references": [{ "path": "../shared" }, { "path": "../engine" }]
+  "include": [
+    "src",
+    ".",
+    "src/app.d.ts"
+  ],
+  "references": [
+    {
+      "path": "../shared"
+    },
+    {
+      "path": "../engine"
+    }
+  ]
 }

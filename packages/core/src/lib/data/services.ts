@@ -1,4 +1,4 @@
-import type { ExternalGroupServices, ServiceDefinition } from '$lib/types'
+import type { ExternalGroupServices, ServiceDefinition } from '$shared/types'
 import bakedData from 'virtual:mapper-data'
 
 export async function getServicesByGroup(groupId: string | null | undefined): Promise<ServiceDefinition[]> {

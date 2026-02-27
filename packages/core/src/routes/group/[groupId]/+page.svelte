@@ -1,13 +1,8 @@
 <script lang="ts">
     import type {PageData} from './$types'
-    import type {GroupInfo, ServiceDefinition, ExternalGroupServices, Team} from '$lib/types'
-    import FlowCanvas from '$lib/components/FlowCanvas.svelte'
-    import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
-    import LoadingOverlay from '$lib/components/LoadingOverlay.svelte'
-    import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
-    import EmptyState from '$lib/components/EmptyState.svelte'
-    import ServiceDetailSidebar from '$lib/components/ServiceDetailSidebar.svelte'
-    import type {FlowGraphInput} from '$lib/utils/flow/types'
+    import type {ExternalGroupServices, GroupInfo, ServiceDefinition} from '$shared/types'
+    import {FlowCanvas, LoadingOverlay, ErrorDisplay, EmptyState, ServiceDetailSidebar} from '$lib/components';
+    import type {FlowGraphInput} from '$shared/flow-types'
     import {buildGroupServicesGraph} from '$lib/utils/flow/servicesGraph'
     import {goto} from '$app/navigation'
     import {SvelteFlowProvider} from '@xyflow/svelte';

@@ -1,5 +1,4 @@
-import type {GroupConnection} from '$lib/types'
-import {type Edge, type InternalNode, type Node, Position} from "@xyflow/svelte";
+import type {GroupConnection} from '$shared/types'
 
 const sanitizeRegEx = /[^a-zA-Z0-9_]/g
 
@@ -13,7 +12,3 @@ export const formatConnectionLabel = (connectionCount: number) =>
 
 export const createGraphSignature = (namespace: string, payload: unknown) =>
     `${namespace}:${JSON.stringify(payload)}`
-
-export const mapConnectionsToSignaturePayload = (connections: GroupConnection[]) =>
-    connections.map(({sourceGroup, targetGroup, connectionCount}) => ({sourceGroup, targetGroup, connectionCount}))
-

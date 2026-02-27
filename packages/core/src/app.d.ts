@@ -10,9 +10,22 @@ declare global {
 	}
 }
 
-declare module 'virtual:mapper-data' {
-	const data: any; //TODO: Figure out what this type needs to be
-	export default data;
+console.log('Adding virtual:mapper-data module declaration');
+declare global {
+	declare module 'virtual:mapper-data' {
+		import type {GroupInfo, GroupConnection, ServiceDefinition, ExternalGroupServices, Team} from '$shared/types';
+
+		const bakedData: {
+			groups: Record<string, GroupInfo>;
+			services: Record<string, ServiceDefinition>;
+			teams: Record<string, Team>;
+			groupConnections: GroupConnection[];
+			servicesByGroup: Record<string, ServiceDefinition[]>;
+			externalServices: Record<string, ExternalGroupServices[]>;
+			generatedAt: Date
+		}
+		export default bakedData;
+	}
 }
 
 export {};

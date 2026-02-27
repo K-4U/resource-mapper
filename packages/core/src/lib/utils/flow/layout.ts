@@ -1,6 +1,6 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
 import {type Edge, type Node} from '@xyflow/svelte';
-import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$lib/utils/flow/types';
+import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$shared/flow-types';
 import type {ElkNode} from "elkjs/lib/elk-api";
 
 const elk = new ELK();

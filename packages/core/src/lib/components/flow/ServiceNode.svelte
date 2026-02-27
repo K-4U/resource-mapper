@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {FlowNodeData} from '$lib/utils/flow/types'
+    import type {FlowNodeData} from '$shared/flow-types'
     import {Handle, type NodeProps, Position, type Node} from '@xyflow/svelte'
     import {getAwsIconPath} from '$lib/utils/awsIcons'
 

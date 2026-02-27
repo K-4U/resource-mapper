@@ -1,10 +1,6 @@
 <script lang="ts">
     import type {PageData} from './$types'
-    import FlowCanvas from '$lib/components/FlowCanvas.svelte'
-    import GroupDetailSidebar from '$lib/components/GroupDetailSidebar.svelte'
-    import LoadingSpinner from '$lib/components/LoadingSpinner.svelte'
-    import EmptyState from '$lib/components/EmptyState.svelte'
-    import ErrorDisplay from '$lib/components/ErrorDisplay.svelte'
+    import {FlowCanvas, GroupDetailSidebar, LoadingSpinner, EmptyState, ErrorDisplay} from '$lib/components'
     import {buildGroupOverviewGraph} from '$lib/utils/flow/groupOverviewGraph'
     import {goto, invalidateAll} from '$app/navigation'
     import {SvelteFlowProvider} from "@xyflow/svelte";

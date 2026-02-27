@@ -3,8 +3,8 @@
     import {
         Background,
         BackgroundVariant,
-        Controls,
         ControlButton,
+        Controls,
         type Edge,
         type EdgeTypes,
         MiniMap,
@@ -13,18 +13,13 @@
         Panel,
         SvelteFlow
     } from '@xyflow/svelte'
-    import Legend from '$lib/components/Legend.svelte'
+    import {ExternalNode, Legend, MainGroupNode, ServiceGroupNode, ServiceNode, SnakeEdge} from '$lib/components'
     import {layoutFlowGraph} from '$lib/utils/flow/layout'
-    import type {FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
-    import MainGroupNode from '$lib/components/flow/MainGroupNode.svelte'
-    import ServiceNode from '$lib/components/flow/ServiceNode.svelte'
-    import ExternalNode from '$lib/components/flow/ExternalNode.svelte'
+    import type {FlowGraphInput} from '$shared/flow-types'
     import {logDiagramAction, showLegend} from '$lib/stores/diagram';
-    import ServiceGroupNode from "$lib/components/flow/ServiceGroupNode.svelte";
-    import SnakeEdge from "$lib/components/flow/SnakeEdge.svelte";
     import Icon from "@iconify/svelte";
     import {goto} from "$app/navigation";
-    import { theme } from '$lib/state/theme.svelte';
+    import {theme} from '$lib/state/theme.svelte';
 
     const DOUBLE_CLICK_THRESHOLD = 400
 

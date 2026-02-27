@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import type {FlowNodeData} from '$lib/utils/flow/types'
+    import type {FlowNodeData} from '$shared/flow-types'
     import {type Node, type NodeProps} from '@xyflow/svelte'
 
     let {

@@ -1,12 +1,10 @@
 <script lang="ts">
-    import type {Team} from '$lib/types'
+    import type {Team} from '$shared/types'
     import Icon from '@iconify/svelte'
     import {getTeam} from "$lib/data/teams";
-    import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
-    import GenericSidebarCard from "$lib/components/GenericSidebarCard.svelte";
+    import {LoadingSpinner, GenericSidebarCard} from "$lib/components";
     import { slide } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
-
 
     const {teamId, classes} = $props<{ teamId: string, classes?: string }>();
 

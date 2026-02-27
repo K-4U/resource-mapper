@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildGroupServicesGraph } from './servicesGraph'
-import { ConnectionType, ServiceType, type GroupInfo, type ServiceDefinition } from '$lib/types'
+import { ConnectionType, ServiceType, type GroupInfo, type ServiceDefinition } from '$shared/types'
 
 describe('servicesGraph', () => {
   const currentGroup: GroupInfo = {

@@ -1,0 +1,13 @@
+friendlyName: "EC2 core machine"
+description: |
+    This is the EC2 machine that runs the core services of our cluster. It is responsible for running the main application and handling all the traffic. It is also responsible for running the database and caching services that are used by the main application.
+    It's so legacy, it's not even fun anymore
+serviceType: EC2
+outgoingConnections:
+  - targetIdentifier: "data/rds-postgres"
+    description: "PostgreSQL database for inventory persistence"
+    connectionType: TCP
+  - targetIdentifier: "data/redis"
+    description: "Redis cache for high-frequency inventory lookups"
+    connectionType: TCP
+

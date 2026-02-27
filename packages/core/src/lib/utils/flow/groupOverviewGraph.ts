@@ -1,5 +1,5 @@
-import type {GroupConnection, GroupInfo} from '$lib/types'
-import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
+import type {GroupConnection, GroupInfo} from '$shared/types'
+import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$shared/flow-types'
 import {createGraphSignature, formatConnectionLabel, sanitizeNodeId} from '$lib/utils/flow/helpers'
 import type {Edge, Node} from "@xyflow/svelte"
 

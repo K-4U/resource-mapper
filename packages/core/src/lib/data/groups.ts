@@ -1,4 +1,4 @@
-import type { GroupInfo } from '$lib/types'
+import type { GroupInfo } from '$shared/types'
 import bakedData from 'virtual:mapper-data'
 
 export async function getAllGroups(): Promise<Record<string, GroupInfo>> {

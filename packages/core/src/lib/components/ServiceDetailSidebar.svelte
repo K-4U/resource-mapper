@@ -1,14 +1,10 @@
 <script lang="ts">
     import TeamContactCard from '$lib/components/TeamContactCard.svelte'
     import {useNodes, useOnSelectionChange} from "@xyflow/svelte";
-    import type {GroupInfo, ServiceDefinition} from "$lib/types";
+    import type {GroupInfo, ServiceDefinition} from "$shared/types";
     import {getAwsIconPath} from "$lib/utils/awsIcons";
-    import GenericSidebarCard from "$lib/components/GenericSidebarCard.svelte";
-    import {selectedGroup} from "$lib/stores/diagram";
+    import {GenericSidebarCard} from "$lib/components";
     import {getGroup} from "$lib/data/groups";
-
-    let selectedNodes = [];
-    let selectedEdges = [];
 
     const nodes = useNodes();
     let selectedNode = $derived(nodes.current.find((node) => node.selected));

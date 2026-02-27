@@ -1,8 +1,7 @@
 <script lang="ts">
-    import type {FlowNodeData} from '$lib/utils/flow/types'
-    import {Handle, type NodeProps, Position, type Node} from '@xyflow/svelte'
+    import type {FlowNodeData} from '$shared/flow-types'
+    import {Handle, type Node, type NodeProps, Position} from '@xyflow/svelte'
     import {goto} from '$app/navigation'
-    import Icon from "@iconify/svelte";
 
     let {
         data,

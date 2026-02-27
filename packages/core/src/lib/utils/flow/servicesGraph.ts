@@ -7,8 +7,8 @@ import {
     type ServiceDefinition,
     type ServiceIncomingLink,
     type ServiceLink
-} from '$lib/types'
-import type {FlowEdgeData, FlowNodeData, ServicesGraphResult,} from '$lib/utils/flow/types'
+} from '$shared/types'
+import type {FlowEdgeData, FlowNodeData, ServicesGraphResult,} from '$shared/flow-types'
 import {createGraphSignature} from '$lib/utils/flow/helpers'
 import {getServiceNodeIdFromDefinition} from '$lib/utils/flow/serviceIds'
 import type {Edge, Node} from "@xyflow/svelte";

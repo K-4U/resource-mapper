@@ -1,6 +1,6 @@
-import { writable } from 'svelte/store';
-import type { XYPosition } from '@xyflow/svelte';
-import { AvoidLib, type Avoid, type Router, type ShapeRef, type ConnRef } from 'libavoid-js';
+import {writable} from 'svelte/store';
+import type {XYPosition} from '@xyflow/svelte';
+import {type Avoid, AvoidLib, type ConnRef, type Router, type ShapeRef} from 'libavoid-js';
 import {OFFSET_STEP} from "$lib/utils/flow/layout";
 
 // --- Types ---

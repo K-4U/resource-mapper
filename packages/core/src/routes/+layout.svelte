@@ -1,11 +1,10 @@
 <script lang="ts">
-    import Header from '$lib/components/Header.svelte';
-    import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
+    import {Header, LoadingOverlay} from '$lib/components';
     import {navigating} from '$app/state';
     import './layout.css';
     import '../app.css';
     import favicon from '$lib/assets/favicon.svg';
-    import { theme } from '$lib/state/theme.svelte';
+    import {theme} from '$lib/state/theme.svelte';
 
     let { children } = $props();
 

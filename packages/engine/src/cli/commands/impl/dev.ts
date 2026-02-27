@@ -16,7 +16,7 @@ export class DevCommand extends BaseCommand {
     await bakeOrExit();
     logger.success('Bake complete. Launching Vite dev server...');
 
-    this.watcher = chokidar.watch(path.join(getDataDir(), '**/*.yaml'), { ignoreInitial: true });
+    this.watcher = chokidar.watch(getDataDir(), { ignoreInitial: true }); //Just watch the entire data dir
     this.watcher.on('all', async () => {
       await bakeOrExit(); //This will update the output JSON file, which Vite should pick up and trigger a reload. We don't need to do anything else here.
     });

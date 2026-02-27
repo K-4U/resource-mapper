@@ -3,7 +3,7 @@ import {error} from '@sveltejs/kit'
 import {getGroup} from '$lib/data/groups'
 import {getExternalServicesForGroup, getServicesByGroup} from '$lib/data/services'
 import {getAllTeams} from '$lib/data/teams'
-import type {GroupInfo} from "$lib/types";
+import type {GroupInfo} from "$shared/types";
 import {getConnectionsFromGroup, getConnectionsToGroup} from "$lib/data/connections";
 
 export const load: PageLoad = async ({params}) => {

@@ -1,4 +1,4 @@
-import type { GroupConnection } from '$lib/types'
+import type { GroupConnection } from '$shared/types'
 import bakedData from 'virtual:mapper-data'
 
 export async function getConnectionsFromGroup(groupId: string | null | undefined): Promise<GroupConnection[]> {

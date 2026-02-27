@@ -1,7 +1,5 @@
-// Types exactly matching Java Spring Boot models
-// DO NOT DEVIATE from the Spring Boot model structure
+//TODO: Move some of the validation logic into the bake utils
 
-// Enums matching Java enums exactly
 export const ConnectionType = {
   TCP: 'TCP',
   PUBLISHES: 'PUBLISHES',

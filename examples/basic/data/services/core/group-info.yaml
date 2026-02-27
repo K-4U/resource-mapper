@@ -1,0 +1,5 @@
+name: "Core Services"
+description: |
+  Holds a bunch of services that are really important to the core functioning of the cluster. These are all services that we run in production, and we want to make sure they are well maintained and monitored.
+teamId: "cloud-shepherds"
+

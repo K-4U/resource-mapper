@@ -1,7 +1,7 @@
-import type { PageLoad } from './$types'
-import { getAllGroups } from '$lib/data/groups'
-import { getAllGroupConnections } from '$lib/data/connections'
-import { getAllTeams } from '$lib/data/teams'
+import type {PageLoad} from './$types'
+import {getAllGroups} from '$lib/data/groups'
+import {getAllGroupConnections} from '$lib/data/connections'
+import {getAllTeams} from '$lib/data/teams'
 import {selectedGroup} from "$lib/stores/diagram";
 
 export const load: PageLoad = async () => {

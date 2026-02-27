@@ -1,8 +1,7 @@
 <script lang="ts">
-    import type {GroupInfo} from '$lib/types'
-    import TeamContactCard from '$lib/components/TeamContactCard.svelte'
+    import type {GroupInfo} from '$shared/types'
+    import {TeamContactCard, GenericSidebarCard} from '$lib/components'
     import {useNodes} from '@xyflow/svelte';
-    import GenericSidebarCard from "$lib/components/GenericSidebarCard.svelte";
 
     const {groupMap, groups} = $props<{
         groupMap: Record<string, string>;
