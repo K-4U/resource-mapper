@@ -1,5 +1,5 @@
 import yaml from 'js-yaml'
-import { validateTeam, type Team } from '@mapper/shared'
+import { validateTeam, type Team } from '@resource-mapper/shared'
 import { YamlEntityService } from './YamlEntityService.js'
 import {logger} from "../cli/utils/logger.js";
 

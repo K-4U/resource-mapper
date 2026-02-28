@@ -1,5 +1,5 @@
 import yaml from 'js-yaml'
-import {type GroupInfo, validateGroupInfo} from '@mapper/shared'
+import {type GroupInfo, validateGroupInfo} from '@resource-mapper/shared'
 import {YamlEntityService} from './YamlEntityService.js'
 import {logger} from "../cli/utils/logger.js";
 

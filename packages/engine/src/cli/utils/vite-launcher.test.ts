@@ -46,7 +46,7 @@ async function getMocks() {
 async function setupHappyPath() {
   const { fs } = await getMocks();
   mockReq.resolve.mockImplementation((id: string) => {
-    if (id === '@mapper/core/package.json') return '/mock/core/package.json';
+    if (id === '@resource-mapper/core/package.json') return '/mock/core/package.json';
     if (id === 'vite/package.json') return '/mock/node_modules/vite/package.json';
     throw new Error('not found');
   });
@@ -77,7 +77,7 @@ describe('ViteLauncher', () => {
   // ─── resolveTemplateRoot ──────────────────────────────────────────────────
 
   describe('resolveTemplateRoot (via launch)', () => {
-    it('resolves @mapper/core package path and passes its dirname as cwd to execa', async () => {
+    it('resolves @resource-mapper/core package path and passes its dirname as cwd to execa', async () => {
       const { execa } = await getMocks();
 
       const result = launcher.launch('dev', {});
@@ -88,7 +88,7 @@ describe('ViteLauncher', () => {
       expect(callArgs[2].cwd).toBe('/mock/core');
     });
 
-    it('calls logger.error and process.exit(1) when @mapper/core cannot be resolved', async () => {
+    it('calls logger.error and process.exit(1) when @resource-mapper/core cannot be resolved', async () => {
       const { fs } = await getMocks();
       // Override: core resolution throws
       mockReq.resolve.mockImplementation(() => { throw new Error('not installed'); });
@@ -98,7 +98,7 @@ describe('ViteLauncher', () => {
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => { throw new Error('process.exit'); });
 
       expect(() => launcher.launch('dev', {})).toThrow('process.exit');
-      expect(errorSpy).toHaveBeenCalledWith('Could not find @mapper/core. Is it installed?');
+      expect(errorSpy).toHaveBeenCalledWith('Could not find @resource-mapper/core. Is it installed?');
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
@@ -134,7 +134,7 @@ describe('ViteLauncher', () => {
       const { fs, execa } = await getMocks();
       // vite/package.json resolution throws → no resolved path
       mockReq.resolve.mockImplementation((id: string) => {
-        if (id === '@mapper/core/package.json') return '/mock/core/package.json';
+        if (id === '@resource-mapper/core/package.json') return '/mock/core/package.json';
         throw new Error('not found');
       });
       (fs.existsSync as ReturnType<typeof vi.fn>).mockReturnValue(false);

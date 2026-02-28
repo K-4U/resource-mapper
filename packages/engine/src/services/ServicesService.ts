@@ -6,7 +6,7 @@ import {
   type GroupInfo,
   type ServiceDefinition,
   type ServiceIncomingLink
-} from '@mapper/shared'
+} from '@resource-mapper/shared'
 import { YamlEntityService } from './YamlEntityService.js'
 import type { GroupService } from './GroupService.js'
 import {logger} from "../cli/utils/logger.js";
@@ -58,7 +58,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
 
   // Prepare will fetch all entities and populate incoming connections once.
   public async prepare(): Promise<Record<string, ServiceDefinition>> {
-    const all = await this.fetchAllEntities()
+    await this.fetchAllEntities()
     return this.ensureIncomingConnectionsPopulated()
   }
 
