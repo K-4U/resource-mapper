@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { __setGroupFileMocks, groupService } from 'scripts/services/GroupService'
+import { GroupService } from '../GroupService.js'
 
 const buildPath = (groupId: string) => `../../../data/services/${groupId}/group-info.yaml`
 
+let groupService: GroupService
+
+function resetMocks(mocks: Record<string, string> = {}) {
+  groupService = new GroupService(mocks)
+}
+
 describe('ResourceService', () => {
   beforeEach(() => {
-    __setGroupFileMocks({})
+    resetMocks()
   })
 
   it('parses group metadata from YAML files', async () => {
-    __setGroupFileMocks({
+    resetMocks({
       [buildPath('api')]: 'name: API Services\ndescription: Core entrypoints\nteamId: cloud-core\n'
     })
 
@@ -25,7 +31,7 @@ describe('ResourceService', () => {
   })
 
   it('returns all discovered groups keyed by folder name', async () => {
-    __setGroupFileMocks({
+    resetMocks({
       [buildPath('api')]: 'name: API\ndescription: Public APIs\nteamId: api\n',
       [buildPath('data')]: 'name: Data Platform\ndescription: Shared data\nteamId: data\n'
     })
@@ -39,8 +45,8 @@ describe('ResourceService', () => {
   })
 
   it('returns null when a group folder is missing', async () => {
+    resetMocks({})
     const group = await groupService.getGroup('missing')
     expect(group).toBeNull()
   })
 })
-

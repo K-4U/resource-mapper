@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ServicesService } from '../ServicesService.js'
+import type { ServiceType } from '@mapper/shared'
 
 const resourceServiceMock = vi.hoisted(() => ({
   getGroup: vi.fn()
@@ -8,18 +10,23 @@ vi.mock('$lib/services/ResourceService', () => ({
   resourceService: resourceServiceMock
 }))
 
-import { __setServiceFileMocks, servicesService } from 'scripts/services/ServicesService'
-
 const servicePath = (groupId: string, file: string) => `../../../data/services/${groupId}/${file}.yaml`
+
+let servicesService: ServicesService
+
+function resetMocks(mocks: Record<string, string> = {}) {
+  servicesService = new ServicesService()
+  servicesService.__setServiceFileMocks(mocks)
+}
 
 describe('ServicesService', () => {
   beforeEach(() => {
-    __setServiceFileMocks({})
+    resetMocks()
     resourceServiceMock.getGroup.mockReset()
   })
 
   it('loads a single service definition by group and identifier', async () => {
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'gateway')]: 'friendlyName: API Gateway\nserviceType: API_GATEWAY\ndescription: Main entry\n'
     })
 
@@ -37,7 +44,7 @@ describe('ServicesService', () => {
   })
 
   it('returns all services for a group', async () => {
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'gateway')]: 'friendlyName: API Gateway\nserviceType: API_GATEWAY\n',
       [servicePath('api', 'users')]: 'friendlyName: Users\nserviceType: LAMBDA\n',
       [servicePath('data', 'warehouse')]: 'friendlyName: Warehouse\nserviceType: REDSHIFT\n'
@@ -45,7 +52,7 @@ describe('ServicesService', () => {
 
     const services = await servicesService.getServicesByGroup('api')
 
-    expect(services.map(s => s.identifier).sort()).toEqual(['gateway', 'users'])
+    expect(services.map((s: ServiceType) => s.identifier).sort()).toEqual(['gateway', 'users'])
   })
 
   it('returns null for unknown services', async () => {
@@ -61,7 +68,7 @@ describe('ServicesService', () => {
       groupName: groupId
     }))
 
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'gateway')]: `friendlyName: API Gateway\nserviceType: API_GATEWAY\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: data/warehouse\n    description: Calls warehouse\n`,
       [servicePath('api', 'payments')]: 'friendlyName: Payments\nserviceType: LAMBDA\n',
       [servicePath('data', 'warehouse')]: `friendlyName: Warehouse\nserviceType: REDSHIFT\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: api/payments\n    description: Calls payments\n`
@@ -86,7 +93,7 @@ describe('ServicesService', () => {
   })
 
   it('populates incoming connections on target services', async () => {
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'payments')]: 'friendlyName: Payments\nserviceType: LAMBDA\n',
       [servicePath('data', 'warehouse')]: `friendlyName: Warehouse\nserviceType: REDSHIFT\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: api/payments\n    description: Calls payments\n`
     })
@@ -104,7 +111,7 @@ describe('ServicesService', () => {
 
   it('returns both incoming and outgoing entries when the same service has bidirectional links to the same external service', async () => {
     // Same internal service participates in both directions with the same external service
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'lambda-orders')]: `friendlyName: Order Processing Lambda\nserviceType: LAMBDA\noutgoingConnections:\n  - connectionType: TCP\n    targetIdentifier: data/rds-postgres\n    description: orders -> rds\n`,
       [servicePath('data', 'rds-postgres')]: `friendlyName: RDS Postgres\nserviceType: RDS\noutgoingConnections:\n  - connectionType: TCP\n    targetIdentifier: api/lambda-orders\n    description: rds -> orders\n`
     })
@@ -112,18 +119,18 @@ describe('ServicesService', () => {
     const result = await servicesService.getExternalServicesForGroup('api')
 
     // Expect one outgoing entry for group 'data' that includes rds-postgres
-    const outEntry = result.find(e => e.direction === 'outgoing' && e.group.groupName === 'data')
+    const outEntry = result.find((e: any) => e.direction === 'outgoing' && e.group.groupName === 'data')
     expect(outEntry).toBeTruthy()
-    expect(outEntry?.services.some(s => s.identifier === 'rds-postgres')).toBe(true)
+    expect(outEntry?.services.some((s: any) => s.identifier === 'rds-postgres')).toBe(true)
 
     // And one incoming entry for group 'data' that includes rds-postgres
-    const inEntry = result.find(e => e.direction === 'incoming' && e.group.groupName === 'data')
+    const inEntry = result.find((e: any) => e.direction === 'incoming' && e.group.groupName === 'data')
     expect(inEntry).toBeTruthy()
-    expect(inEntry?.services.some(s => s.identifier === 'rds-postgres')).toBe(true)
+    expect(inEntry?.services.some((s: any) => s.identifier === 'rds-postgres')).toBe(true)
   })
 
   it("rejects legacy brace-based target identifiers", async () => {
-    __setServiceFileMocks({
+    servicesService.__setServiceFileMocks({
       [servicePath('api', 'gateway')]: `friendlyName: API Gateway\nserviceType: API_GATEWAY\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: warehouse{data}\n    description: Calls warehouse\n`
     })
 

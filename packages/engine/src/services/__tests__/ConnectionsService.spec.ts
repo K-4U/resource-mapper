@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { connectionsService } from 'scripts/services/ConnectionsService'
-import { __setServiceFileMocks } from 'scripts/services/ServicesService'
+import { ConnectionsService } from '../ConnectionsService.ts'
+import { ServicesService } from '../ServicesService.ts'
+import type { ServiceConnection, GroupConnection } from '@mapper/shared'
 
 const servicePath = (groupId: string, file: string) => `../../../data/services/${groupId}/${file}.yaml`
 
@@ -20,13 +21,18 @@ const multiCountMocks: Record<string, string> = {
   [servicePath('api', 'processor')]: `friendlyName: API Processor\nserviceType: LAMBDA\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: frontend/site\n    description: Secondary path\n`
 }
 
+let servicesService: ServicesService
+let connectionsService: ConnectionsService
+
 function resetMocks(mocks = baseMocks) {
-  __setServiceFileMocks(mocks)
-  connectionsService.__reset()
+  servicesService.__setServiceFileMocks(mocks)
+  connectionsService = new ConnectionsService(servicesService)
 }
 
 describe('ConnectionsService', () => {
   beforeEach(() => {
+    servicesService = new ServicesService()
+    connectionsService = new ConnectionsService(servicesService)
     resetMocks()
   })
 
@@ -35,7 +41,7 @@ describe('ConnectionsService', () => {
     expect(connections).toHaveLength(2)
     expect(
       connections
-        .map(conn => `${conn.targetService.groupId}/${conn.targetService.serviceId}`)
+        .map((conn: ServiceConnection) => `${conn.targetService.groupId}/${conn.targetService.serviceId}`)
         .sort()
     ).toEqual(['data/warehouse', 'frontend/site'])
   })
@@ -45,7 +51,7 @@ describe('ConnectionsService', () => {
     expect(connections).toHaveLength(2)
     expect(
       connections
-        .map(conn => `${conn.startService.groupId}/${conn.startService.serviceId}`)
+        .map((conn: ServiceConnection) => `${conn.startService.groupId}/${conn.startService.serviceId}`)
         .sort()
     ).toEqual(['api/gateway', 'data/warehouse'])
   })
@@ -53,15 +59,15 @@ describe('ConnectionsService', () => {
   it('returns outgoing connections for a group', async () => {
     const connections = await connectionsService.getConnectionsFromGroup('api')
     expect(connections).toHaveLength(2)
-    expect(new Set(connections.map(conn => conn.sourceGroup))).toEqual(new Set(['api']))
-    expect(new Set(connections.map(conn => conn.targetGroup))).toEqual(new Set(['data', 'frontend']))
+    expect(new Set(connections.map((conn: GroupConnection) => conn.sourceGroup))).toEqual(new Set(['api']))
+    expect(new Set(connections.map((conn: GroupConnection) => conn.targetGroup))).toEqual(new Set(['data', 'frontend']))
   })
 
   it('returns incoming connections for a group', async () => {
     const connections = await connectionsService.getConnectionsToGroup('frontend')
     expect(connections).toHaveLength(2)
-    expect(new Set(connections.map(conn => conn.targetGroup))).toEqual(new Set(['frontend']))
-    expect(new Set(connections.map(conn => conn.sourceGroup))).toEqual(new Set(['api', 'data']))
+    expect(new Set(connections.map((conn: GroupConnection) => conn.targetGroup))).toEqual(new Set(['frontend']))
+    expect(new Set(connections.map((conn: GroupConnection) => conn.sourceGroup))).toEqual(new Set(['api', 'data']))
   })
 
   it('filters self-loop connections by default but can include them', async () => {
@@ -78,7 +84,7 @@ describe('ConnectionsService', () => {
   it('aggregates group connections with accurate counts', async () => {
     resetMocks(multiCountMocks)
     const summary = await connectionsService.getAllGroupConnections()
-    const lookup = summary.reduce<Record<string, number>>((acc, edge) => {
+    const lookup = summary.reduce<Record<string, number>>((acc: Record<string, number>, edge: GroupConnection) => {
       acc[`${edge.sourceGroup}->${edge.targetGroup}`] = edge.connectionCount
       return acc
     }, {})
@@ -88,4 +94,3 @@ describe('ConnectionsService', () => {
     expect(lookup['data->frontend']).toBe(1)
   })
 })
-

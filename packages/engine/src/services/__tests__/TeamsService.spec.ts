@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { __setTeamFileMocks, teamsService } from 'scripts/services/TeamsService'
+import { TeamsService } from '../TeamsService.ts'
 
 const buildTeamPath = (teamId: string) => `../../../data/teams/${teamId}.yaml`
 
+let teamsService: TeamsService
+
+function resetMocks(mocks: Record<string, string> = {}) {
+  teamsService = new TeamsService(mocks)
+}
+
 describe('TeamsService', () => {
   beforeEach(() => {
-    __setTeamFileMocks({})
+    resetMocks()
   })
 
   it('returns team information for a given team id', async () => {
-    __setTeamFileMocks({
+    resetMocks({
       [buildTeamPath('cloud-shepherds')]: `name: The Cloud Shepherds\ndescription: Cloud team\nteamLead: Alice\nreachability:\n  - channel: email\n    detail: cloud@example.com\n`
     })
 
@@ -25,7 +31,7 @@ describe('TeamsService', () => {
   })
 
   it('builds a map of all teams', async () => {
-    __setTeamFileMocks({
+    resetMocks({
       [buildTeamPath('cloud-shepherds')]: 'name: The Cloud Shepherds\n',
       [buildTeamPath('data-wizards')]: 'name: Data Wizards\n'
     })
@@ -39,6 +45,7 @@ describe('TeamsService', () => {
   })
 
   it('returns null for unknown teams', async () => {
+    resetMocks({})
     const result = await teamsService.getTeam('missing')
     expect(result).toBeNull()
   })

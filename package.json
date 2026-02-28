@@ -22,7 +22,9 @@
     "@nx/vitest": "22.5.3",
     "eslint": "~8.57.0",
     "nx": "22.5.3",
+    "prettier": "~3.6.2",
     "vite": "^7.0.0",
     "vitest": "^4.0.8"
-  }
+  },
+  "dependencies": {}
 }
