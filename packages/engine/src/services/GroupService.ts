@@ -11,7 +11,8 @@ export class GroupService extends YamlEntityService<GroupInfo> {
 
   protected extractId(relativePath: string): string | null {
     // Only index group-info.yaml files in services/*/group-info.yaml
-    const match = relativePath.match(/^services\/([^/]+)\/group-info\.yaml$/);
+    const re = /^services\/([^/]+)\/group-info\.yaml$/
+    const match = re.exec(relativePath)
     return match ? match[1] : null;
   }
 
@@ -37,10 +38,5 @@ export class GroupService extends YamlEntityService<GroupInfo> {
   async getAllGroups(): Promise<Record<string, GroupInfo>> {
     console.debug('[GroupService] getAllGroups start')
     return this.fetchAllEntities()
-  }
-
-  __setGroupFileMocks(files: Record<string, string>) {
-    console.debug('[GroupService] __setGroupFileMocks', Object.keys(files))
-    this.setFileMocks(files)
   }
 }

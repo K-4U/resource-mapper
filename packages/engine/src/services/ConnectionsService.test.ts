@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import { ConnectionsService } from '../ConnectionsService.ts'
-import { ServicesService } from '../ServicesService.ts'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ConnectionsService } from './ConnectionsService.js'
+import { ServicesService } from './ServicesService.js'
 import type { ServiceConnection, GroupConnection } from '@mapper/shared'
 
-const servicePath = (groupId: string, file: string) => `../../../data/services/${groupId}/${file}.yaml`
+const servicePath = (groupId: string, file: string) => `services/${groupId}/${file}.yaml`
 
 const baseMocks: Record<string, string> = {
   [servicePath('api', 'gateway')]: `friendlyName: API Gateway\nserviceType: API_GATEWAY\noutgoingConnections:\n  - connectionType: CALLS\n    targetIdentifier: data/warehouse\n    description: Calls warehouse\n  - connectionType: CALLS\n    targetIdentifier: frontend/site\n    description: Calls site\n`,
@@ -25,13 +25,14 @@ let servicesService: ServicesService
 let connectionsService: ConnectionsService
 
 function resetMocks(mocks = baseMocks) {
-  servicesService.__setServiceFileMocks(mocks)
+  servicesService.setFileMocks(mocks)
   connectionsService = new ConnectionsService(servicesService)
 }
 
 describe('ConnectionsService', () => {
   beforeEach(() => {
-    servicesService = new ServicesService()
+    const groupServiceMock = { getGroup: vi.fn() }
+    servicesService = new ServicesService({}, groupServiceMock as any)
     connectionsService = new ConnectionsService(servicesService)
     resetMocks()
   })

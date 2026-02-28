@@ -9,7 +9,8 @@ export class TeamsService extends YamlEntityService<Team> {
 
   protected extractId(relativePath: string): string | null {
     // Only index files in teams/ and ignore all others
-    const match = relativePath.match(/^teams\/([^/]+)\.yaml$/);
+    const re = /^teams\/([^/]+)\.yaml$/
+    const match = re.exec(relativePath)
     return match ? match[1] : null;
   }
 
@@ -35,10 +36,5 @@ export class TeamsService extends YamlEntityService<Team> {
   async getAllTeams(): Promise<Record<string, Team>> {
     console.debug('[TeamsService] getAllTeams invoked')
     return this.fetchAllEntities()
-  }
-
-  __setTeamFileMocks(files: Record<string, string>) {
-    console.debug('[TeamsService] __setTeamFileMocks override', Object.keys(files).length)
-    this.setFileMocks(files)
   }
 }

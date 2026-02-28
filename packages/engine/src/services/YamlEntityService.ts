@@ -1,7 +1,8 @@
 export abstract class YamlEntityService<T> {
-  private rawFiles: Record<string, string> = {}
+  // Use a Map for rawFiles for faster lookups and predictable iteration order
+  private rawFiles: Map<string, string> = new Map()
   protected fileIndex: Record<string, string> = {}
-  private cache = new Map<string, T>()
+  private readonly cache = new Map<string, T>()
 
   protected constructor(initialFiles: Record<string, string>) {
     this.updateFiles(initialFiles)
@@ -55,25 +56,28 @@ export abstract class YamlEntityService<T> {
     this.rebuildIndex()
   }
 
-  private normalizeFileMap(files: Record<string, string>) {
-    const normalized: Record<string, string> = {}
-    Object.entries(files).forEach(([path, contents]) => {
-      normalized[path.replaceAll('\\', '/')] = contents
+  // Normalize path separators to forward slashes for cross-platform consistency
+  private normalizeFileMap(files: Record<string, string>): Map<string, string> {
+    const map = new Map<string, string>()
+    Object.entries(files).forEach(([p, contents]) => {
+      const normalized = p.replaceAll('\\', '/')
+      map.set(normalized, contents)
     })
-    return normalized
+    return map
   }
 
   private rebuildIndex() {
     this.fileIndex = {}
-    Object.keys(this.rawFiles).forEach(path => {
-      const relativePath = path.replace('../public', '')
+    // The keys in rawFiles are assumed to be relative to the data root already
+    for (const path of this.rawFiles.keys()) {
+      const relativePath = path
       const id = this.extractId(relativePath)
       if (id) {
         this.fileIndex[id] = path
       } else {
         console.warn('[YamlEntityService] extractId returned null', { path, service: this.constructor.name })
       }
-    })
+    }
     console.debug('[YamlEntityService] rebuildIndex complete', {
       service: this.constructor.name,
       indexed: Object.keys(this.fileIndex).length
@@ -90,7 +94,7 @@ export abstract class YamlEntityService<T> {
       console.warn('[YamlEntityService] no path for id', { service: this.constructor.name, id })
       return
     }
-    const rawYaml = this.rawFiles[path]
+    const rawYaml = this.rawFiles.get(path)
     if (!rawYaml) {
       console.warn('[YamlEntityService] empty raw yaml', { service: this.constructor.name, path })
       return

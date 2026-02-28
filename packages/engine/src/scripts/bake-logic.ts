@@ -44,24 +44,32 @@ export async function runBake(opts?: { dataDir?: string; outputPath?: string }) 
     const teamsService = new TeamsService(yamlFiles);
     const connectionsService = new ConnectionsService(servicesService);
 
-    // 3. Extract data
-    const groups = await groupService.getAllGroups();
-    const services = await servicesService.getAllServices();
-    const teams = await teamsService.getAllTeams();
-    const groupConnections = await connectionsService.getAllGroupConnections(true);
+    // 3. Extract data - run prepares in parallel where possible
+    const groupsPromise = groupService.getAllGroups();
+    const teamsPromise = teamsService.getAllTeams();
+    const servicesPreparePromise = servicesService.prepare();
+    const groupConnectionsPromise = connectionsService.getAllGroupConnections(true);
 
-    // 4. Per-group relationships
+    const [groups, teams, servicesAll, groupConnections] = await Promise.all([
+        groupsPromise,
+        teamsPromise,
+        servicesPreparePromise,
+        groupConnectionsPromise
+    ]);
+
+    // 4. Per-group relationships - fetch services per group in parallel
     const servicesByGroup: Record<string, any> = {};
     const externalServices: Record<string, any> = {};
-    for (const groupId of Object.keys(groups)) {
+    const groupIds = Object.keys(groups);
+    await Promise.all(groupIds.map(async (groupId) => {
         servicesByGroup[groupId] = await servicesService.getServicesByGroup(groupId);
         externalServices[groupId] = await servicesService.getExternalServicesForGroup(groupId);
-    }
+    }));
 
     // 5. Aggregate
     const masterData = {
         groups,
-        services,
+        services: servicesAll,
         teams,
         groupConnections,
         servicesByGroup,
@@ -79,5 +87,6 @@ export async function runBake(opts?: { dataDir?: string; outputPath?: string }) 
         logger.success(`[bake-logic] Data baked to ${OUTPUT_PATH}`);
     } catch (err) {
         logger.error(`[bake-logic] Failed to write data.json: ${err}`);
+        throw err;
     }
 }

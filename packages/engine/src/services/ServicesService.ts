@@ -12,17 +12,10 @@ import type { GroupService } from './GroupService.js'
 
 export class ServicesService extends YamlEntityService<ServiceDefinition> {
   private incomingConnectionsPopulated = false
-  private groupService: GroupService
+  private readonly groupService: GroupService
 
-  constructor(initialFiles: Record<string, string> | null = null, groupService: GroupService) {
-    super(
-        initialFiles ??
-        import.meta.glob('../../../data/services/*/*.yaml', {
-          eager: true,
-          import: 'default',
-          query: '?raw'
-        })
-    )
+  constructor(initialFiles: Record<string, string>, groupService: GroupService) {
+    super(initialFiles)
     this.groupService = groupService
   }
 
@@ -62,15 +55,19 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
     }
   }
 
+  // Prepare will fetch all entities and populate incoming connections once.
+  public async prepare(): Promise<Record<string, ServiceDefinition>> {
+    const all = await this.fetchAllEntities()
+    return this.ensureIncomingConnectionsPopulated()
+  }
+
   async getService(groupId: string, serviceId: string): Promise<ServiceDefinition | null> {
     console.debug('[ServicesService] getService', { groupId, serviceId })
-    await this.ensureIncomingConnectionsPopulated()
     return this.fetchEntity(`${groupId}/${serviceId}`)
   }
 
   async getServicesByGroup(groupId: string): Promise<ServiceDefinition[]> {
     console.debug('[ServicesService] getServicesByGroup start', groupId)
-    await this.ensureIncomingConnectionsPopulated()
     const result: ServiceDefinition[] = []
     const prefix = `${groupId}/`
     for (const id of this.getIds()) {
@@ -88,7 +85,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
 
   async getAllServices(): Promise<Record<string, ServiceDefinition>> {
     console.debug('[ServicesService] getAllServices invoked')
-    return this.ensureIncomingConnectionsPopulated()
+    return this.fetchAllEntities()
   }
 
   async getExternalServicesForGroup(groupId: string): Promise<ExternalGroupServices[]> {
@@ -202,9 +199,10 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
     return services
   }
 
-  __setServiceFileMocks(files: Record<string, string>) {
-    console.debug('[ServicesService] __setServiceFileMocks override', Object.keys(files).length)
-    this.setFileMocks(files)
+  // Reset the incoming connections flag when files are updated through the base setFileMocks
+  public setFileMocks(files: Record<string, string>) {
+    console.debug('[ServicesService] setFileMocks override', Object.keys(files).length)
+    super.setFileMocks(files)
     this.incomingConnectionsPopulated = false
   }
 }

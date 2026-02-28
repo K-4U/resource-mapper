@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { TeamsService } from '../TeamsService.ts'
+import { TeamsService } from './TeamsService.ts'
 
-const buildTeamPath = (teamId: string) => `../../../data/teams/${teamId}.yaml`
+const buildTeamPath = (teamId: string) => `teams/${teamId}.yaml`
 
 let teamsService: TeamsService
 
 function resetMocks(mocks: Record<string, string> = {}) {
-  teamsService = new TeamsService(mocks)
+  teamsService = new TeamsService({})
+  teamsService.setFileMocks(mocks)
 }
 
 describe('TeamsService', () => {
@@ -50,4 +51,3 @@ describe('TeamsService', () => {
     expect(result).toBeNull()
   })
 })
-

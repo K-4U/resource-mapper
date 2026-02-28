@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { GroupService } from '../GroupService.js'
+import { GroupService } from './GroupService.ts'
 
-const buildPath = (groupId: string) => `../../../data/services/${groupId}/group-info.yaml`
+const buildPath = (groupId: string) => `services/${groupId}/group-info.yaml`
 
 let groupService: GroupService
 
 function resetMocks(mocks: Record<string, string> = {}) {
-  groupService = new GroupService(mocks)
+  groupService = new GroupService({})
+  groupService.setFileMocks(mocks)
 }
 
 describe('ResourceService', () => {
