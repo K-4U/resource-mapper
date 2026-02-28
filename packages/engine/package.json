@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "download-icons": "tsx src/scripts/download-aws-icons.ts"
+    "download-icons": "node src/scripts/download-aws-icons.ts"
   },
   "devDependencies": {
     "tsup": "^8.5.1"

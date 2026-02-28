@@ -1,6 +1,11 @@
 default:
     @just --list
 
+init:
+    @echo "Initializing project..."
+    npm install
+    just build-engine
+
 refresh: build-engine relink
     @echo "Engine rebuilt and binaries refreshed!"
 
