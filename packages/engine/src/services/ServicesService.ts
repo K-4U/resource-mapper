@@ -9,6 +9,7 @@ import {
 } from '@mapper/shared'
 import { YamlEntityService } from './YamlEntityService.js'
 import type { GroupService } from './GroupService.js'
+import {logger} from "../cli/utils/logger.js";
 
 export class ServicesService extends YamlEntityService<ServiceDefinition> {
   private incomingConnectionsPopulated = false
@@ -35,7 +36,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   protected parseEntity(identifier: string, rawYaml: string): ServiceDefinition | null {
-    console.debug('[ServicesService] parseEntity', identifier)
+    logger.debug('[ServicesService] parseEntity', identifier)
     try {
       const parsed = yaml.load(rawYaml)
       if (!parsed || typeof parsed !== 'object') {
@@ -50,7 +51,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
       service.identifier = serviceId
       return service
     } catch (error) {
-      console.error(`[ServicesService] Failed to parse service ${identifier}:`, error)
+      logger.error(`[ServicesService] Failed to parse service ${identifier}:`, error)
       throw error
     }
   }
@@ -62,12 +63,12 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   async getService(groupId: string, serviceId: string): Promise<ServiceDefinition | null> {
-    console.debug('[ServicesService] getService', { groupId, serviceId })
+    logger.debug('[ServicesService] getService', { groupId, serviceId })
     return this.fetchEntity(`${groupId}/${serviceId}`)
   }
 
   async getServicesByGroup(groupId: string): Promise<ServiceDefinition[]> {
-    console.debug('[ServicesService] getServicesByGroup start', groupId)
+    logger.debug('[ServicesService] getServicesByGroup start', groupId)
     const result: ServiceDefinition[] = []
     const prefix = `${groupId}/`
     for (const id of this.getIds()) {
@@ -79,17 +80,17 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
         result.push(service)
       }
     }
-    console.debug('[ServicesService] getServicesByGroup result', { groupId, count: result.length })
+    logger.debug('[ServicesService] getServicesByGroup result', { groupId, count: result.length })
     return result
   }
 
   async getAllServices(): Promise<Record<string, ServiceDefinition>> {
-    console.debug('[ServicesService] getAllServices invoked')
+    logger.debug('[ServicesService] getAllServices invoked')
     return this.fetchAllEntities()
   }
 
   async getExternalServicesForGroup(groupId: string): Promise<ExternalGroupServices[]> {
-    console.debug('[ServicesService] getExternalServicesForGroup start', groupId)
+    logger.debug('[ServicesService] getExternalServicesForGroup start', groupId)
     const services = await this.getServicesByGroup(groupId)
     const allServices = await this.getAllServices()
 
@@ -145,7 +146,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
     await buildEntries(outgoingTargets, 'outgoing')
     await buildEntries(incomingTargets, 'incoming')
 
-    console.debug('[ServicesService] getExternalServicesForGroup result', {
+    logger.debug('[ServicesService] getExternalServicesForGroup result', {
       groupId,
       entries: results.length
     })
@@ -153,7 +154,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   private createFallbackGroup(groupId: string): GroupInfo {
-    console.warn('[ServicesService] createFallbackGroup for missing group', groupId)
+    logger.warn('[ServicesService] createFallbackGroup for missing group', groupId)
     return {
       id: groupId,
       name: groupId,
@@ -164,7 +165,7 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
   }
 
   private async ensureIncomingConnectionsPopulated(): Promise<Record<string, ServiceDefinition>> {
-    console.debug('[ServicesService] ensureIncomingConnectionsPopulated invoked')
+    logger.debug('[ServicesService] ensureIncomingConnectionsPopulated invoked')
     const services = await this.fetchAllEntities()
     if (this.incomingConnectionsPopulated) {
       return services
@@ -195,13 +196,13 @@ export class ServicesService extends YamlEntityService<ServiceDefinition> {
     })
 
     this.incomingConnectionsPopulated = true
-    console.debug('[ServicesService] incoming connections populated for', Object.keys(services).length, 'services')
+    logger.debug('[ServicesService] incoming connections populated for', Object.keys(services).length, 'services')
     return services
   }
 
   // Reset the incoming connections flag when files are updated through the base setFileMocks
   public setFileMocks(files: Record<string, string>) {
-    console.debug('[ServicesService] setFileMocks override', Object.keys(files).length)
+    logger.debug('[ServicesService] setFileMocks override', Object.keys(files).length)
     super.setFileMocks(files)
     this.incomingConnectionsPopulated = false
   }

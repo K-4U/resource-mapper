@@ -1,11 +1,12 @@
 import yaml from 'js-yaml'
 import {type GroupInfo, validateGroupInfo} from '@mapper/shared'
 import {YamlEntityService} from './YamlEntityService.js'
+import {logger} from "../cli/utils/logger.js";
 
 export class GroupService extends YamlEntityService<GroupInfo> {
   constructor(initialFiles: Record<string, string>) {
     super(initialFiles)
-    console.debug('[GroupService] initialized')
+    logger.debug('[GroupService] initialized')
   }
 
 
@@ -17,7 +18,7 @@ export class GroupService extends YamlEntityService<GroupInfo> {
   }
 
   protected parseEntity(groupId: string, rawYaml: string): GroupInfo | null {
-    console.debug('[GroupService] parseEntity', { groupId })
+    logger.debug('[GroupService] parseEntity', { groupId })
     try {
       const parsed = yaml.load(rawYaml)
       if (!parsed || typeof parsed !== 'object') {
@@ -25,18 +26,18 @@ export class GroupService extends YamlEntityService<GroupInfo> {
       }
       return validateGroupInfo(parsed, groupId)
     } catch (error) {
-      console.error(`Failed to parse group info for ${groupId}:`, error)
+      logger.error(`Failed to parse group info for ${groupId}:`, error)
       return null
     }
   }
 
   async getGroup(groupId: string): Promise<GroupInfo | null> {
-    console.debug('[GroupService] getGroup', groupId)
+    logger.debug('[GroupService] getGroup', groupId)
     return this.fetchEntity(groupId)
   }
 
   async getAllGroups(): Promise<Record<string, GroupInfo>> {
-    console.debug('[GroupService] getAllGroups start')
+    logger.debug('[GroupService] getAllGroups start')
     return this.fetchAllEntities()
   }
 }

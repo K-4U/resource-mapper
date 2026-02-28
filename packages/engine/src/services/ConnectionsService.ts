@@ -1,4 +1,5 @@
-import type { GroupConnection, ServiceConnection, ServiceIdentifier } from '@mapper/shared'
+import type {GroupConnection, ServiceConnection, ServiceDefinition, ServiceIdentifier} from '@mapper/shared'
+import {logger} from "../cli/utils/logger.js";
 
 const SERVICE_KEY_SEPARATOR = '/'
 
@@ -37,7 +38,7 @@ export class ConnectionsService {
   }
 
   private addServiceToGroup(groupId: string, serviceKey: string) {
-    console.debug('[ConnectionsService] addServiceToGroup', { groupId, serviceKey })
+    logger.debug('[ConnectionsService] addServiceToGroup', { groupId, serviceKey })
     if (!this.servicesByGroup.has(groupId)) {
       this.servicesByGroup.set(groupId, new Set())
     }
@@ -45,7 +46,7 @@ export class ConnectionsService {
   }
 
   private addEdge(sourceKey: string, edge: ServiceConnection) {
-    console.debug('[ConnectionsService] addEdge', { sourceKey, target: edge.targetService })
+    logger.debug('[ConnectionsService] addEdge', { sourceKey, target: edge.targetService })
     if (!this.connectionsFromService.has(sourceKey)) {
       this.connectionsFromService.set(sourceKey, [])
     }
@@ -62,7 +63,7 @@ export class ConnectionsService {
   private recordGroupConnection(sourceService: ServiceIdentifier, targetService: ServiceIdentifier) {
     const sourceGroup = getGroupFromServiceIdentifier(sourceService)
     const targetGroup = getGroupFromServiceIdentifier(targetService)
-    console.debug('[ConnectionsService] recordGroupConnection', { sourceGroup, targetGroup })
+    logger.debug('[ConnectionsService] recordGroupConnection', { sourceGroup, targetGroup })
     if (!this.groupConnectionCounts.has(sourceGroup)) {
       this.groupConnectionCounts.set(sourceGroup, new Map<string, number>())
     }
@@ -74,9 +75,9 @@ export class ConnectionsService {
     if (this.loaded) {
       return
     }
-    console.debug('[ConnectionsService] ensureLoaded building graph')
-    const services = await this.servicesService.getAllServices()
-    Object.values(services).forEach(service => {
+    logger.debug('[ConnectionsService] ensureLoaded building graph')
+    const services: Record<string, ServiceDefinition> = await this.servicesService.getAllServices()
+    Object.values(services).forEach((service:ServiceDefinition) => {
       const startServiceKey = `${service.groupId}/${service.identifier}`
       const startTemplate: ServiceIdentifier = { groupId: service.groupId, serviceId: service.identifier }
       this.addServiceToGroup(service.groupId, startServiceKey)
@@ -92,7 +93,7 @@ export class ConnectionsService {
       })
     })
     this.loaded = true
-    console.debug('[ConnectionsService] ensureLoaded complete', {
+    logger.debug('[ConnectionsService] ensureLoaded complete', {
       services: this.connectionsFromService.size,
       groups: this.servicesByGroup.size
     })
@@ -101,14 +102,14 @@ export class ConnectionsService {
   async getConnectionsFromService(serviceIdentifier: string): Promise<ServiceConnection[]> {
     await this.ensureLoaded()
     const edges = cloneEdges(this.connectionsFromService.get(serviceIdentifier) || [])
-    console.debug('[ConnectionsService] getConnectionsFromService', { serviceIdentifier, count: edges.length })
+    logger.debug('[ConnectionsService] getConnectionsFromService', { serviceIdentifier, count: edges.length })
     return edges
   }
 
   async getConnectionsToService(serviceIdentifier: string): Promise<ServiceConnection[]> {
     await this.ensureLoaded()
     const edges = cloneEdges(this.connectionsToService.get(serviceIdentifier) || [])
-    console.debug('[ConnectionsService] getConnectionsToService', { serviceIdentifier, count: edges.length })
+    logger.debug('[ConnectionsService] getConnectionsToService', { serviceIdentifier, count: edges.length })
     return edges
   }
 
@@ -136,7 +137,7 @@ export class ConnectionsService {
     groupCounts.forEach((count, targetGroup) => {
       results.push({ sourceGroup: groupId, targetGroup, connectionCount: count })
     })
-    console.debug('[ConnectionsService] getConnectionsFromGroup', { groupId, includeSelfConnections, count: results.length })
+    logger.debug('[ConnectionsService] getConnectionsFromGroup', { groupId, includeSelfConnections, count: results.length })
     return results
   }
 
@@ -164,7 +165,7 @@ export class ConnectionsService {
     groupCounts.forEach((count, sourceGroup) => {
       results.push({ sourceGroup, targetGroup: groupId, connectionCount: count })
     })
-    console.debug('[ConnectionsService] getConnectionsToGroup', { groupId, includeSelfConnections, count: results.length })
+    logger.debug('[ConnectionsService] getConnectionsToGroup', { groupId, includeSelfConnections, count: results.length })
     return results
   }
 
@@ -179,19 +180,10 @@ export class ConnectionsService {
         result.push({ sourceGroup, targetGroup, connectionCount: count })
       })
     })
-    console.debug('[ConnectionsService] getAllGroupConnections', {
+    logger.debug('[ConnectionsService] getAllGroupConnections', {
       includeSelfConnections,
       count: result.length
     })
     return result
-  }
-
-  __reset() {
-    console.debug('[ConnectionsService] __reset invoked')
-    this.connectionsFromService.clear()
-    this.connectionsToService.clear()
-    this.servicesByGroup.clear()
-    this.groupConnectionCounts.clear()
-    this.loaded = false
   }
 }

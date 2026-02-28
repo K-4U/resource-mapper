@@ -1,17 +1,20 @@
 import pc from 'picocolors';
 
 export const logger = {
-  info(msg: string) {
-    console.log(pc.blue('[mapper]'), msg);
+  debug(msg: string, ...args: any[]) {
+    console.debug(pc.blue('[mapper]'), pc.cyan(msg), ...args);
   },
-  success(msg: string) {
-    console.log(pc.blue('[mapper]'), pc.green(msg));
+  info(msg: string, ...args: any[]) {
+    console.log(pc.blue('[mapper]'), msg, ...args);
   },
-  warn(msg: string) {
-    console.log(pc.blue('[mapper]'), pc.yellow(msg));
+  success(msg: string, ...args: any[]) {
+    console.log(pc.blue('[mapper]'), pc.green(msg), ...args);
   },
-  error(msg: string) {
-    console.error(pc.blue('[mapper]'), pc.red(msg));
+  warn(msg: string, ...args: any[]) {
+    console.log(pc.blue('[mapper]'), pc.yellow(msg), ...args);
+  },
+  error(msg: string, ...args: any[]) {
+    console.error(pc.blue('[mapper]'), pc.red(msg), ...args);
   },
 };
 

@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TeamsService } from './TeamsService.ts'
+import { logger } from '../cli/utils/logger.js'
 
 const buildTeamPath = (teamId: string) => `teams/${teamId}.yaml`
 
@@ -49,5 +50,36 @@ describe('TeamsService', () => {
     resetMocks({})
     const result = await teamsService.getTeam('missing')
     expect(result).toBeNull()
+  })
+
+  it('ignores non-team files when rebuilding index', async () => {
+    resetMocks({
+      [buildTeamPath('cloud-shepherds')]: 'name: Cloud\n',
+      ['teams/subdir/should-ignore.yaml']: 'name: ignore\n'
+    })
+
+    const teams = await teamsService.getAllTeams()
+    expect(Object.keys(teams)).toEqual(['cloud-shepherds'])
+  })
+
+  it('returns null when team yaml is invalid or empty', async () => {
+    resetMocks({
+      [buildTeamPath('cloud-shepherds')]: ''
+    })
+
+    const team = await teamsService.getTeam('cloud-shepherds')
+    expect(team).toBeNull()
+  })
+
+  it('parseEntity returns null and logs error for invalid YAML', () => {
+    // Arrange: mock logger.error
+    const errorSpy = vi.spyOn(logger, 'error')
+    const service = new TeamsService({})
+    // Act: call parseEntity with invalid YAML
+    const result = service['parseEntity']('cloud-shepherds', 'invalid: yaml: : :')
+    // Assert: returns null and logs error
+    expect(result).toBeNull()
+    expect(errorSpy).toHaveBeenCalledWith('Failed to parse team info for cloud-shepherds:', expect.any(Error))
+    errorSpy.mockRestore()
   })
 })
