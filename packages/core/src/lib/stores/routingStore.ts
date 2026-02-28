@@ -30,7 +30,12 @@ let avoidLibInstance: Avoid | null = null;
 
 async function ensureAvoidLibLoaded() {
     if (avoidLibPromise) return avoidLibPromise;
-    avoidLibPromise = AvoidLib.load("/libavoid.wasm");
+    if (typeof window === 'undefined') {
+        //We're in test mode in node, load the library directly from the file system
+        avoidLibPromise = AvoidLib.load();
+    } else {
+        avoidLibPromise = AvoidLib.load("/libavoid.wasm");
+    }
     return avoidLibPromise;
 }
 

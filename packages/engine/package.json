@@ -15,7 +15,7 @@
     "mapper-engine": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build-engine": "tsup",
     "download-icons": "node src/scripts/download-aws-icons.ts"
   },
   "devDependencies": {

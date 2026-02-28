@@ -1,0 +1,13 @@
+{
+  "name": "core",
+  "projectType": "application",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run",
+        "cwd": "packages/core"
+      }
+    }
+  }
+}

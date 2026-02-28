@@ -1,7 +1,7 @@
 import {describe, it, expect} from 'vitest'
 import type {Edge, Node} from '@xyflow/svelte'
 import {layoutFlowGraph, calculateEdgeOffset, OFFSET_STEP} from './layout'
-import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$lib/utils/flow/types'
+import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$shared/flow-types'
 
 // Basic helpers to build nodes/edges with minimal required data
 function serviceNode(id: string, label = id, serviceType?: string, position = {x: 0, y: 0}): Node<FlowNodeData> {

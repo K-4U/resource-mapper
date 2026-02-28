@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "build-engine": {
+      "dependsOn": [
+        "^build-engine"
+      ]
+    },
+    "download-icons": {
+      "dependsOn": [
+        "^download-icons"
+      ]
+    },
+    "build": {
+      "outputs": [
+        "{projectRoot}/packages/core/build"
+      ],
+      "cache": true
+    },
+    "@nx/vitest:test": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default"
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ]
+}

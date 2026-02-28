@@ -63,3 +63,8 @@ storybook-static
 .aws-icons-last-updated
 dist
 .svelte-kit
+
+
+.nx/cache
+.nx/workspace-data
+vitest.config.*.timestamp*

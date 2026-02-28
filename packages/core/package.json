@@ -4,8 +4,8 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "@mapper/shared": "*",
     "@mapper/engine": "*",
+    "@mapper/shared": "*",
     "@xyflow/svelte": "^1.5.1",
     "adm-zip": "^0.5.16",
     "elkjs": "^0.11.0",
@@ -17,6 +17,7 @@
     "@eslint/compat": "^2.0.2",
     "@eslint/js": "^9.39.2",
     "@iconify/svelte": "^5.2.1",
+    "@nx/vite": "^22.5.3",
     "@sveltejs/adapter-auto": "^7.0.1",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.51.0",
