@@ -8,6 +8,10 @@
         "command": "vitest run",
         "cwd": "packages/core"
       }
+    },
+    "publish": {
+      "command": "npm publish --access public",
+      "dependsOn": ["build"]
     }
   }
 }

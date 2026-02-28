@@ -15,6 +15,10 @@
         "command": "vitest run --coverage",
         "cwd": "packages/engine"
       }
+    },
+    "publish": {
+      "command": "npm publish --access public",
+      "dependsOn": ["build"]
     }
   }
 }

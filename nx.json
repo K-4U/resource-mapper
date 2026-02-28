@@ -25,6 +25,16 @@
       ]
     }
   },
+  "release": {
+    "projects": ["packages/*"],
+    "projectsRelationship": "fixed",
+    "version": {
+      "currentVersionResolver": "git-tag"
+    },
+    "changelog": {
+      "projectChangelogs": true
+    }
+  },
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
