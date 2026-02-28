@@ -91,5 +91,17 @@ There are several possible connection types and service types. See them all in t
 ## Contributing
 Contributions are welcome! If you have any ideas for new features or improvements, please feel free to submit a pull request or open an issue.
 
+### Getting to run locally
+1. Clone the repository
+2. Run `npm install` to install the dependencies and build the engine.
+3. cd into the examples folder and run `npm run dev` to start the development server.
+
+
+### Structure
+The project is structured as a monorepo with the following packages:
+- `shared`: Contains shared types and utilities used across the project.
+- `engine`: Contains cli tools to build the resource mapper and transpile the yaml into a json.
+- `core`: Contains the core logic for the resource mapper and diagram generation. Also the website.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

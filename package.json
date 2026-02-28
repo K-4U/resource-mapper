@@ -4,15 +4,13 @@
 	"version": "0.0.1",
 	"type": "module",
 	"license": "MIT",
+	"engines": {
+		"node": ">=22.11.0"
+	},
 	"workspaces": [
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "npm run dev -w @mapper/core",
-		"build": "npm run build -w @mapper/core",
-		"postinstall": "npm run download-icons -w @mapper/core"
-	},
-	"dependencies": {
-		"chokidar": "^5.0.0"
+		"postinstall": "npm run build -w @mapper/engine && npm run download-icons -w @mapper/engine"
 	}
 }
