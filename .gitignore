@@ -1,70 +1,50 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+### Dependencies ###
+node_modules/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+### Build outputs ###
+dist/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+.svelte-kit/
+.output/
+.vercel/
+.netlify/
+.wrangler/
 
-### VS Code ###
-.vscode/
-node_modules
+### Test & coverage outputs ###
+# Vitest writes these under packages/*/coverage/
+packages/*/coverage/
+# Playwright e2e results
+test-results/
+playwright-report/
 
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
+### NX ###
+.nx/cache
+.nx/workspace-data
 
-# OS
-.DS_Store
-Thumbs.db
+### Bake output ###
+.mapper/
 
-# Env
+### Environment ###
 .env
 .env.*
 !.env.example
 !.env.test
 
-# Vite
+### Vite ###
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-# Playwright
-test-results
-
-*storybook.log
-storybook-static
-
-.aws-icons-last-updated
-dist
-.svelte-kit
-
-
-.nx/cache
-.nx/workspace-data
 vitest.config.*.timestamp*
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### IDE ###
+.idea/
+.vscode/
+*.iml
+
+### Misc ###
+.aws-icons-last-updated
+storybook-static
+*.storybook.log

@@ -24,9 +24,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: |
-          npx nx run-many --target=test --parallel=3 --exclude=core -- --passWithNoTests
-          npx nx run core:test
+        run: npx nx run-many --target=test --parallel=3-- --passWithNoTests
 
       - name: Version Packages
         run: npx nx release version ${{ github.event.release.tag_name }} --stageChanges
