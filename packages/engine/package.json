@@ -1,10 +1,32 @@
 {
-  "name": "@resource-mapper/engine",
-  "version": "0.1.0",
+  "name": "@k-4u/resource-mapper",
+  "version": "0.0.37",
+  "description": "CLI tool to bake and visualise your architecture as an interactive map",
+  "keywords": [
+    "architecture",
+    "visualisation",
+    "diagram",
+    "cli",
+    "yaml"
+  ],
+  "author": "K-4U",
+  "homepage": "https://github.com/K-4U/resource-mapper#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/K-4U/resource-mapper.git",
+    "directory": "packages/engine"
+  },
+  "bugs": {
+    "url": "https://github.com/K-4U/resource-mapper/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "@resource-mapper/shared": "*",
+    "@k-4u/resource-mapper-shared": "*",
+    "@k-4u/resource-mapper-core": "*",
     "execa": "^5.1.1",
     "zod": "^4.3.6"
   },

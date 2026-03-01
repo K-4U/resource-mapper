@@ -1,11 +1,26 @@
 {
-  "name": "@resource-mapper/core",
-  "version": "0.1.0",
+  "name": "@k-4u/resource-mapper-core",
+  "version": "0.0.1",
+  "description": "SvelteKit UI template for resource-mapper — used internally by the CLI",
+  "keywords": ["architecture", "visualisation", "svelte", "ui"],
+  "author": "K-4U",
+  "homepage": "https://github.com/K-4U/resource-mapper#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/K-4U/resource-mapper.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/K-4U/resource-mapper/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "@resource-mapper/engine": "*",
-    "@resource-mapper/shared": "*",
+    "@k-4u/resource-mapper": "*",
+    "@k-4u/resource-mapper-shared": "*",
     "@xyflow/svelte": "^1.5.1",
     "adm-zip": "^0.5.16",
     "elkjs": "^0.11.0",

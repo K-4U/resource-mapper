@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServicesService } from './ServicesService.ts'
-import {ExternalGroupServices, ServiceDefinition} from "@resource-mapper/shared";
+import {ExternalGroupServices, ServiceDefinition} from "@k-4u/resource-mapper-shared";
 
 const groupServiceMock = vi.hoisted(() => ({
   getGroup: vi.fn()
