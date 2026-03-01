@@ -40,6 +40,9 @@ jobs:
       - name: Build Projects
         run: npx nx run-many --target=build
 
+      - name: Update npm version so that we're running latest
+        run: npm install -g npm@latest
+
       - name: Publish
         run: |
           # Loop through your built packages in the dist folder
