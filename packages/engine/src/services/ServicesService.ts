@@ -6,7 +6,7 @@ import {
   type GroupInfo,
   type ServiceDefinition,
   type ServiceIncomingLink
-} from '@resource-mapper/shared'
+} from '@k-4u/resource-mapper-shared'
 import { YamlEntityService } from './YamlEntityService.js'
 import type { GroupService } from './GroupService.js'
 import {logger} from "../cli/utils/logger.js";

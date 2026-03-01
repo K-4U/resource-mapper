@@ -10,11 +10,11 @@ export class ViteLauncher {
 
   private resolveTemplateRoot(): string {
     try {
-      // Finds the @resource-mapper/core package regardless of where it's installed
-      const corePkgPath = require.resolve('@resource-mapper/core/package.json');
+      // Finds the @k-4u/resource-mapper-core package regardless of where it's installed
+      const corePkgPath = require.resolve('@k-4u/resource-mapper-core/package.json');
       return path.dirname(corePkgPath);
     } catch (e) {
-      logger.error('Could not find @resource-mapper/core. Is it installed?');
+      logger.error('Could not find @k-4u/resource-mapper-core. Is it installed?');
       process.exit(1);
     }
   }

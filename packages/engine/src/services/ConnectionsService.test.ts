@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ConnectionsService } from './ConnectionsService.js'
 import { ServicesService } from './ServicesService.js'
-import type { ServiceConnection, GroupConnection } from '@resource-mapper/shared'
+import type { ServiceConnection, GroupConnection } from '@k-4u/resource-mapper-shared'
 
 const servicePath = (groupId: string, file: string) => `services/${groupId}/${file}.yaml`
 

@@ -1,8 +1,22 @@
 {
-  "name": "@resource-mapper/shared",
+  "name": "@k-4u/resource-mapper-shared",
   "version": "0.0.1",
+  "description": "Shared types and validators for the resource-mapper toolchain",
+  "keywords": ["architecture", "types", "validators", "yaml"],
+  "author": "K-4U",
+  "homepage": "https://github.com/K-4U/resource-mapper#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/K-4U/resource-mapper.git",
+    "directory": "packages/shared"
+  },
+  "bugs": {
+    "url": "https://github.com/K-4U/resource-mapper/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "license": "MIT",
   "exports": { ".": "./src/index.ts" }
 }
-

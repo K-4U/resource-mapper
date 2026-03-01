@@ -1,4 +1,4 @@
-import { ServiceType } from '@resource-mapper/shared'
+import { ServiceType } from '@k-4u/resource-mapper-shared'
 
 type IconLookup = Record<ServiceType, string>
 
