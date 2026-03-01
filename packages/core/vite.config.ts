@@ -8,6 +8,7 @@ import {viteStaticCopy} from 'vite-plugin-static-copy';
 import {mapperDataPlugin} from "./plugins/mapper-data-plugin.ts";
 import {createRequire} from "node:module";
 import {normalizePath} from "vite";
+import {sharedReporters, sharedCoverage} from "../../vitest.shared.js";
 
 // 1. Rename to avoid TS2441
 const cjsRequire = createRequire(import.meta.url);
@@ -42,6 +43,15 @@ export default defineConfig({
     test: {
         expect: {
             requireAssertions: true
+        },
+        reporters: sharedReporters,
+        outputFile: {
+            junit: './coverage/junit.xml',
+            json:  './coverage/test-results.json',
+        },
+        coverage: {
+            ...sharedCoverage,
+            reportsDirectory: './coverage',
         },
         projects: [{
             extends: './vite.config.ts',

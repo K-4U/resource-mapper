@@ -87,9 +87,9 @@ jobs:
           name: coverage-${{ matrix.artifact }}
           path: packages/*/coverage/
 
-  # ── 3. Annotate + Report ──────────────────────────────────────────────────
+  # ── 3. Report (matrix: one leg per package) ───────────────────────────────
   report:
-    name: Report
+    name: Report — ${{ matrix.package }}
     needs: test
     runs-on: ubuntu-latest
     if: always()
@@ -97,6 +97,11 @@ jobs:
       checks: write
       pull-requests: write
       contents: read
+    strategy:
+      fail-fast: false
+      # Add a new entry here when you add a new package with tests.
+      matrix:
+        package: [engine, shared, core]
 
     steps:
       # Required by dorny/test-reporter to resolve commit SHAs for annotations
@@ -116,47 +121,22 @@ jobs:
           name: coverage-main
           path: main-coverage
 
-      # Reads all junit.xml files and posts inline PR annotations per failing test.
-      # "java-junit" is the XML schema name — not the language.
-      - name: Annotate PR with test results
-        uses: dorny/test-reporter@v2
+      - name: Annotate test results — ${{ matrix.package }}
+        uses: dorny/test-reporter@v2.5.0
         with:
-          name: Test Results
-          path: pr-coverage/*/junit*.xml
-          reporter: java-junit
+          name: Tests — ${{ matrix.package }}
+          path: pr-coverage/${{ matrix.package }}/junit*.xml
+          reporter: jest-junit
           fail-on-error: false
+          fail-on-empty: false
 
-      # Per-package coverage comments.
-      # continue-on-error so a missing file (e.g. no tests yet in shared) doesn't fail the job.
-      - name: Report coverage — engine
+      - name: Report coverage — ${{ matrix.package }}
         uses: davelosert/vitest-coverage-report-action@v2.9.2
         if: always()
         continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          name: Engine
-          json-summary-path: pr-coverage/engine/coverage-summary.json
-          json-summary-compare-path: main-coverage/engine/coverage-summary.json
-          json-final-path: pr-coverage/engine/coverage-final.json
-
-      - name: Report coverage — shared
-        uses: davelosert/vitest-coverage-report-action@v2.9.2
-        if: always()
-        continue-on-error: true
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          name: Shared
-          json-summary-path: pr-coverage/shared/coverage-summary.json
-          json-summary-compare-path: main-coverage/shared/coverage-summary.json
-          json-final-path: pr-coverage/shared/coverage-final.json
-
-      - name: Report coverage — core
-        uses: davelosert/vitest-coverage-report-action@v2.9.2
-        if: always()
-        continue-on-error: true
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          name: Core
-          json-summary-path: pr-coverage/core/coverage-summary.json
-          json-summary-compare-path: main-coverage/core/coverage-summary.json
-          json-final-path: pr-coverage/core/coverage-final.json
+          name: ${{ matrix.package }}
+          json-summary-path: pr-coverage/${{ matrix.package }}/coverage-summary.json
+          json-summary-compare-path: main-coverage/${{ matrix.package }}/coverage-summary.json
+          json-final-path: pr-coverage/${{ matrix.package }}/coverage-final.json
