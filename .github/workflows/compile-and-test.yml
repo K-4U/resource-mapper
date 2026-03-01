@@ -1,0 +1,142 @@
+name: CI
+
+env:
+  node_version: '22.17.0'
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Build ──────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6.2.0
+        with:
+          node-version: ${{ env.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: Build Affected
+        run: npx nx affected --target=build --parallel=3
+
+  # ── 2. Test (matrix: PR branch + main for trend comparison) ───────────────
+  test:
+    name: Test (${{ matrix.artifact }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      # Run both legs even if one fails so we always have both artifacts
+      fail-fast: false
+      matrix:
+        include:
+          - branch: ${{ github.head_ref }}
+            artifact: pull-request
+            # PR leg: only test what changed — faster feedback
+            all: false
+          - branch: main
+            artifact: main
+            # main leg: always test everything so coverage is never missing
+            all: true
+
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6.2.0
+        with:
+          node-version: ${{ env.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: nrwl/nx-set-shas@v4
+
+      # PR leg — only affected packages, faster
+      - name: Run affected tests with coverage
+        if: ${{ !matrix.all }}
+        run: |
+          npx nx affected --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+          npx nx run core:test:coverage
+
+      # main leg — all packages, so coverage-main is always complete
+      - name: Run all tests with coverage
+        if: ${{ matrix.all }}
+        run: |
+          npx nx run-many --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+          npx nx run core:test:coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v7.0.0
+        if: always()
+        with:
+          name: coverage-${{ matrix.artifact }}
+          path: packages/*/coverage/
+
+  # ── 3. Report (matrix: one leg per package) ───────────────────────────────
+  report:
+    name: Report — ${{ matrix.package }}
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+    strategy:
+      fail-fast: false
+      # Add a new entry here when you add a new package with tests.
+      matrix:
+        package: [engine, shared, core]
+
+    steps:
+      # Required by dorny/test-reporter to resolve commit SHAs for annotations
+      - uses: actions/checkout@v6.0.2
+
+      - name: Download PR coverage
+        uses: actions/download-artifact@v8.0.0
+        with:
+          name: coverage-pull-request
+          path: pr-coverage
+
+      - name: Download main coverage
+        # continue-on-error: the very first PR to main won't have a main artifact yet
+        continue-on-error: true
+        uses: actions/download-artifact@v8.0.0
+        with:
+          name: coverage-main
+          path: main-coverage
+
+      - name: Annotate test results — ${{ matrix.package }}
+        uses: dorny/test-reporter@v2.5.0
+        with:
+          name: Tests — ${{ matrix.package }}
+          path: pr-coverage/${{ matrix.package }}/junit*.xml
+          reporter: jest-junit
+          fail-on-error: false
+          fail-on-empty: false
+
+      - name: Report coverage — ${{ matrix.package }}
+        uses: davelosert/vitest-coverage-report-action@v2.9.2
+        if: always()
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ matrix.package }}
+          json-summary-path: pr-coverage/${{ matrix.package }}/coverage-summary.json
+          json-summary-compare-path: main-coverage/${{ matrix.package }}/coverage-summary.json
+          json-final-path: pr-coverage/${{ matrix.package }}/coverage-final.json

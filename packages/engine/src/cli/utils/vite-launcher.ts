@@ -10,11 +10,11 @@ export class ViteLauncher {
 
   private resolveTemplateRoot(): string {
     try {
-      // Finds the @mapper/core package regardless of where it's installed
-      const corePkgPath = require.resolve('@mapper/core/package.json');
+      // Finds the @resource-mapper/core package regardless of where it's installed
+      const corePkgPath = require.resolve('@resource-mapper/core/package.json');
       return path.dirname(corePkgPath);
     } catch (e) {
-      logger.error('Could not find @mapper/core. Is it installed?');
+      logger.error('Could not find @resource-mapper/core. Is it installed?');
       process.exit(1);
     }
   }
@@ -61,8 +61,7 @@ export class ViteLauncher {
     ];
 
     if (command === 'build' && outDir) {
-      args.push('--outDir', path.resolve(process.cwd(), outDir));
-      args.push('--emptyOutDir');
+      args.push('--outDir', path.resolve(process.cwd(), outDir), '--emptyOutDir');
     }
 
     logger.info(`Running vite with args: ${args.join(' ')}`);

@@ -14,7 +14,10 @@
     "build": "nx build",
     "build-engine": "nx build-engine",
     "download-icons": "nx download-icons",
-    "test": "nx run-many --target=test"
+    "test": "nx run-many --target=test",
+    "test:coverage": "nx run-many --target=test -- --coverage",
+    "test:watch": "vitest --workspace vitest.workspace.ts",
+    "test:ui": "vitest --ui --workspace vitest.workspace.ts"
   },
   "devDependencies": {
     "@nx/eslint": "22.5.3",
@@ -24,7 +27,9 @@
     "nx": "22.5.3",
     "prettier": "~3.6.2",
     "vite": "^7.0.0",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18"
   },
   "dependencies": {}
 }

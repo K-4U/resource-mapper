@@ -9,7 +9,7 @@
     "build": "mapper-engine build"
   },
   "dependencies": {
-    "@mapper/engine": "workspace:*",
-    "@mapper/core": "workspace:*"
+    "@resource-mapper/engine": "workspace:*",
+    "@resource-mapper/core": "workspace:*"
   }
 }

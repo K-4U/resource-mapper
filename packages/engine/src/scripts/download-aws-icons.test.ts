@@ -100,33 +100,17 @@ describe('download-aws-icons', () => {
         expect(process.exit).toHaveBeenCalledWith(0);
     });
 
-    it('should handle timeout error', async () => {
-        vi.mocked(fs.existsSync).mockReturnValue(false);
-        const abortError = new Error('Timeout');
-        abortError.name = 'AbortError';
-        vi.mocked(global.fetch).mockRejectedValue(abortError);
+    it.each([
+      ['AbortError (timeout)', Object.assign(new Error('Timeout'), { name: 'AbortError' }), 'Failed to update AWS icons: Request timed out'],
+      ['generic Error',        new Error('Network Error'),                                   'Failed to update AWS icons: Network Error'    ],
+      ['unknown throw value',  'Something went wrong',                                       'Failed to update AWS icons: Unknown error'    ],
+    ])('handles fetch rejection: %s', async (_label, rejection, expectedMessage) => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(global.fetch).mockRejectedValue(rejection);
 
-        await run();
+      await run();
 
-        expect(console.error).toHaveBeenCalledWith('Failed to update AWS icons: Request timed out');
-    });
-
-    it('should handle generic error', async () => {
-        vi.mocked(fs.existsSync).mockReturnValue(false);
-        vi.mocked(global.fetch).mockRejectedValue(new Error('Network Error'));
-
-        await run();
-
-        expect(console.error).toHaveBeenCalledWith('Failed to update AWS icons: Network Error');
-    });
-
-    it('should handle unknown error type', async () => {
-        vi.mocked(fs.existsSync).mockReturnValue(false);
-        vi.mocked(global.fetch).mockRejectedValue('Something went wrong');
-
-        await run();
-
-        expect(console.error).toHaveBeenCalledWith('Failed to update AWS icons: Unknown error');
+      expect(console.error).toHaveBeenCalledWith(expectedMessage);
     });
     it('should handle empty ZIP extraction', async () => {
         vi.mocked(fs.existsSync).mockReturnValue(false);

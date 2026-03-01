@@ -1,4 +1,4 @@
-import type {GroupConnection, ServiceConnection, ServiceDefinition, ServiceIdentifier} from '@mapper/shared'
+import type {GroupConnection, ServiceConnection, ServiceDefinition, ServiceIdentifier} from '@resource-mapper/shared'
 import {logger} from "../cli/utils/logger.js";
 
 const SERVICE_KEY_SEPARATOR = '/'

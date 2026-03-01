@@ -3,18 +3,15 @@
   "projectType": "application",
   "targets": {
     "test": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/vitest:test",
       "options": {
-        "command": "vitest run",
-        "cwd": "packages/engine"
-      }
+        "configFile": "packages/engine/vitest.config.ts"
+      },
+      "outputs": ["{projectRoot}/coverage"]
     },
-    "test-coverage": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "vitest run --coverage",
-        "cwd": "packages/engine"
-      }
+    "publish": {
+      "command": "npm publish --access public",
+      "dependsOn": ["build"]
     }
   }
 }

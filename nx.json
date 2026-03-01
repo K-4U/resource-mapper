@@ -17,12 +17,25 @@
       ],
       "cache": true
     },
-    "@nx/vitest:test": {
+    "test": {
       "cache": true,
       "inputs": [
         "default",
         "^default"
+      ],
+      "outputs": [
+        "{projectRoot}/coverage"
       ]
+    }
+  },
+  "release": {
+    "projects": ["packages/*"],
+    "projectsRelationship": "fixed",
+    "version": {
+      "currentVersionResolver": "git-tag"
+    },
+    "changelog": {
+      "projectChangelogs": true
     }
   },
   "plugins": [

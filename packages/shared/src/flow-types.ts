@@ -1,5 +1,5 @@
 import type { Edge, Node } from '@xyflow/svelte'
-import type { GroupInfo, ServiceDefinition } from '@mapper/shared'
+import type { GroupInfo, ServiceDefinition } from '@resource-mapper/shared'
 
 export type FlowNodeKind = 'group' | 'service' | 'external' | 'mainGroup'
 
