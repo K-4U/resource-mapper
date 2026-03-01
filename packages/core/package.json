@@ -1,8 +1,13 @@
 {
   "name": "@k-4u/resource-mapper-core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "SvelteKit UI template for resource-mapper — used internally by the CLI",
-  "keywords": ["architecture", "visualisation", "svelte", "ui"],
+  "keywords": [
+    "architecture",
+    "visualisation",
+    "svelte",
+    "ui"
+  ],
   "author": "K-4U",
   "homepage": "https://github.com/K-4U/resource-mapper#readme",
   "repository": {
