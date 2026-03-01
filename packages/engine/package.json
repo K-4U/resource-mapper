@@ -1,6 +1,6 @@
 {
   "name": "@resource-mapper/engine",
-  "version": "0.0.37",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "dependencies": {

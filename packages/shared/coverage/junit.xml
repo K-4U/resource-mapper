@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="55" failures="0" errors="0" time="0.030301109">
+    <testsuite name="src/validators.test.ts" timestamp="2026-03-01T14:28:54.067Z" hostname="runnervmnay03" tests="55" failures="0" errors="0" skipped="0" time="0.030301109">
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; parses &quot;api/gateway&quot; into the correct ServiceIdentifier" time="0.002450879">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; parses &quot;data/my-database&quot; into the correct ServiceIdentifier" time="0.000297474">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; parses &quot;frontend/site&quot; into the correct ServiceIdentifier" time="0.000237724">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; throws for invalid string &quot;gateway{api}&quot;: conn 0" time="0.001474348">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; throws for invalid string &quot;just-a-name&quot;: conn 1" time="0.000336437">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; throws for invalid string &quot;/service&quot;: conn 2" time="0.00026833">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; string format &gt; throws for invalid string &quot;group/&quot;: conn 3" time="0.0004507">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; object format &gt; accepts a valid { groupId, serviceId } object" time="0.000262729">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; object format &gt; throws for invalid object ({ serviceId: &apos;gateway&apos; })" time="0.00065455">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; object format &gt; throws for invalid object ({ groupId: &apos;api&apos; })" time="0.000489653">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; object format &gt; throws for invalid object ({ groupId: &apos;&apos;, serviceId: &apos;gateway&apos; })" time="0.000247292">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; invalid types &gt; throws for null" time="0.00027335">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; invalid types &gt; throws for 42" time="0.00047169">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; invalid types &gt; throws for undefined" time="0.000285763">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; invalid types &gt; throws for true" time="0.000265575">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="parseServiceIdentifier &gt; invalid types &gt; throws for " time="0.00024131">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; returns a correct ServiceDefinition for valid minimal input" time="0.000811241">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; description is undefined when not provided" time="0.000239397">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid root input null" time="0.000307603">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid root input bad" time="0.000220431">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid root input 42" time="0.000256388">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid field in { serviceType: &apos;S3&apos; }" time="0.000269392">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid field in { friendlyName: &apos;&apos;, serviceType: &apos;S3&apos; }" time="0.000220531">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid field in { friendlyName: 42, serviceType: &apos;S3&apos; }" time="0.000221172">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid field in { friendlyName: &apos;X&apos; }" time="0.000244546">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; throws for invalid field in { friendlyName: &apos;X&apos;, serviceType: &apos;UNKNOWN&apos; }" time="0.003473935">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; outgoingConnections &gt; parses valid outgoing connections" time="0.00121238">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; outgoingConnections &gt; throws for invalid connection in { friendlyName: &apos;API Gateway&apos;, serviceType: &apos;LAMBDA&apos;, description: &apos;Handles routing&apos;, outgoingConnections: &apos;bad&apos; }" time="0.000339853">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; outgoingConnections &gt; throws for invalid connection in { friendlyName: &apos;API Gateway&apos;, serviceType: &apos;LAMBDA&apos;, description: &apos;Handles routing&apos;, outgoingConnections: [ { connectionType: &apos;UNKNOWN&apos;, targetIdentifier: &apos;data/x&apos;, description: &apos;x&apos; } ] }" time="0.000192589">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; outgoingConnections &gt; throws for invalid connection in { friendlyName: &apos;API Gateway&apos;, serviceType: &apos;LAMBDA&apos;, description: &apos;Handles routing&apos;, outgoingConnections: [ { connectionType: &apos;CALLS&apos;, targetIdentifier: &apos;no-slash&apos;, description: &apos;x&apos; } ] }" time="0.00020401">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateServiceDefinition &gt; outgoingConnections &gt; throws for invalid connection in { friendlyName: &apos;API Gateway&apos;, serviceType: &apos;LAMBDA&apos;, description: &apos;Handles routing&apos;, outgoingConnections: [ { connectionType: &apos;CALLS&apos;, targetIdentifier: &apos;data/x&apos; } ] }" time="0.00017715">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; returns a correct GroupInfo for valid input" time="0.000266005">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; includes optional description and teamId when provided" time="0.000206295">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; sets both id and groupName to the groupId argument" time="0.000195865">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; throws for invalid root input null" time="0.00027871">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; throws for invalid root input 42" time="0.000178553">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; throws for invalid name in {}" time="0.000237463">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; throws for invalid name in { name: &apos;&apos; }" time="0.000178503">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateGroupInfo &gt; throws for invalid name in { name: 42 }" time="0.000189023">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; returns a correct Team for valid minimal input" time="0.000330967">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; includes optional description and teamLead when provided" time="0.00021467">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; sets teamId to the teamId argument" time="0.000149789">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; throws for invalid root input null" time="0.000265244">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; throws for invalid root input bad" time="0.000210943">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; throws for invalid name in {}" time="0.000255857">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; throws for invalid name in { name: &apos;&apos; }" time="0.000193611">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; parses reachability entries [ { channel: &apos;slack&apos;, detail: &apos;#cloud-shepherds&apos; } ] correctly" time="0.000371162">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; parses reachability entries [ { channel: &apos;slack&apos;, detail: &apos;#team&apos; }, { channel: &apos;email&apos;, detail: &apos;team@co.com&apos; } ] correctly" time="0.000209671">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; returns empty reachability when the field is absent" time="0.000175518">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; throws for invalid reachability [ &apos;bad&apos; ]" time="0.000260064">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; throws for invalid reachability [ { detail: &apos;#x&apos; } ]" time="0.000205533">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; throws for invalid reachability [ { channel: &apos;carrier-pigeon&apos;, detail: &apos;x&apos; } ]" time="0.000200423">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; throws for invalid reachability [ { channel: &apos;slack&apos; } ]" time="0.001327885">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; throws for invalid reachability [ { channel: &apos;slack&apos;, detail: &apos;&apos; } ]" time="0.002138386">
+        </testcase>
+        <testcase classname="src/validators.test.ts" name="validateTeam &gt; reachability &gt; includes the list of allowed channels in the error for an unknown channel" time="0.000301272">
+        </testcase>
+    </testsuite>
+</testsuites>
