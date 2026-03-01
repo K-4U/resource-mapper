@@ -4,7 +4,6 @@ on:
     types: [published]
 
 jobs:
-  # ── 1. Shared prep: test, version bump, build ─────────────────────────────
   prepare:
     runs-on: ubuntu-latest
     permissions:
@@ -42,5 +41,13 @@ jobs:
         run: npx nx run-many --target=build
 
       - name: Publish
-        run: npx nx release publish --yes
+        run: |
+          # Loop through your built packages in the dist folder
+          for dir in packages/*; do
+            if [ -d "$dir" ]; then
+              echo "Publishing $dir..."
+              cd "$dir"
+              npm publish
+            fi
+          done
 
