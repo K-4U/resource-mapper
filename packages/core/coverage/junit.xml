@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="0.18015693">
+    <testsuite name="src/lib/stores/routingStore.test.ts" timestamp="2026-03-01T14:29:03.073Z" hostname="runnervmnay03" tests="3" failures="0" errors="0" skipped="0" time="0.038021767">
+        <testcase classname="src/lib/stores/routingStore.test.ts" name="routingStore &gt; registers nodes and routes an edge between them" time="0.027907022">
+        </testcase>
+        <testcase classname="src/lib/stores/routingStore.test.ts" name="routingStore &gt; nudges parallel edges apart" time="0.005104733">
+            <system-err>
+Warning: skipping checkpoint for connector 3 at (110, 125).
+Warning: skipping checkpoint for connector 3 at (290, 25).
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/lib/stores/routingStore.test.ts" name="routingStore &gt; unregisters an edge and stops returning its points" time="0.003434403">
+            <system-err>
+Warning: skipping checkpoint for connector 8 at (110, 25).
+Warning: skipping checkpoint for connector 8 at (190, 225).
+Warning: skipping checkpoint for connector 3 at (110, 125).
+Warning: skipping checkpoint for connector 3 at (290, 25).
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/utils/flow/layout.test.ts" timestamp="2026-03-01T14:29:03.076Z" hostname="runnervmnay03" tests="8" failures="0" errors="0" skipped="0" time="0.128121732">
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="layoutFlowGraph &gt; returns positions for nodes and preserves signature" time="0.085737843">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="layoutFlowGraph &gt; keeps nodes and edges ids and data" time="0.02151683">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="layoutFlowGraph &gt; handles a simple group with a child service node" time="0.017275473">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="calculateEdgeOffset &gt; returns 0 for a single edge" time="0.000476949">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="calculateEdgeOffset &gt; spreads multiple edges and sorts them by target position" time="0.000399264">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="calculateEdgeOffset &gt; spreads three edges correctly" time="0.000264914">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="calculateEdgeOffset &gt; correctly calculates offsets for nodes in groups vs orphans using absolute coordinates" time="0.000399064">
+        </testcase>
+        <testcase classname="src/lib/utils/flow/layout.test.ts" name="calculateEdgeOffset &gt; correctly calculates absolute coordinates for deeply nested nodes" time="0.000239567">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/utils/flow/servicesGraph.test.ts" timestamp="2026-03-01T14:29:03.079Z" hostname="runnervmnay03" tests="2" failures="0" errors="0" skipped="0" time="0.014013431">
+        <testcase classname="src/lib/utils/flow/servicesGraph.test.ts" name="servicesGraph &gt; correctly loads bidirectional connections between two services in the same group" time="0.010773514">
+            <system-out>
+Creating edge from svc::g1::svc-a to svc::g1::svc-b of type TCP (internal)
+Creating edge from svc::g1::svc-b to svc::g1::svc-a of type TCP (internal)
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/lib/utils/flow/servicesGraph.test.ts" name="servicesGraph &gt; correctly loads bidirectional connections involving an external service" time="0.001354675">
+            <system-out>
+Creating edge from svc::g1::svc-a to svc::g2::svc-ext of type TCP (external)
+Creating edge from svc::g2::svc-ext to svc::g1::svc-a of type TCP (external)
+
+            </system-out>
+        </testcase>
+    </testsuite>
+</testsuites>

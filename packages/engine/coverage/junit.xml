@@ -1,0 +1,1359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="89" failures="0" errors="0" time="0.477334324">
+    <testsuite name="src/scripts/bake-logic.test.ts" timestamp="2026-03-01T14:28:56.806Z" hostname="runnervmnay03" tests="10" failures="0" errors="0" skipped="0" time="0.143096941">
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – file system errors &gt; throws and logs an error when the data directory does not exist" time="0.119749844">
+            <system-err>
+[34m[mapper][39m [31m[bake-logic] ERROR: Missing ./data directory at /no/data[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; logs how many YAML files were found" time="0.002963063">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 1 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; constructs GroupService, ServicesService, TeamsService and ConnectionsService" time="0.001749321">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; calls getAllGroups, getAllTeams, servicesService.prepare and getAllGroupConnections" time="0.005870592">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; calls getServicesByGroup and getExternalServicesForGroup for each group" time="0.002313893">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; writes aggregated JSON to the output path" time="0.001429234">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; logs the resolved output path and success message" time="0.001723392">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; creates the output directory if it does not exist" time="0.00170613">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+[34m[mapper][39m [32m[bake-logic] Data baked to /out/data.json[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; logs error and rethrows when writeFileSync throws" time="0.002036015">
+            <system-out>
+[34m[mapper][39m [bake-logic] Found 0 YAML files in /data
+
+[34m[mapper][39m [32m[bake-logic] Resolved output path: /out/data.json[39m
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31m[bake-logic] Failed to write data.json: Error: disk full[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/scripts/bake-logic.test.ts" name="bake-logic &gt; runBake – happy path &gt; uses default dataDir from process.cwd() when no opts are provided" time="0.001432971">
+            <system-err>
+[34m[mapper][39m [31m[bake-logic] ERROR: Missing ./data directory at /home/runner/work/resource-mapper/resource-mapper/data[39m
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/scripts/download-aws-icons.test.ts" timestamp="2026-03-01T14:28:56.812Z" hostname="runnervmnay03" tests="9" failures="0" errors="0" skipped="0" time="0.012085566">
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should skip update if icons are up to date" time="0.003830119">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should update if icons are old" time="0.001135867">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should handle successful download and extraction with flattening" time="0.001036392">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should handle fetch failure" time="0.001631">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; handles fetch rejection: AbortError (timeout)" time="0.000500403">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; handles fetch rejection: generic Error" time="0.000309307">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; handles fetch rejection: unknown throw value" time="0.000394395">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should handle empty ZIP extraction" time="0.000596251">
+        </testcase>
+        <testcase classname="src/scripts/download-aws-icons.test.ts" name="download-aws-icons &gt; should handle more than one item in ZIP extraction (no flattening)" time="0.000682563">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/services/ConnectionsService.test.ts" timestamp="2026-03-01T14:28:56.814Z" hostname="runnervmnay03" tests="6" failures="0" errors="0" skipped="0" time="0.032637964">
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; returns outgoing connections for a service" time="0.012818663">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m2[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsFromService[39m { serviceIdentifier: [32m&apos;api/gateway&apos;[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; returns incoming connections for a service" time="0.003193372">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m2[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsToService[39m { serviceIdentifier: [32m&apos;frontend/site&apos;[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; returns outgoing connections for a group" time="0.005255306">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m2[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsFromGroup[39m { groupId: [32m&apos;api&apos;[39m, includeSelfConnections: [33mfalse[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; returns incoming connections for a group" time="0.003108494">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m2[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, includeSelfConnections: [33mfalse[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; filters self-loop connections by default but can include them" time="0.003223789">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;frontend/site&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;frontend&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m3[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsFromGroup[39m { groupId: [32m&apos;frontend&apos;[39m, includeSelfConnections: [33mfalse[39m, count: [33m0[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getConnectionsFromGroup[39m { groupId: [32m&apos;frontend&apos;[39m, includeSelfConnections: [33mtrue[39m, count: [33m1[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ConnectionsService.test.ts" name="ConnectionsService &gt; aggregates group connections with accurate counts" time="0.003153347">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m4[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m4[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m4[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded building graph[39m
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m4[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m frontend/site
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;frontend/site&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/processor&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/processor
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/processor&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/processor&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m4[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;data&apos;[39m, serviceId: [32m&apos;warehouse&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/gateway&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;data&apos;[39m, serviceKey: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;data/warehouse&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;data&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;frontend&apos;[39m, serviceKey: [32m&apos;frontend/site&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addServiceToGroup[39m { groupId: [32m&apos;api&apos;[39m, serviceKey: [32m&apos;api/processor&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] addEdge[39m {
+  sourceKey: [32m&apos;api/processor&apos;[39m,
+  target: { groupId: [32m&apos;frontend&apos;[39m, serviceId: [32m&apos;site&apos;[39m }
+}
+[34m[mapper][39m [36m[ConnectionsService] recordGroupConnection[39m { sourceGroup: [32m&apos;api&apos;[39m, targetGroup: [32m&apos;frontend&apos;[39m }
+[34m[mapper][39m [36m[ConnectionsService] ensureLoaded complete[39m { services: [33m3[39m, groups: [33m3[39m }
+
+[34m[mapper][39m [36m[ConnectionsService] getAllGroupConnections[39m { includeSelfConnections: [33mfalse[39m, count: [33m3[39m }
+
+            </system-out>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/services/GroupService.test.ts" timestamp="2026-03-01T14:28:56.819Z" hostname="runnervmnay03" tests="6" failures="0" errors="0" skipped="0" time="0.031333303">
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; parses group metadata from YAML files" time="0.010681129">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[GroupService] getGroup[39m api
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[GroupService] parseEntity[39m { groupId: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; returns all discovered groups keyed by folder name" time="0.004146178">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m2[39m }
+[34m[mapper][39m [36m[GroupService] getAllGroups start[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m GroupService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for GroupService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[GroupService] parseEntity[39m { groupId: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[GroupService] parseEntity[39m { groupId: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;data&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;data&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;GroupService&apos;[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; returns null when a group folder is missing" time="0.001678879">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] getGroup[39m missing
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] no path for id[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] fetchEntity miss[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; ignores non-group files when rebuilding index" time="0.003344173">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m2[39m
+[34m[mapper][39m [33m[YamlEntityService] extractId returned null[39m { path: [32m&apos;services/api/ignore-this-file.yaml&apos;[39m, service: [32m&apos;GroupService&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[GroupService] getAllGroups start[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m GroupService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m1[39m ids for GroupService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[GroupService] parseEntity[39m { groupId: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;GroupService&apos;[39m, count: [33m1[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; returns null for invalid/empty group YAML (parseEntity returns null)" time="0.001171205">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[GroupService] getGroup[39m api
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] empty raw yaml[39m { service: [32m&apos;GroupService&apos;[39m, path: [32m&apos;services/api/group-info.yaml&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] fetchEntity miss[39m { service: [32m&apos;GroupService&apos;[39m, id: [32m&apos;api&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/GroupService.test.ts" name="ResourceService &gt; parseEntity returns null and logs error for invalid YAML" time="0.008317401">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m GroupService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;GroupService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[GroupService] initialized[39m
+[34m[mapper][39m [36m[GroupService] parseEntity[39m { groupId: [32m&apos;api&apos;[39m }
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31mFailed to parse group info for api:[39m YAMLException: bad indentation of a mapping entry (1:14)
+
+ 1 | invalid: yaml: : :
+------------------^
+    at generateError [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:1289:10[90m)[39m
+    at throwError [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:1293:9[90m)[39m
+    at readBlockMapping [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2278:7[90m)[39m
+    at composeNode [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2537:12[90m)[39m
+    at readDocument [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2721:3[90m)[39m
+    at loadDocuments [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2784:5[90m)[39m
+    at Object.load$1 [as load] [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2810:19[90m)[39m
+    at GroupService.parseEntity [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/GroupService.ts:23:27[90m)[39m
+    at [90m/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/GroupService.test.ts:83:41
+    at [90mfile:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11 {
+  reason: [32m&apos;bad indentation of a mapping entry&apos;[39m,
+  mark: {
+    name: [1mnull[22m,
+    buffer: [32m&apos;invalid: yaml: : :\n&apos;[39m,
+    position: [33m13[39m,
+    line: [33m0[39m,
+    column: [33m13[39m,
+    snippet: [32m&apos; 1 | invalid: yaml: : :\n------------------^&apos;[39m
+  }
+}
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/services/ServicesService.test.ts" timestamp="2026-03-01T14:28:56.822Z" hostname="runnervmnay03" tests="7" failures="0" errors="0" skipped="0" time="0.047327537">
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; loads a single service definition by group and identifier" time="0.013484825">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m1[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m1[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m1[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m1[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m1[39m services
+
+[34m[mapper][39m [36m[ServicesService] getService[39m { groupId: [32m&apos;api&apos;[39m, serviceId: [32m&apos;gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; returns all services for a group" time="0.005623121">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/users
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m3[39m services
+
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup start[39m api
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/users&apos;[39m }
+
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup result[39m { groupId: [32m&apos;api&apos;[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; returns null for unknown services" time="0.001510507">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m0[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m0[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m0[39m services
+
+[34m[mapper][39m [36m[ServicesService] getService[39m { groupId: [32m&apos;api&apos;[39m, serviceId: [32m&apos;missing&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] no path for id[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] fetchEntity miss[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/missing&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; returns external services grouped by direction" time="0.007954627">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m3[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m3[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/payments
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m3[39m services
+
+[34m[mapper][39m [36m[ServicesService] getExternalServicesForGroup start[39m api
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup start[39m api
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup result[39m { groupId: [32m&apos;api&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m3[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m3[39m }
+
+[34m[mapper][39m [36m[ServicesService] getExternalServicesForGroup result[39m { groupId: [32m&apos;api&apos;[39m, entries: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; populates incoming connections on target services" time="0.00274705">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m2[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/payments
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/warehouse
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/warehouse&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m2[39m services
+
+[34m[mapper][39m [36m[ServicesService] getService[39m { groupId: [32m&apos;api&apos;[39m, serviceId: [32m&apos;payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/payments&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; returns both incoming and outgoing entries when the same service has bidirectional links to the same external service" time="0.005236701">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m2[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/lambda-orders
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m data/rds-postgres
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [36m[ServicesService] ensureIncomingConnectionsPopulated invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [36m[ServicesService] incoming connections populated for[39m [33m2[39m services
+
+[34m[mapper][39m [36m[ServicesService] getExternalServicesForGroup start[39m api
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup start[39m api
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+
+[34m[mapper][39m [36m[ServicesService] getServicesByGroup result[39m { groupId: [32m&apos;api&apos;[39m, count: [33m1[39m }
+
+[34m[mapper][39m [36m[ServicesService] getAllServices invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/lambda-orders&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] cache hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;data/rds-postgres&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;ServicesService&apos;[39m, count: [33m2[39m }
+
+[34m[mapper][39m [33m[ServicesService] createFallbackGroup for missing group[39m data
+
+[34m[mapper][39m [33m[ServicesService] createFallbackGroup for missing group[39m data
+
+[34m[mapper][39m [36m[ServicesService] getExternalServicesForGroup result[39m { groupId: [32m&apos;api&apos;[39m, entries: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/ServicesService.test.ts" name="ServicesService &gt; rejects legacy brace-based target identifiers" time="0.008719091">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[ServicesService] setFileMocks override[39m [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m ServicesService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;ServicesService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m ServicesService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m1[39m ids for ServicesService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;ServicesService&apos;[39m, id: [32m&apos;api/gateway&apos;[39m }
+[34m[mapper][39m [36m[ServicesService] parseEntity[39m api/gateway
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31m[ServicesService] Failed to parse service api/gateway:[39m Error: Invalid targetIdentifier for gateway connection 0: legacy &apos;service{group}&apos; format is not supported
+    at parseServiceIdentifier [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/shared/src/validators.ts:19:13[90m)[39m
+    at [90m/home/runner/work/resource-mapper/resource-mapper/[39mpackages/shared/src/validators.ts:59:7
+    at Array.forEach (&lt;anonymous&gt;)
+    at validateServiceDefinition [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/shared/src/validators.ts:54:30[90m)[39m
+    at ServicesService.parseEntity [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/ServicesService.ts:49:23[90m)[39m
+    at ServicesService.loadIntoCache [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/YamlEntityService.ts:105:29[90m)[39m
+    at ServicesService.fetchEntity [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/YamlEntityService.ts:25:14[90m)[39m
+    at ServicesService.fetchAllEntities [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/YamlEntityService.ts:39:39[90m)[39m
+    at ServicesService.prepare [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/ServicesService.ts:61:16[90m)[39m
+    at [90m/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/ServicesService.test.ts:148:34
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/services/TeamsService.test.ts" timestamp="2026-03-01T14:28:56.829Z" hostname="runnervmnay03" tests="6" failures="0" errors="0" skipped="0" time="0.030208766">
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; returns team information for a given team id" time="0.010338771">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[TeamsService] getTeam[39m cloud-shepherds
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[TeamsService] parseEntity[39m cloud-shepherds
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; builds a map of all teams" time="0.003560566">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m2[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m2[39m }
+[34m[mapper][39m [36m[TeamsService] getAllTeams invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m TeamsService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m2[39m ids for TeamsService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[TeamsService] parseEntity[39m cloud-shepherds
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;data-wizards&apos;[39m }
+[34m[mapper][39m [36m[TeamsService] parseEntity[39m data-wizards
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;data-wizards&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;data-wizards&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;TeamsService&apos;[39m, count: [33m2[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; returns null for unknown teams" time="0.001596666">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[TeamsService] getTeam[39m missing
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] no path for id[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] fetchEntity miss[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;missing&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; ignores non-team files when rebuilding index" time="0.002271524">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m2[39m
+[34m[mapper][39m [33m[YamlEntityService] extractId returned null[39m { path: [32m&apos;teams/subdir/should-ignore.yaml&apos;[39m, service: [32m&apos;TeamsService&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[TeamsService] getAllTeams invoked[39m
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities start[39m TeamsService
+[34m[mapper][39m [36m[YamlEntityService] getIds -&gt;[39m [33m1[39m ids for TeamsService
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[TeamsService] parseEntity[39m cloud-shepherds
+[34m[mapper][39m [36m[YamlEntityService] cached entity[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity hit[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] fetchAllEntities done[39m { service: [32m&apos;TeamsService&apos;[39m, count: [33m1[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; returns null when team yaml is invalid or empty" time="0.001359434">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m1[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m1[39m }
+[34m[mapper][39m [36m[TeamsService] getTeam[39m cloud-shepherds
+[34m[mapper][39m [36m[YamlEntityService] fetchEntity request[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] empty raw yaml[39m { service: [32m&apos;TeamsService&apos;[39m, path: [32m&apos;teams/cloud-shepherds.yaml&apos;[39m }
+[34m[mapper][39m [33m[YamlEntityService] fetchEntity miss[39m { service: [32m&apos;TeamsService&apos;[39m, id: [32m&apos;cloud-shepherds&apos;[39m }
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/services/TeamsService.test.ts" name="TeamsService &gt; parseEntity returns null and logs error for invalid YAML" time="0.009068603">
+            <system-out>
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+
+[34m[mapper][39m [36m[YamlEntityService] updateFiles[39m TeamsService files: [33m0[39m
+[34m[mapper][39m [36m[YamlEntityService] rebuildIndex complete[39m { service: [32m&apos;TeamsService&apos;[39m, indexed: [33m0[39m }
+[34m[mapper][39m [36m[TeamsService] parseEntity[39m cloud-shepherds
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31mFailed to parse team info for cloud-shepherds:[39m YAMLException: bad indentation of a mapping entry (1:14)
+
+ 1 | invalid: yaml: : :
+------------------^
+    at generateError [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:1289:10[90m)[39m
+    at throwError [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:1293:9[90m)[39m
+    at readBlockMapping [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2278:7[90m)[39m
+    at composeNode [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2537:12[90m)[39m
+    at readDocument [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2721:3[90m)[39m
+    at loadDocuments [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2784:5[90m)[39m
+    at Object.load$1 [as load] [90m(file:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4mjs-yaml[24m/dist/js-yaml.mjs:2810:19[90m)[39m
+    at TeamsService.parseEntity [90m(/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/TeamsService.ts:21:27[90m)[39m
+    at [90m/home/runner/work/resource-mapper/resource-mapper/[39mpackages/engine/src/services/TeamsService.test.ts:79:41
+    at [90mfile:///home/runner/work/resource-mapper/resource-mapper/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11 {
+  reason: [32m&apos;bad indentation of a mapping entry&apos;[39m,
+  mark: {
+    name: [1mnull[22m,
+    buffer: [32m&apos;invalid: yaml: : :\n&apos;[39m,
+    position: [33m13[39m,
+    line: [33m0[39m,
+    column: [33m13[39m,
+    snippet: [32m&apos; 1 | invalid: yaml: : :\n------------------^&apos;[39m
+  }
+}
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/commands/base.test.ts" timestamp="2026-03-01T14:28:56.833Z" hostname="runnervmnay03" tests="2" failures="0" errors="0" skipped="0" time="0.007847006">
+        <testcase classname="src/cli/commands/base.test.ts" name="BaseCommand &gt; registers command with correct name and description" time="0.004144765">
+        </testcase>
+        <testcase classname="src/cli/commands/base.test.ts" name="BaseCommand &gt; calls run when command is executed via Commander with correct args" time="0.002032818">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/utils/bake-util.test.ts" timestamp="2026-03-01T14:28:56.833Z" hostname="runnervmnay03" tests="6" failures="0" errors="0" skipped="0" time="0.024432819">
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; getDataDir &gt; returns a path ending with /data" time="0.012367612">
+        </testcase>
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; getOutputDir &gt; returns a path ending with /.mapper" time="0.000570343">
+        </testcase>
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; getOutputPath &gt; returns a path containing data.json" time="0.000648349">
+        </testcase>
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; bakeOrExit &gt; calls runBake with a correct dataDir when data directory exists" time="0.003921399">
+        </testcase>
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; bakeOrExit &gt; calls runBake with a correct outputPath when data directory exists" time="0.000972503">
+        </testcase>
+        <testcase classname="src/cli/utils/bake-util.test.ts" name="bake-util &gt; bakeOrExit &gt; logs an error and calls process.exit(1) when data directory is missing" time="0.003737845">
+            <system-err>
+[34m[mapper][39m [31m[mapper-engine] ERROR: Missing ./data directory. Please create a data folder with YAML files.[39m
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/utils/config-mapper.test.ts" timestamp="2026-03-01T14:28:56.835Z" hostname="runnervmnay03" tests="15" failures="0" errors="0" skipped="0" time="0.0671419">
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; applies default value for build.outDir when parsing an empty object" time="0.057084804">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; applies default value for site.title when parsing an empty object" time="0.000299057">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; applies default value for site.subtitle when parsing an empty object" time="0.000416226">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; accepts and returns custom build.outDir" time="0.00075678">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; accepts and returns custom site title and subtitle" time="0.000639842">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; accepts and returns an optional logo" time="0.000231261">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; logo is undefined when not provided" time="0.000312904">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; MapperConfigSchema &gt; throws a ZodError for an invalid outDir type" time="0.001214924">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; returns defaults when mapper.config.json does not exist" time="0.000697731">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; does not call readFileSync when the config file does not exist" time="0.000519869">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; reads and parses mapper.config.json when it exists" time="0.001970032">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; merges partial config with defaults (site stays default when not provided)" time="0.000299699">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; returns a full custom config when all fields are provided" time="0.000290401">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; throws when config file contains invalid JSON" time="0.000441082">
+        </testcase>
+        <testcase classname="src/cli/utils/config-mapper.test.ts" name="config-mapper (integration – real zod) &gt; getMapperConfig &gt; throws when config file contains wrong field type" time="0.00033257">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/utils/vite-launcher.test.ts" timestamp="2026-03-01T14:28:56.838Z" hostname="runnervmnay03" tests="15" failures="0" errors="0" skipped="0" time="0.033443185">
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; resolveTemplateRoot (via launch) &gt; resolves @resource-mapper/core package path and passes its dirname as cwd to execa" time="0.005878738">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; resolveTemplateRoot (via launch) &gt; calls logger.error and process.exit(1) when @resource-mapper/core cannot be resolved" time="0.004606777">
+            <system-err>
+[34m[mapper][39m [31mCould not find @resource-mapper/core. Is it installed?[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; findViteBin (via launch) &gt; uses the vite bin resolved via require.resolve when the path exists" time="0.002196143">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; findViteBin (via launch) &gt; falls back to local node_modules/.bin/vite when resolved vite path does not exist but local bin does" time="0.00172186">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; findViteBin (via launch) &gt; falls back to plain &quot;vite&quot; string when neither resolved nor local bin exists" time="0.002069838">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; logs info messages for dev command" time="0.00320951">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; calls execa with correct options for dev command" time="0.002598946">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; passes only [&quot;dev&quot;] as args and does not include --outDir when outDir is omitted" time="0.001223921">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; passes only [&quot;build&quot;] as args and does not include --outDir when outDir is omitted" time="0.001075946">
+            <system-out>
+[34m[mapper][39m Launching vite with command: build
+[34m[mapper][39m Running vite with args: build
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; calls execa with build + --outDir + --emptyOutDir when outDir is provided" time="0.001017456">
+            <system-out>
+[34m[mapper][39m Launching vite with command: build
+[34m[mapper][39m Running vite with args: build --outDir /home/runner/work/resource-mapper/resource-mapper/dist --emptyOutDir
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; returns the child process returned by execa" time="0.000720754">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; merges process.env with provided env when calling execa" time="0.00107337">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; attaches a catch handler to the child process" time="0.001024279">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; catch handler with signal SIGINT: logs=killed exit=false" time="0.001262373">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/utils/vite-launcher.test.ts" name="ViteLauncher &gt; launch &gt; catch handler with signal SIGTERM: logs=something went wrong exit=true" time="0.001348454">
+            <system-out>
+[34m[mapper][39m Launching vite with command: dev
+[34m[mapper][39m Running vite with args: dev
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31mVite process failed: something went wrong[39m
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/commands/impl/build.test.ts" timestamp="2026-03-01T14:28:56.844Z" hostname="runnervmnay03" tests="2" failures="0" errors="0" skipped="0" time="0.014711371">
+        <testcase classname="src/cli/commands/impl/build.test.ts" name="BuildCommand &gt; logs and runs bake/build logic and calls bakeOrExit, getOutputPath, launcher.launch" time="0.010195323">
+            <system-out>
+[34m[mapper][39m Running bake logic...
+
+[34m[mapper][39m [32mBake complete. Launching Vite build...[39m
+
+config.build.outDir: dist
+launchMock args: [
+  [32m&apos;build&apos;[39m,
+  {
+    VITE_MAPPER_DATA: [32m&apos;/mock/output.json&apos;[39m,
+    MAPPER_BUILD_OUT: [32m&apos;/home/runner/work/resource-mapper/resource-mapper/dist&apos;[39m
+  }
+]
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/commands/impl/build.test.ts" name="BuildCommand &gt; sets up cleanup handlers and calls kill/on" time="0.002698069">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/commands/impl/dev.test.ts" timestamp="2026-03-01T14:28:56.845Z" hostname="runnervmnay03" tests="2" failures="0" errors="0" skipped="0" time="0.013738518">
+        <testcase classname="src/cli/commands/impl/dev.test.ts" name="DevCommand &gt; logs and runs bake/dev logic and calls bakeOrExit, getDataDir, getOutputPath, launcher.launch, watcher.on" time="0.010629312">
+            <system-out>
+[34m[mapper][39m Running bake logic...
+
+[34m[mapper][39m [32mBake complete. Launching Vite dev server...[39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/commands/impl/dev.test.ts" name="DevCommand &gt; sets up cleanup handlers and calls watcher.close, viteProc.kill, viteProc.on" time="0.001350388">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cli/commands/impl/validate.test.ts" timestamp="2026-03-01T14:28:56.846Z" hostname="runnervmnay03" tests="3" failures="0" errors="0" skipped="0" time="0.019329448">
+        <testcase classname="src/cli/commands/impl/validate.test.ts" name="ValidateCommand &gt; logs validation steps and finds files, calls path.resolve, fs.existsSync, fs.readdirSync" time="0.012622347">
+            <system-out>
+[34m[mapper][39m Starting project validation...
+[34m[mapper][39m [32mConfiguration (mapper.config.json) is valid.[39m
+[34m[mapper][39m [32mFound 2 data source files.[39m
+[34m[mapper][39m Build output directory set to: /home/runner/work/resource-mapper/resource-mapper/dist
+[34m[mapper][39m [32mValidation complete. Project is ready to map![39m
+
+            </system-out>
+        </testcase>
+        <testcase classname="src/cli/commands/impl/validate.test.ts" name="ValidateCommand &gt; logs error if data directory missing and calls process.exit" time="0.00358423">
+            <system-out>
+[34m[mapper][39m Starting project validation...
+[34m[mapper][39m [32mConfiguration (mapper.config.json) is valid.[39m
+
+            </system-out>
+            <system-err>
+[34m[mapper][39m [31mData directory not found at: /home/runner/work/resource-mapper/resource-mapper/data[39m
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/cli/commands/impl/validate.test.ts" name="ValidateCommand &gt; logs warning if no yaml files found" time="0.001415108">
+            <system-out>
+[34m[mapper][39m Starting project validation...
+[34m[mapper][39m [32mConfiguration (mapper.config.json) is valid.[39m
+[34m[mapper][39m [33mData directory is empty. No YAML files found to process.[39m
+[34m[mapper][39m Build output directory set to: /home/runner/work/resource-mapper/resource-mapper/dist
+[34m[mapper][39m [32mValidation complete. Project is ready to map![39m
+
+            </system-out>
+        </testcase>
+    </testsuite>
+</testsuites>
