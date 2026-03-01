@@ -1,25 +1,23 @@
 name: CI
-on:
-  pull_request:
-    branches: [main]
 
 env:
   node_version: '22.17.0'
 
-jobs:
-  main:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.2
-        with:
-          fetch-depth: 0 # Important: Nx needs the full history to see what changed
+on:
+  pull_request:
+    branches: [main]
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6.2.0
+jobs:
+  # ── 1. Build ──────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6.2.0
         with:
           node-version: ${{ env.node_version }}
           cache: npm
@@ -32,13 +30,122 @@ jobs:
       - name: Build Affected
         run: npx nx affected --target=build --parallel=3
 
-      - name: Test Affected with Coverage
-        run: npx nx affected --target=test --parallel=3 --coverage.enabled --coverage.reporter=json-summary --coverage.reporter=lcov
+  # ── 2. Test (matrix: PR branch + main for trend comparison) ───────────────
+  test:
+    name: Test (${{ matrix.artifact }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      # Run both matrix legs even if one fails so we always have both artifacts
+      fail-fast: false
+      matrix:
+        include:
+          - branch: ${{ github.head_ref }}
+            artifact: pull-request
+          - branch: main
+            artifact: main
 
-      - name: Report Coverage
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6.2.0
+        with:
+          node-version: ${{ env.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: Run affected tests with coverage (vitest executor)
+        # engine + shared use @nx/vitest:test which forwards -- --coverage cleanly
+        run: npx nx affected --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+
+      - name: Run core tests with coverage
+        # core uses nx:run-commands + cwd due to SvelteKit vite.config complexity;
+        # coverage is enabled via a named configuration instead of -- --coverage
+        run: npx nx run core:test:coverage --passWithNoTests
+
+      # Upload all coverage folders as a single artifact so report-coverage can compare them
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.artifact }}
+          path: packages/*/coverage/
+
+  # ── 3. Annotate + Report ──────────────────────────────────────────────────
+  report:
+    name: Report
+    needs: test
+    runs-on: ubuntu-latest
+    # Always run so we get annotations even when tests fail
+    if: always()
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Download PR coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-pull-request
+          # Restores packages/*/coverage/ under pr-coverage/
+          path: pr-coverage
+
+      - name: Download main coverage
+        # continue-on-error: first PR to main won't have a main artifact yet
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-main
+          path: main-coverage
+
+      # Reads all junit.xml files across every package and posts inline
+      # annotations on the PR for each failing test.
+      # "java-junit" is the XML schema name — not the language.
+      - name: Annotate PR with test results
+        uses: dorny/test-reporter@v2
+        with:
+          name: Test Results
+          path: pr-coverage/*/junit*.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      # Per-package coverage comments. Each call posts one comment block.
+      # Add a new block here when you add a new package with tests.
+      - name: Report coverage — engine
         uses: davelosert/vitest-coverage-report-action@v2
         if: always()
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          json-summary-path: ./coverage/packages/core/coverage-summary.json
-          json-final-path: ./coverage/packages/core/coverage-final.json
+          name: Engine
+          json-summary-path: pr-coverage/engine/coverage-summary.json
+          json-summary-compare-path: main-coverage/engine/coverage-summary.json
+          json-final-path: pr-coverage/engine/coverage-final.json
+
+      - name: Report coverage — shared
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: Shared
+          json-summary-path: pr-coverage/shared/coverage-summary.json
+          json-summary-compare-path: main-coverage/shared/coverage-summary.json
+          json-final-path: pr-coverage/shared/coverage-final.json
+
+      - name: Report coverage — core
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: Core
+          json-summary-path: pr-coverage/core/coverage-summary.json
+          json-summary-compare-path: main-coverage/core/coverage-summary.json
+          json-final-path: pr-coverage/core/coverage-final.json

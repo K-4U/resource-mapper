@@ -1,5 +1,13 @@
 {
   "name": "shared",
   "projectType": "application",
-  "targets": {}
+  "targets": {
+    "test": {
+      "executor": "@nx/vitest:test",
+      "options": {
+        "configFile": "packages/shared/vitest.config.ts"
+      },
+      "outputs": ["{projectRoot}/coverage"]
+    }
+  }
 }

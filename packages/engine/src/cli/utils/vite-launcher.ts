@@ -61,7 +61,7 @@ export class ViteLauncher {
     ];
 
     if (command === 'build' && outDir) {
-      args.push('--outDir', path.resolve(process.cwd(), outDir, '--emptyOutDir'));;
+      args.push('--outDir', path.resolve(process.cwd(), outDir), '--emptyOutDir');
     }
 
     logger.info(`Running vite with args: ${args.join(' ')}`);

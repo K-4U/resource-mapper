@@ -65,7 +65,10 @@ describe('bake-util', () => {
   // ─── bakeOrExit ───────────────────────────────────────────────────────────
 
   describe('bakeOrExit', () => {
-    it('calls runBake with dataDir and outputPath when data directory exists', async () => {
+    it.each([
+      ['dataDir',    (a: any) => a.dataDir,    (v: string) => expect(v).toMatch(/data$/)],
+      ['outputPath', (a: any) => a.outputPath, (v: string) => expect(v).toContain('data.json')],
+    ])('calls runBake with a correct %s when data directory exists', async (_label, pick, assert) => {
       const { fs, runBake } = await getMocks();
       (fs.existsSync as ReturnType<typeof vi.fn>).mockReturnValue(true);
       runBake.mockResolvedValue(undefined);
@@ -73,36 +76,11 @@ describe('bake-util', () => {
       const { bakeOrExit } = await import('./bake-util.js');
       await bakeOrExit();
 
-      expect(runBake).toHaveBeenCalledWith(
-        expect.objectContaining({
-          dataDir: expect.any(String),
-          outputPath: expect.any(String),
-        })
-      );
-    });
-
-    it('calls runBake with a dataDir containing "data"', async () => {
-      const { fs, runBake } = await getMocks();
-      (fs.existsSync as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      runBake.mockResolvedValue(undefined);
-
-      const { bakeOrExit } = await import('./bake-util.js');
-      await bakeOrExit();
-
-      const callArg = runBake.mock.calls[0][0];
-      expect(callArg.dataDir).toMatch(/data$/);
-    });
-
-    it('calls runBake with an outputPath containing "data.json"', async () => {
-      const { fs, runBake } = await getMocks();
-      (fs.existsSync as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      runBake.mockResolvedValue(undefined);
-
-      const { bakeOrExit } = await import('./bake-util.js');
-      await bakeOrExit();
-
-      const callArg = runBake.mock.calls[0][0];
-      expect(callArg.outputPath).toContain('data.json');
+      expect(runBake).toHaveBeenCalledWith(expect.objectContaining({
+        dataDir: expect.any(String),
+        outputPath: expect.any(String),
+      }));
+      assert(pick(runBake.mock.calls[0][0]));
     });
 
     it('logs an error and calls process.exit(1) when data directory is missing', async () => {

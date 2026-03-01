@@ -7,7 +7,13 @@
       "options": {
         "command": "vitest run",
         "cwd": "packages/core"
-      }
+      },
+      "configurations": {
+        "coverage": {
+          "command": "vitest run --coverage"
+        }
+      },
+      "outputs": ["{projectRoot}/coverage"]
     },
     "publish": {
       "command": "npm publish --access public",

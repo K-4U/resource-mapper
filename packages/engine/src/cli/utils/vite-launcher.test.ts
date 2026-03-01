@@ -171,11 +171,14 @@ describe('ViteLauncher', () => {
       );
     });
 
-    it('passes only ["dev"] as args and does not include --outDir', async () => {
+    it.each([
+      ['dev'  ] as const,
+      ['build'] as const,
+    ])('passes only ["%s"] as args and does not include --outDir when outDir is omitted', async (command) => {
       const { execa } = await getMocks();
-      launcher.launch('dev', {});
+      launcher.launch(command, {});
       const argsUsed = (execa as any).mock.calls[0][1] as string[];
-      expect(argsUsed).toEqual(['dev']);
+      expect(argsUsed).toEqual([command]);
       expect(argsUsed).not.toContain('--outDir');
     });
 
@@ -188,23 +191,6 @@ describe('ViteLauncher', () => {
       expect(argsUsed).toContain('--emptyOutDir');
     });
 
-    it('logs build args including --outDir and --emptyOutDir', () => {
-      const infoSpy = vi.spyOn(logger, 'info');
-      launcher.launch('build', {}, 'dist');
-      expect(infoSpy).toHaveBeenCalledWith('Launching vite with command: build');
-      const argsLog = infoSpy.mock.calls.find(c => (c[0] as string).startsWith('Running vite with args:'));
-      expect(argsLog).toBeDefined();
-      expect(argsLog![0]).toContain('--outDir');
-      expect(argsLog![0]).toContain('--emptyOutDir');
-    });
-
-    it('calls execa with only ["build"] when outDir is not provided', async () => {
-      const { execa } = await getMocks();
-      launcher.launch('build', {});
-      const argsUsed = (execa as any).mock.calls[0][1] as string[];
-      expect(argsUsed).toEqual(['build']);
-      expect(argsUsed).not.toContain('--outDir');
-    });
 
     it('returns the child process returned by execa', () => {
       const result = launcher.launch('dev', {});
@@ -232,34 +218,34 @@ describe('ViteLauncher', () => {
       expect(localCatch).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    it('suppresses SIGINT errors in the catch handler without calling logger.error', async () => {
+    it.each([
+      ['SIGINT',  'killed',              false, false],
+      ['SIGTERM', 'something went wrong', true,  true ],
+    ] as const)('catch handler with signal %s: logs=%s exit=%s', async (signal, message, shouldLog, shouldExit) => {
       const { execa } = await getMocks();
       let catchHandler: ((err: any) => void) | undefined;
-      childMock = { catch: vi.fn((fn) => { catchHandler = fn; return undefined; }) };
-      execa.mockReturnValue(childMock);
-
-      const errorSpy = vi.spyOn(logger, 'error');
-      launcher.launch('dev', {});
-
-      expect(catchHandler).toBeDefined();
-      catchHandler!({ signal: 'SIGINT', message: 'killed' });
-      expect(errorSpy).not.toHaveBeenCalled();
-    });
-
-    it('calls logger.error and process.exit(1) for non-SIGINT errors in catch handler', async () => {
-      const { execa } = await getMocks();
-      let catchHandler: ((err: any) => void) | undefined;
-      childMock = { catch: vi.fn((fn) => { catchHandler = fn; return undefined; }) };
-      execa.mockReturnValue(childMock);
+      const localChild = { catch: vi.fn((fn) => { catchHandler = fn; return undefined; }) };
+      execa.mockReturnValue(localChild);
 
       const errorSpy = vi.spyOn(logger, 'error');
       const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => { throw new Error('process.exit'); });
 
       launcher.launch('dev', {});
       expect(catchHandler).toBeDefined();
-      expect(() => catchHandler!({ signal: 'SIGTERM', message: 'something went wrong' })).toThrow('process.exit');
-      expect(errorSpy).toHaveBeenCalledWith('Vite process failed: something went wrong');
-      expect(exitSpy).toHaveBeenCalledWith(1);
+
+      const run = () => catchHandler!({ signal, message });
+      if (shouldExit) {
+        expect(run).toThrow('process.exit');
+      } else {
+        run();
+      }
+
+      if (shouldLog) {
+        expect(errorSpy).toHaveBeenCalledWith(`Vite process failed: ${message}`);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+      } else {
+        expect(errorSpy).not.toHaveBeenCalled();
+      }
     });
   });
 });
