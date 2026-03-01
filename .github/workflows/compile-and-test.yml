@@ -36,14 +36,18 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     strategy:
-      # Run both matrix legs even if one fails so we always have both artifacts
+      # Run both legs even if one fails so we always have both artifacts
       fail-fast: false
       matrix:
         include:
           - branch: ${{ github.head_ref }}
             artifact: pull-request
+            # PR leg: only test what changed — faster feedback
+            all: false
           - branch: main
             artifact: main
+            # main leg: always test everything so coverage is never missing
+            all: true
 
     steps:
       - name: Checkout ${{ matrix.branch }}
@@ -62,18 +66,22 @@ jobs:
 
       - uses: nrwl/nx-set-shas@v4
 
-      - name: Run affected tests with coverage (vitest executor)
-        # engine + shared use @nx/vitest:test which forwards -- --coverage cleanly
-        run: npx nx affected --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+      # PR leg — only affected packages, faster
+      - name: Run affected tests with coverage
+        if: ${{ !matrix.all }}
+        run: |
+          npx nx affected --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+          npx nx run core:test:coverage
 
-      - name: Run core tests with coverage
-        # core uses nx:run-commands + cwd due to SvelteKit vite.config complexity;
-        # coverage is enabled via a named configuration instead of -- --coverage
-        run: npx nx run core:test:coverage --passWithNoTests
+      # main leg — all packages, so coverage-main is always complete
+      - name: Run all tests with coverage
+        if: ${{ matrix.all }}
+        run: |
+          npx nx run-many --target=test --parallel=3 --exclude=core -- --coverage --passWithNoTests
+          npx nx run core:test:coverage
 
-      # Upload all coverage folders as a single artifact so report-coverage can compare them
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.0
         if: always()
         with:
           name: coverage-${{ matrix.artifact }}
@@ -84,7 +92,6 @@ jobs:
     name: Report
     needs: test
     runs-on: ubuntu-latest
-    # Always run so we get annotations even when tests fail
     if: always()
     permissions:
       checks: write
@@ -92,23 +99,24 @@ jobs:
       contents: read
 
     steps:
+      # Required by dorny/test-reporter to resolve commit SHAs for annotations
+      - uses: actions/checkout@v6.0.2
+
       - name: Download PR coverage
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.0
         with:
           name: coverage-pull-request
-          # Restores packages/*/coverage/ under pr-coverage/
           path: pr-coverage
 
       - name: Download main coverage
-        # continue-on-error: first PR to main won't have a main artifact yet
+        # continue-on-error: the very first PR to main won't have a main artifact yet
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.0
         with:
           name: coverage-main
           path: main-coverage
 
-      # Reads all junit.xml files across every package and posts inline
-      # annotations on the PR for each failing test.
+      # Reads all junit.xml files and posts inline PR annotations per failing test.
       # "java-junit" is the XML schema name — not the language.
       - name: Annotate PR with test results
         uses: dorny/test-reporter@v2
@@ -118,11 +126,12 @@ jobs:
           reporter: java-junit
           fail-on-error: false
 
-      # Per-package coverage comments. Each call posts one comment block.
-      # Add a new block here when you add a new package with tests.
+      # Per-package coverage comments.
+      # continue-on-error so a missing file (e.g. no tests yet in shared) doesn't fail the job.
       - name: Report coverage — engine
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@v2.9.2
         if: always()
+        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           name: Engine
@@ -131,8 +140,9 @@ jobs:
           json-final-path: pr-coverage/engine/coverage-final.json
 
       - name: Report coverage — shared
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@v2.9.2
         if: always()
+        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           name: Shared
@@ -141,8 +151,9 @@ jobs:
           json-final-path: pr-coverage/shared/coverage-final.json
 
       - name: Report coverage — core
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@v2.9.2
         if: always()
+        continue-on-error: true
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           name: Core
