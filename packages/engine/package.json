@@ -30,9 +30,10 @@
     "execa": "^5.1.1",
     "zod": "^4.3.6"
   },
-  "exports": {
-    "./bake-logic": "./src/scripts/bake-logic.js"
-  },
+  "main": "dist/cli.js",
+  "files": [
+    "dist"
+  ],
   "bin": {
     "mapper-engine": "./dist/cli.js"
   },
