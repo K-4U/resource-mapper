@@ -32,14 +32,17 @@
   },
   "main": "dist/cli.js",
   "files": [
-    "dist"
+    "dist",
+    "../../README.md",
+    "../../LICENSE"
   ],
   "bin": {
     "mapper-engine": "./dist/cli.js"
   },
   "scripts": {
     "build-engine": "tsup",
-    "download-icons": "node src/scripts/download-aws-icons.ts"
+    "download-icons": "node src/scripts/download-aws-icons.ts",
+    "prepublishOnly": "cp ../../README.md . && cp ../../LICENSE . && npm run build-engine"
   },
   "devDependencies": {
     "tsup": "^8.5.1",
