@@ -9,7 +9,6 @@
     "build": "mapper-engine build"
   },
   "dependencies": {
-    "@resource-mapper/engine": "workspace:*",
-    "@resource-mapper/core": "workspace:*"
+    "@k-4u/resource-mapper": "*"
   }
 }

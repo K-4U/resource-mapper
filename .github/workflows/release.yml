@@ -1,14 +1,26 @@
 name: Release and Publish
+
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      specifier:
+        description: 'Version bump'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
 
 jobs:
-  # ── 1. Shared prep: test, version bump, build ─────────────────────────────
-  prepare:
+  release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write   # push tags + create GitHub release
       id-token: write   # OIDC token for npm trusted publishing
 
     steps:
@@ -16,6 +28,7 @@ jobs:
         uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v6.2.0
@@ -23,27 +36,19 @@ jobs:
           node-version: '22.17.0'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Test
-        run: npx nx run-many --target=test --parallel=3-- --passWithNoTests
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Version Packages
-        run: npx nx release version ${{ github.event.release.tag_name }} --stageChanges
+      - name: Build packages
+        run: npx nx run-many --target=build --projects=shared,engine
 
-      - name: Commit Version Bump
-        uses: stefanzweifel/git-auto-commit-action@v7.1.0
-        with:
-          commit_message: "chore: release ${{ github.event.release.tag_name }}"
-          branch: main
-
-      - name: Build Projects
-        run: nx run-many --target=build
-
-      - name: Update NPM because github supplies old versions
-        run: npm install -g npm@latest
-
-      - name: Publish
-        run: nx release publish --yes
+      - name: Release
+        run: npx nx release ${{ inputs.specifier }} --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
