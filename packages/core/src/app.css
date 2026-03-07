@@ -88,6 +88,17 @@ TODO: The styles below are for all nodes, style them based on the type of node, 
     filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
 }
 
+@keyframes snake-dash {
+    to {
+        stroke-dashoffset: -24;
+    }
+}
+
+.snake-edge-path.animated {
+    stroke-dasharray: 8 6;
+    animation: snake-dash 1s linear infinite;
+}
+
 .snake-edge-path.internal {
     @apply stroke-blue-400 dark:stroke-blue-600
 }

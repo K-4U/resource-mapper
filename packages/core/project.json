@@ -2,6 +2,21 @@
   "name": "core",
   "projectType": "application",
   "targets": {
+    "build": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "build"
+      },
+      "outputs": ["{projectRoot}/build"],
+      "dependsOn": [{ "projects": "shared", "target": "build" }]
+    },
+    "dev": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "dev"
+      },
+      "dependsOn": [{ "projects": "shared", "target": "build" }]
+    },
     "test": {
       "executor": "nx:run-commands",
       "options": {

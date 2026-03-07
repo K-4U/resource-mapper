@@ -1,0 +1,28 @@
+{
+  "name": "my-test-application",
+  "projectType": "application",
+  "root": "examples/basic",
+  "sourceRoot": "examples/basic/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "dev"
+      },
+      "dependsOn": [
+        { "projects": "engine", "target": "build" }
+      ],
+      "outputs": []
+    },
+    "build": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "build"
+      },
+      "dependsOn": [
+        { "projects": "engine", "target": "build" }
+      ],
+      "outputs": ["{projectRoot}/dist"]
+    }
+  }
+}

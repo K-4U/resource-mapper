@@ -1,7 +1,23 @@
 {
   "name": "engine",
-  "projectType": "application",
+  "projectType": "library",
   "targets": {
+    "build": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "build"
+      },
+      "dependsOn": [{ "projects": "shared", "target": "build" }],
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "build-engine": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "build-engine"
+      },
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^build-engine"]
+    },
     "test": {
       "executor": "@nx/vitest:test",
       "options": {

@@ -1,5 +1,5 @@
 {
-  "name": "my-test-map",
+  "name": "my-test-application",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,6 @@
     "build": "mapper-engine build"
   },
   "dependencies": {
-    "@resource-mapper/engine": "workspace:*",
-    "@resource-mapper/core": "workspace:*"
+    "@k-4u/resource-mapper": "*"
   }
 }

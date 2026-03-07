@@ -187,7 +187,7 @@
 </script>
 
 <BaseEdge
-        class={`${isEffectivelySelected ? 'snake-edge-path selected' : 'snake-edge-path'} ${incomingOrOutgoingOrInternal ?? ''}`}
+        class={`snake-edge-path ${isEffectivelySelected ? 'selected' : ''} ${isConnectedNodeSelected ? 'animated' : ''} ${incomingOrOutgoingOrInternal ?? ''}`}
         {id}
         {path}
         {style}

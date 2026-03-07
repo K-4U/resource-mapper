@@ -12,9 +12,6 @@
       ]
     },
     "build": {
-      "outputs": [
-        "{projectRoot}/packages/core/build"
-      ],
       "cache": true
     },
     "test": {
@@ -35,6 +32,9 @@
       "currentVersionResolver": "git-tag"
     },
     "changelog": {
+      "workspaceChangelog": {
+        "createRelease": false
+      },
       "projectChangelogs": true
     }
   },

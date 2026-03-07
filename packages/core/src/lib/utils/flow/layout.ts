@@ -5,7 +5,7 @@ import type {ElkNode} from "elkjs/lib/elk-api";
 
 const elk = new ELK();
 const PADDING = 10;
-export const OFFSET_STEP = 20;
+export const OFFSET_STEP = 5;
 
 /**
  * Helper to calculate absolute position of a node by traversing its parent chain.
