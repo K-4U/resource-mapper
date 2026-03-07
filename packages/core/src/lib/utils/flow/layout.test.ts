@@ -77,9 +77,9 @@ describe('layoutFlowGraph', () => {
         expect(nodeB).toBeTruthy()
 
         // Verify component-specific data is preserved
-        expect(nodeA?.data.label).toBe('Service A')
-        expect(nodeA?.data.serviceType).toBe('lambda')
-        expect(nodeB?.data.serviceType).toBe('sqs')
+        expect(nodeA?.data?.label).toBe('Service A')
+        expect(nodeA?.data?.serviceType).toBe('lambda')
+        expect(nodeB?.data?.serviceType).toBe('sqs')
 
         // Edge should be preserved with same ids and data
         expect(out.edges.length).toBe(1)

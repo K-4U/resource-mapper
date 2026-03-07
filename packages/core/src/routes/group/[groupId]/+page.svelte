@@ -1,11 +1,10 @@
 <script lang="ts">
     import type {PageData} from './$types'
     import type {ExternalGroupServices, GroupInfo, ServiceDefinition} from '$shared/types'
-    import {FlowCanvas, LoadingOverlay, ErrorDisplay, EmptyState, ServiceDetailSidebar} from '$lib/components';
+    import {FlowCanvas, LoadingOverlay, ErrorDisplay, EmptyState, ServiceDetailSidebar, GraphProvider} from '$lib/components';
     import type {FlowGraphInput} from '$shared/flow-types'
     import {buildGroupServicesGraph} from '$lib/utils/flow/servicesGraph'
     import {goto} from '$app/navigation'
-    import {SvelteFlowProvider} from '@xyflow/svelte';
     import {selectedGroup} from "$lib/stores/diagram";
 
     let {data}: { data: PageData } = $props()
@@ -57,8 +56,7 @@
         }
     })
 
-    function handleNodeDoubleClick(event: CustomEvent<string>) {
-        const nodeId = event.detail
+    function handleNodeDoubleClick(nodeId: string) {
         const externalGroupId = externalGroupNodeLookup[nodeId]
         console.debug('[group.svelte] nodeDoubleClick', {nodeId, externalGroupId})
         if (externalGroupId) {
@@ -84,11 +82,11 @@
     <EmptyState title="No services" message="This group has no service diagram to display yet."/>
 {:else}
     <div class="flex h-full w-full gap-1 lg:flex-row">
-        <SvelteFlowProvider>
+        <GraphProvider>
             <FlowCanvas
                     graph={groupGraph}
                     pending={false}
-                    on:nodeDoubleClick={handleNodeDoubleClick}
+                    onnodeDoubleClick={handleNodeDoubleClick}
             />
             <!--            on:nodeClick={handleNodeClick}-->
 
@@ -97,6 +95,6 @@
                     {serviceNodeLookup}
                     {externalServiceLookup}
             />
-        </SvelteFlowProvider>
+        </GraphProvider>
     </div>
 {/if}

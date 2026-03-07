@@ -37,7 +37,11 @@ export default defineConfig({
         }
     },
     optimizeDeps: {
-        exclude: ['libavoid-js']
+        exclude: ['libavoid-js'],
+        include: ['@maxgraph/core']
+    },
+    ssr: {
+        noExternal: ['@maxgraph/core']
     },
     assetsInclude: ['**/*.wasm'],
     test: {

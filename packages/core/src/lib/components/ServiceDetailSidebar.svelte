@@ -1,18 +1,10 @@
 <script lang="ts">
     import TeamContactCard from '$lib/components/TeamContactCard.svelte'
-    import {useNodes, useOnSelectionChange} from "@xyflow/svelte";
+    import {graphSelection} from '$lib/state/graphSelection.svelte'
     import type {GroupInfo, ServiceDefinition} from "$shared/types";
     import {getAwsIconPath} from "$lib/utils/awsIcons";
     import {GenericSidebarCard} from "$lib/components";
     import {getGroup} from "$lib/data/groups";
-
-    const nodes = useNodes();
-    let selectedNode = $derived(nodes.current.find((node) => node.selected));
-
-    useOnSelectionChange(({nodes: n, edges}) => {
-        selectedNodes = n.map((node) => node.id);
-        selectedEdges = edges.map((edge) => edge.id);
-    });
 
     const {group, serviceNodeLookup, externalServiceLookup} = $props<{
         group: GroupInfo | null;
@@ -20,27 +12,26 @@
         externalServiceLookup: Record<string, { service: ServiceDefinition; group: GroupInfo }>;
     }>();
 
-    let isExternal = $derived(!!selectedNode && selectedNode.id in externalServiceLookup);
+    let selectedNodeId = $derived(graphSelection.selectedNodeIds[0] ?? null);
+
+    let isExternal = $derived(!!selectedNodeId && selectedNodeId in externalServiceLookup);
 
     let serviceInfo = $derived.by<ServiceDefinition | null>(() => {
-        if (!selectedNode) return null;
+        if (!selectedNodeId) return null;
 
-        // Use the boolean to pick the source
         return isExternal
-            ? externalServiceLookup[selectedNode.id]?.service
-            : serviceNodeLookup[selectedNode.id];
+            ? externalServiceLookup[selectedNodeId]?.service
+            : serviceNodeLookup[selectedNodeId];
     });
 
     let activeGroup = $state<GroupInfo | null>(group);
 
     $effect(() => {
-        // If it's external and we have a groupId, go fetch it
         if (isExternal && serviceInfo?.groupId) {
             getGroup(serviceInfo.groupId).then(res => {
                 activeGroup = res;
             });
         } else {
-            // Otherwise, reset back to the group passed in via props
             activeGroup = group;
         }
     });

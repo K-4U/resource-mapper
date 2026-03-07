@@ -1,7 +1,31 @@
-import type { Edge, Node } from '@xyflow/svelte'
 import type { GroupInfo, ServiceDefinition } from './types.js'
 
 export type FlowNodeKind = 'group' | 'service' | 'external' | 'mainGroup'
+
+export interface GraphNode<T = any> {
+  id: string
+  position: { x: number; y: number }
+  data?: T
+  type?: string
+  width?: number
+  height?: number
+  parentId?: string
+  hidden?: boolean
+  [key: string]: any
+}
+
+export interface GraphEdge<T = any> {
+  id: string
+  source: string
+  target: string
+  data?: T
+  type?: string
+  label?: string
+  sourceHandle?: string | null
+  targetHandle?: string | null
+  hidden?: boolean
+  [key: string]: any
+}
 
 export interface FlowNodeData extends Record<string, unknown> {
   label: string
@@ -23,15 +47,15 @@ export interface FlowEdgeData extends Record<string, unknown> {
 }
 
 export interface FlowGraphInput {
-  groupNodes: Node<FlowNodeData>[]
-  serviceNodes: Node<FlowNodeData>[]
-  edges: Edge<FlowEdgeData>[]
+  groupNodes: GraphNode<FlowNodeData>[]
+  serviceNodes: GraphNode<FlowNodeData>[]
+  edges: GraphEdge<FlowEdgeData>[]
   signature: string
 }
 
 export interface FlowGraphOutput {
-  nodes: Node<FlowNodeData>[]
-  edges: Edge<FlowEdgeData>[]
+  nodes: GraphNode<FlowNodeData>[]
+  edges: GraphEdge<FlowEdgeData>[]
   signature: string
 }
 

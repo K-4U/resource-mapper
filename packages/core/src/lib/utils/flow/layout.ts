@@ -1,6 +1,5 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
-import {type Edge, type Node} from '@xyflow/svelte';
-import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData} from '$shared/flow-types';
+import type {FlowEdgeData, FlowGraphInput, FlowGraphOutput, FlowNodeData, GraphEdge, GraphNode} from '$shared/flow-types';
 import type {ElkNode} from "elkjs/lib/elk-api";
 
 const elk = new ELK();
@@ -10,7 +9,7 @@ export const OFFSET_STEP = 20;
 /**
  * Helper to calculate absolute position of a node by traversing its parent chain.
  */
-export function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[]): { x: number, y: number } {
+export function getAbsolutePosition(nodeId: string, nodes: GraphNode<any>[]): { x: number, y: number } {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return {x: 0, y: 0};
 
@@ -37,8 +36,8 @@ export function getAbsolutePosition(nodeId: string, nodes: Node<FlowNodeData>[])
  */
 export function calculateEdgeOffset(
     edgeId: string,
-    nodes: Node<FlowNodeData>[],
-    edges: Edge<FlowEdgeData>[],
+    nodes: GraphNode<any>[],
+    edges: GraphEdge<any>[],
     isSource: boolean
 ): number {
     const edge = edges.find(e => e.id === edgeId);
@@ -50,7 +49,7 @@ export function calculateEdgeOffset(
     const handle = isSource ? edge.sourceHandle : edge.targetHandle;
     const isVertical = handle?.toLowerCase().includes('top') || handle?.toLowerCase().includes('bottom');
 
-    let finalSiblings: Edge<FlowEdgeData>[] = [];
+    let finalSiblings: GraphEdge<FlowEdgeData>[] = [];
     let usedAreaFallback = false;
 
     // HANDLE OFFSET: Siblings on the same node and same handle
@@ -138,7 +137,7 @@ function convertEdgesToElkEdges(input: FlowGraphInput) {
 /**
  * Helper to get the dimensions of a node, prioritizing measured values from Svelte Flow.
  */
-export function getNodeDimensions(node: Node<FlowNodeData>): { w: number, h: number } {
+export function getNodeDimensions(node: GraphNode<any>): { w: number, h: number } {
     const w = Math.round(node.measured?.width ?? node.width ?? 150);
     const h = Math.round(node.measured?.height ?? node.height ?? 40);
     return {w, h};
@@ -149,7 +148,7 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
     const elkEdges = convertEdgesToElkEdges(input);
     // console.debug('[layoutFlowGraph] Starting layout with input:', {input});
     // Helper: Build node properties and handle dimensions
-    const prepareElkNode = (node: Node<FlowNodeData>) => {
+    const prepareElkNode = (node: GraphNode<FlowNodeData>) => {
         const {w, h} = getNodeDimensions(node);
         return {
             ...node,
@@ -182,13 +181,13 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
 
     return elk.layout(elkGraph).then(async (layoutedGraph) => {
         console.debug('[layoutFlowGraph] Layout completed:', {layoutedGraph});
-        const flattenedNodes: Node<FlowNodeData>[] = [];
-        const flattenedEdges: Edge<FlowEdgeData>[] = [];
+        const flattenedNodes: GraphNode<FlowNodeData>[] = [];
+        const flattenedEdges: GraphEdge<FlowEdgeData>[] = [];
 
         // Lookup maps to handle the coordinate system bridge
         const parentPosLookup = new Map<string, { x: number, y: number }>();
         const nodeToParent = new Map<string, string>();
-        const nodeLookup = new Map<String, Node<FlowNodeData>>();
+        const nodeLookup = new Map<String, GraphNode<FlowNodeData>>();
 
         // 2. Process the results
         layoutedGraph.children?.forEach(parentOrOrphan => {
@@ -203,7 +202,7 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
                     ...parentOrOrphan,
                     position: {x: px, y: py},
                     draggable: true,
-                } as Node<FlowNodeData>);
+                } as unknown as GraphNode<FlowNodeData>);
 
                 // Map children and record their parent for edge offsetting
                 parentOrOrphan.children.forEach(child => {
@@ -213,7 +212,7 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
                         position: {x: child.x || 0, y: child.y || 0},
                         draggable: true,
                         extent: [[PADDING, 50], [(parentOrOrphan.width || 0) - PADDING, (parentOrOrphan.height || 0) - PADDING]]
-                    } as Node<FlowNodeData>;
+                    } as unknown as GraphNode<FlowNodeData>;
                     flattenedNodes.push(node);
                     nodeLookup.set(child.id, node);
                 });
@@ -223,13 +222,13 @@ export async function layoutFlowGraph(input: FlowGraphInput): Promise<FlowGraphO
                     ...parentOrOrphan,
                     position: {x: px, y: py},
                     draggable: true,
-                } as Node<FlowNodeData>;
+                } as unknown as GraphNode<FlowNodeData>;
                 flattenedNodes.push(node);
                 nodeLookup.set(node.id, node);
             }
         });
 
-        const edges = input.edges.filter(e => e.data.connectionType !== 'service-group');
+        const edges = input.edges.filter(e => e.data?.connectionType !== 'service-group');
 
         return {
             nodes: flattenedNodes,

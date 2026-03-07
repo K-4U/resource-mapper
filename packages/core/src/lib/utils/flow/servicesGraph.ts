@@ -8,14 +8,13 @@ import {
     type ServiceIncomingLink,
     type ServiceLink
 } from '$shared/types'
-import type {FlowEdgeData, FlowNodeData, ServicesGraphResult,} from '$shared/flow-types'
+import type {FlowEdgeData, FlowNodeData, ServicesGraphResult, GraphNode, GraphEdge} from '$shared/flow-types'
 import {createGraphSignature} from '$lib/utils/flow/helpers'
 import {getServiceNodeIdFromDefinition} from '$lib/utils/flow/serviceIds'
-import type {Edge, Node} from "@xyflow/svelte";
 
 const position = {x: 0, y: 0};
 
-function createServiceNode(nodeId: string, service: ServiceDefinition): Node<FlowNodeData> {
+function createServiceNode(nodeId: string, service: ServiceDefinition): GraphNode<FlowNodeData> {
     return {
         id: nodeId,
         type: 'service',
@@ -42,10 +41,10 @@ export function buildGroupServicesGraph(
     groupConnections: GroupConnection[],
     externalGroups: ExternalGroupServices[] = []
 ): ServicesGraphResult {
-    const nodes: Node<FlowNodeData>[] = []
-    const edges: Edge<FlowEdgeData>[] = []
+    const nodes: GraphNode<FlowNodeData>[] = []
+    const edges: GraphEdge<FlowEdgeData>[] = []
     const serviceNodeLookup = new Map<string, string>()
-    const externalNodeMap = new Map<string, Node<FlowNodeData>>()
+    const externalNodeMap = new Map<string, GraphNode<FlowNodeData>>()
     const serviceNodeRecord: Record<string, ServiceDefinition> = {}
     const externalNodeRecord: Record<string, { service: ServiceDefinition; group: GroupInfo }> = {}
 
@@ -117,7 +116,7 @@ export function buildGroupServicesGraph(
     })
 
     // 4. Create Group Container Nodes
-    const groupNodes: Node<FlowNodeData>[] = Array.from(allGroups.values()).map(g => ({
+    const groupNodes: GraphNode<FlowNodeData>[] = Array.from(allGroups.values()).map(g => ({
         id: `group_${g.groupName}`,
         type: 'serviceGroup',
         data: {
@@ -182,7 +181,7 @@ function ensureExternalNode(
     groupId: string,
     serviceId: string,
     lookup: Map<string, { incoming?: ExternalGroupServices; outgoing?: ExternalGroupServices }>,
-    nodeMap: Map<string, Node<FlowNodeData>>,
+    nodeMap: Map<string, GraphNode<FlowNodeData>>,
     record: Record<string, { service: ServiceDefinition; group: GroupInfo }>
 ): string | null {
     const key = `svc::${groupId}::${serviceId}`
@@ -240,7 +239,7 @@ function buildEdge(
     targetId: string,
     connectionType?: ConnectionType | 'service-group',
     edgeType: 'external' | 'internal' = 'internal' //TODO: Name me better
-): Edge<FlowEdgeData> {
+): GraphEdge<FlowEdgeData> {
     console.debug(`Creating edge from ${sourceId} to ${targetId} of type ${connectionType} (${edgeType})`)
     return {
         id: `edge_${sourceId}_${targetId}`,

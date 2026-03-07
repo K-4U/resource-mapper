@@ -1,9 +1,8 @@
 <script lang="ts">
     import type {PageData} from './$types'
-    import {FlowCanvas, GroupDetailSidebar, LoadingSpinner, EmptyState, ErrorDisplay} from '$lib/components'
+    import {FlowCanvas, GroupDetailSidebar, LoadingSpinner, EmptyState, ErrorDisplay, GraphProvider} from '$lib/components'
     import {buildGroupOverviewGraph} from '$lib/utils/flow/groupOverviewGraph'
     import {goto, invalidateAll} from '$app/navigation'
-    import {SvelteFlowProvider} from "@xyflow/svelte";
 
     let { data } = $props<{ data: PageData }>()
 
@@ -28,9 +27,9 @@
     let isLoading = $derived(!groups || !groupConnections)
     let hasDiagramContent = $derived(true)
 
-    function handleNodeDoubleClick(event: CustomEvent<string>) {
-        const groupId = nodeGroupMap[event.detail]
-        console.debug('[overview.svelte] nodeDoubleClick', {nodeId: event.detail, groupId})
+    function handleNodeDoubleClick(nodeId: string) {
+        const groupId = nodeGroupMap[nodeId]
+        console.debug('[overview.svelte] nodeDoubleClick', {nodeId, groupId})
         if (groupId) {
             goto(`/group/${groupId}`)
         }
@@ -62,12 +61,12 @@
     <EmptyState title="No Groups Found" message="No group definitions were discovered in the static data set."/>
 {:else}
     <div class="flex h-full w-full gap-1 lg:flex-row">
-        <SvelteFlowProvider>
+        <GraphProvider>
             <!-- Todo: make the pending variable dependant on the actual loading of data -->
             <FlowCanvas
                     graph={graphInput}
                     pending={isLoading}
-                    on:nodeDoubleClick={handleNodeDoubleClick}
+                    onnodeDoubleClick={handleNodeDoubleClick}
             />
             <!-- Todo: Check if we can resize this sidebar on drag -->
             <!-- Todo: Check if we can close the sidebar with a button in the center left of the sidebar when open -->
@@ -76,6 +75,6 @@
                     groups={groups ?? {}}
                     placeholderMessage="Select a group to see details"
             />
-        </SvelteFlowProvider>
+        </GraphProvider>
     </div>
 {/if}

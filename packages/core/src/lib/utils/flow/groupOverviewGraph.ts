@@ -1,7 +1,6 @@
 import type {GroupConnection, GroupInfo} from '$shared/types'
-import type {FlowEdgeData, FlowGraphInput, FlowNodeData} from '$shared/flow-types'
+import type {FlowEdgeData, FlowGraphInput, FlowNodeData, GraphEdge, GraphNode} from '$shared/flow-types'
 import {createGraphSignature, formatConnectionLabel, sanitizeNodeId} from '$lib/utils/flow/helpers'
-import type {Edge, Node} from "@xyflow/svelte"
 
 export interface GroupOverviewGraphResult {
   graph: FlowGraphInput | null
@@ -17,7 +16,7 @@ export function buildGroupOverviewGraph(
   }
 
   // Convert each group into a diagram node
-  const nodes: Node<FlowNodeData>[] = Object.entries(groups).map(([groupId, groupInfo]) => ({
+  const nodes: GraphNode<FlowNodeData>[] = Object.entries(groups).map(([groupId, groupInfo]) => ({
     id: sanitizeNodeId(groupId, 'mainGroup'),
     type: 'mainGroup',
     data: {
@@ -32,7 +31,7 @@ export function buildGroupOverviewGraph(
   }))
 
     // Convert each connection into a diagram edge
-    const edges: Edge<FlowEdgeData>[] = connections.map((connection, index) => {
+    const edges: GraphEdge<FlowEdgeData>[] = connections.map((connection, index) => {
         const sourceId = sanitizeNodeId(connection.sourceGroup, 'mainGroup')
         const targetId = sanitizeNodeId(connection.targetGroup, 'mainGroup')
         return {
@@ -51,7 +50,7 @@ export function buildGroupOverviewGraph(
 
   // Create a unique signature for the graph for caching/change detection
   const signature = createGraphSignature('group-overview', {
-    groups: nodes.map(node => node.data.groupId).sort(),
+    groups: nodes.map(node => node.data?.groupId).sort(),
     connections: connections.map(connection => ({
       sourceGroup: connection.sourceGroup,
       targetGroup: connection.targetGroup,
@@ -62,7 +61,7 @@ export function buildGroupOverviewGraph(
   const graph: FlowGraphInput = { groupNodes: [], serviceNodes: nodes, edges, signature }
   // Map diagram node IDs back to group IDs for UI interaction
   const nodeToGroupMap = nodes.reduce<Record<string, string>>((lookup, node) => {
-    if (node.data.groupId) {
+    if (node.data?.groupId) {
       lookup[node.id] = node.data.groupId
     }
     return lookup

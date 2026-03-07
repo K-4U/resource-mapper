@@ -1,15 +1,15 @@
 <script lang="ts">
     import type {GroupInfo} from '$shared/types'
     import {TeamContactCard, GenericSidebarCard} from '$lib/components'
-    import {useNodes} from '@xyflow/svelte';
+    import {graphSelection} from '$lib/state/graphSelection.svelte'
 
-    const {groupMap, groups} = $props<{
+    const {groupMap, groups, placeholderMessage = 'Select a node to see details'} = $props<{
         groupMap: Record<string, string>;
         groups: Record<string, GroupInfo>;
+        placeholderMessage?: string;
     }>()
 
-    const nodes = useNodes();
-    let selectedNodeId = $derived(nodes.current.find(n => n.selected)?.id ?? null);
+    let selectedNodeId = $derived(graphSelection.selectedNodeIds[0] ?? null);
 
     let groupId = $derived(selectedNodeId ? (groupMap[selectedNodeId] ?? null) : null);
     let groupInfo = $derived(groupId ? (groups[groupId] ?? null) : null);
