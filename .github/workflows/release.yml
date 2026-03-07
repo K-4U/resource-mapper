@@ -15,6 +15,10 @@ on:
           - prepatch
           - preminor
           - premajor
+      release_title:
+        description: 'Optional release title (leave empty to use generated title)'
+        required: false
+        type: string
 
 jobs:
   release:
@@ -47,8 +51,47 @@ jobs:
       - name: Build packages
         run: npx nx run-many --target=build --projects=shared,engine
 
+      - name: Update NPM (ensure latest for publish)
+        run: npm install -g npm@latest
+
       - name: Release
         run: npx nx release ${{ inputs.specifier }} --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get last tag
+        id: get_tag
+        run: |
+          echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+
+      - name: Read changelogs from packages and combine into release body
+        id: changelog
+        run: |
+          set -e
+          TEMPFILE=$(mktemp)
+          for f in packages/*/CHANGELOG.md; do
+            if [ -f "$f" ]; then
+              PKG=$(basename $(dirname "$f"))
+              echo "## $PKG" >> "$TEMPFILE"
+              cat "$f" >> "$TEMPFILE"
+              echo "\n" >> "$TEMPFILE"
+            fi
+          done
+          if [ -f "$TEMPFILE" ] && [ -s "$TEMPFILE" ]; then
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            cat "$TEMPFILE" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "body=" >> $GITHUB_OUTPUT
+          fi
+          rm -f "$TEMPFILE"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: ${{ inputs.release_title || steps.get_tag.outputs.tag }}
+          body: ${{ steps.changelog.outputs.body }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

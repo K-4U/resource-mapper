@@ -50,3 +50,4 @@ storybook-static
 *.storybook.log
 
 .nx/polygraph
+**/CHANGELOG.md

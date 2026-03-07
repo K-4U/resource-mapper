@@ -33,7 +33,7 @@
     },
     "changelog": {
       "workspaceChangelog": {
-        "createRelease": "github"
+        "createRelease": false
       },
       "projectChangelogs": true
     }
