@@ -8,6 +8,10 @@
         "configFile": "packages/shared/vitest.config.ts"
       },
       "outputs": ["{projectRoot}/coverage"]
+    },
+    "publish": {
+      "command": "npm publish --access public",
+      "dependsOn": ["build"]
     }
   }
 }

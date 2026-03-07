@@ -24,6 +24,13 @@
   "type": "module",
   "license": "MIT",
   "exports": {
-    ".": "./src/index.ts"
-  }
+    ".": "./dist/index.js"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1"
+  },
+  "scripts": {
+    "build": "tsup && tsc --emitDeclarationOnly --outDir dist"
+  },
+  "main": "./dist/index.js"
 }
