@@ -25,13 +25,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Add workspace node bin to PATH
-        run: echo "PATH=${{ github.workspace }}/node_modules/.bin:$PATH" >> $GITHUB_ENV
-
       - uses: nrwl/nx-set-shas@v4
 
-      - name: Build all
-        run: nx affected --target=build --parallel=3
+      - name: Build engine and shared
+        run: npx nx run-many --target=build --projects=shared,engine --parallel=3
+
+      - name: Refresh node modules to recreate bin links
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build example
+        run: npx nx run my-test-application:build
 
   # ── 2. Test (matrix: PR branch + main for trend comparison) ───────────────
   test:
