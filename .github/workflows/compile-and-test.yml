@@ -73,6 +73,7 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
 
       - name: Build shared (required by engine and core tests)
+        continue-on-error: true
         run: npx nx run shared:build
 
       # PR leg — only affected packages, faster

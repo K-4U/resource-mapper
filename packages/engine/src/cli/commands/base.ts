@@ -15,7 +15,7 @@ export abstract class BaseCommand {
   }
 
   public register(program: Command) {
-    const cmd = program.command(this.name).description(this.description);
+    const cmd = program.command(this.name).description(this.description).argument('[args...]');
     this.setupOptions(cmd);
     cmd.action((...args: any[]) => this.run(...args));
   }

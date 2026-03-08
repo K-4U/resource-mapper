@@ -24,6 +24,6 @@ describe('BaseCommand', () => {
     cmd.register(program);
     await program.parseAsync(['node', 'test', 'dummy', 'foo', 'bar']);
     const call = cmd.run.mock.calls[0];
-    expect(call[1]).toEqual(['foo', 'bar']);
+    expect(call[0]).toEqual(['foo', 'bar']);
   });
 });
