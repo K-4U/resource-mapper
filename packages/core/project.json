@@ -20,14 +20,15 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "vitest run",
+        "command": "vitest run --project server",
         "cwd": "packages/core"
       },
       "configurations": {
         "coverage": {
-          "command": "vitest run --coverage"
+          "command": "vitest run --project server --coverage"
         }
       },
+      "dependsOn": [{ "projects": "shared", "target": "build" }],
       "outputs": ["{projectRoot}/coverage"]
     },
     "publish": {

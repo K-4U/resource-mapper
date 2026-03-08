@@ -4,7 +4,7 @@ import { logger } from './logger.js';
 
 // --- Module mocks ---
 vi.mock('execa', () => ({
-  default: vi.fn(),
+  execa: vi.fn(),
 }));
 
 vi.mock('node:fs', () => ({

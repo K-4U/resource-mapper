@@ -72,6 +72,9 @@ jobs:
 
       - uses: nrwl/nx-set-shas@v4
 
+      - name: Build shared (required by engine and core tests)
+        run: npx nx run shared:build
+
       # PR leg — only affected packages, faster
       - name: Run affected tests with coverage
         if: ${{ !matrix.all }}
