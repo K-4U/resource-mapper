@@ -29,7 +29,10 @@
     "projects": ["packages/*"],
     "projectsRelationship": "fixed",
     "version": {
-      "currentVersionResolver": "git-tag"
+      "currentVersionResolver": "git-tag",
+      "generatorOptions": {
+        "updateDependents": "auto"
+      }
     },
     "changelog": {
       "workspaceChangelog": {
