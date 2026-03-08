@@ -31,9 +31,9 @@
     "git": {},
     "version": {
       "currentVersionResolver": "git-tag",
-      "generatorOptions": {
-        "updateDependents": "auto"
-      }
+      "updateDependents": "auto",
+      "preserveMatchingDependencyRanges": false,
+      "versionPrefix": ""
     },
     "changelog": {
       "renderer": "scripts/changelog-renderer.cjs",
