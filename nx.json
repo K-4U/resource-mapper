@@ -28,6 +28,9 @@
   "release": {
     "projects": ["packages/*"],
     "projectsRelationship": "fixed",
+    "git": {
+      "push": true
+    },
     "version": {
       "currentVersionResolver": "git-tag",
       "generatorOptions": {
@@ -35,6 +38,10 @@
       }
     },
     "changelog": {
+      "renderer": "scripts/changelog-renderer.cjs",
+      "renderOptions": {
+        "excludeAuthors": ["K-4U"]
+      },
       "workspaceChangelog": {
         "createRelease": false
       },
