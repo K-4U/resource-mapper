@@ -1,11 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import { sharedReporters, sharedCoverage } from '../../vitest.shared.js'
 
-/**
- * Per-package config used by the @nx/vitest:test executor.
- * Reporters and coverage settings are imported from vitest.shared.ts
- * so they stay in sync with vitest.workspace.ts.
- */
 export default defineConfig({
   test: {
     name: 'engine',
