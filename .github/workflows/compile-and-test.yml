@@ -135,7 +135,7 @@ jobs:
         uses: dorny/test-reporter@v2.5.0
         with:
           name: Tests — ${{ matrix.package }}
-          path: pr-coverage/${{ matrix.package }}/junit*.xml
+          path: pr-coverage/packages/${{ matrix.package }}/coverage/junit*.xml
           reporter: jest-junit
           fail-on-error: false
           fail-on-empty: false
@@ -147,6 +147,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           name: ${{ matrix.package }}
-          json-summary-path: pr-coverage/${{ matrix.package }}/coverage-summary.json
-          json-summary-compare-path: main-coverage/${{ matrix.package }}/coverage-summary.json
-          json-final-path: pr-coverage/${{ matrix.package }}/coverage-final.json
+          json-summary-path: pr-coverage/packages/${{ matrix.package }}/coverage/coverage-summary.json
+          json-summary-compare-path: main-coverage/packages/${{ matrix.package }}/coverage/coverage-summary.json
+          json-final-path: pr-coverage/packages/${{ matrix.package }}/coverage/coverage-final.json
