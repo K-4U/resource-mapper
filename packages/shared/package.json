@@ -24,6 +24,34 @@
   "type": "module",
   "license": "MIT",
   "exports": {
-    ".": "./src/index.ts"
-  }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./flow-types": {
+      "types": "./dist/flow-types.d.ts",
+      "default": "./dist/flow-types.js"
+    },
+    "./validators": {
+      "types": "./dist/validators.d.ts",
+      "default": "./dist/validators.js"
+    }
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1"
+  },
+  "scripts": {
+    "build": "tsup && tsc --emitDeclarationOnly --outDir dist",
+    "prepublishOnly": "node -e \"const fs=require('fs');fs.copyFileSync('../../LICENSE','LICENSE');\" && npm run build"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
 }

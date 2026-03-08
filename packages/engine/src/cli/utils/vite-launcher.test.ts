@@ -4,7 +4,7 @@ import { logger } from './logger.js';
 
 // --- Module mocks ---
 vi.mock('execa', () => ({
-  default: vi.fn(),
+  execa: vi.fn(),
 }));
 
 vi.mock('node:fs', () => ({
@@ -37,7 +37,7 @@ vi.mock('node:module', () => ({
 
 // Helper: get mocked modules
 async function getMocks() {
-  const execa = (await import('execa')).default as unknown as ReturnType<typeof vi.fn>;
+  const execa = (await import('execa')).execa as unknown as ReturnType<typeof vi.fn>;
   const fs = (await import('node:fs')).default;
   return { execa, fs, req: mockReq };
 }

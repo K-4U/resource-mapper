@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { execa } from 'execa';
 import path from 'node:path';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';

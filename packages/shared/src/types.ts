@@ -6,6 +6,10 @@ export const ConnectionType = {
   CALLS: 'CALLS',
   TRIGGERS: 'TRIGGERS',
   STREAM: 'STREAM',
+  PUSH: 'PUSH',
+  POLLS: 'POLLS',
+  FETCH: 'FETCH',
+  STORES: 'STORES',
 } as const
 
 export type ConnectionType = typeof ConnectionType[keyof typeof ConnectionType]
