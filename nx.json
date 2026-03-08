@@ -28,9 +28,7 @@
   "release": {
     "projects": ["packages/*"],
     "projectsRelationship": "fixed",
-    "git": {
-      "push": true
-    },
+    "git": {},
     "version": {
       "currentVersionResolver": "git-tag",
       "generatorOptions": {

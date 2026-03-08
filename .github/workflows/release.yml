@@ -66,6 +66,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Push version bump commit and tags
+        run: git push --follow-tags
+
       - name: Get last tag
         id: get_tag
         run: |
