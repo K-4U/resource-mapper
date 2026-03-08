@@ -1,6 +1,6 @@
 {
   "name": "@k-4u/resource-mapper-core",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "SvelteKit UI template for resource-mapper — used internally by the CLI",
   "keywords": [
     "architecture",
@@ -35,8 +35,8 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@k-4u/resource-mapper": "*",
-    "@k-4u/resource-mapper-shared": "*",
+    "@k-4u/resource-mapper": "0.7.2",
+    "@k-4u/resource-mapper-shared": "0.7.2",
     "@iconify/svelte": "^5.2.1",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.53.3",

@@ -1,6 +1,6 @@
 {
   "name": "@k-4u/resource-mapper",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "CLI tool to bake and visualise your architecture as an interactive map",
   "keywords": [
     "architecture",
@@ -25,8 +25,8 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "@k-4u/resource-mapper-shared": "*",
-    "@k-4u/resource-mapper-core": "*",
+    "@k-4u/resource-mapper-shared": "0.7.2",
+    "@k-4u/resource-mapper-core": "0.7.2",
     "commander": "^14.0.3",
     "execa": "^9.6.1",
     "js-yaml": "^4.1.1",
