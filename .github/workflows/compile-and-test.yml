@@ -27,8 +27,11 @@ jobs:
 
       - uses: nrwl/nx-set-shas@v4
 
-      - name: Build Affected
-        run: npx nx affected --target=build --parallel=3
+      - name: Build engine and shared
+        run: npx nx run-many --target=build --projects=shared,engine --parallel=3
+
+      - name: Build example
+        run: npx nx run my-test-application:build
 
   # ── 2. Test (matrix: PR branch + main for trend comparison) ───────────────
   test:
