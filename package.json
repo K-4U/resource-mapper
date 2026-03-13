@@ -26,7 +26,7 @@
     "@nx/vitest": "22.5.3",
     "@swc-node/register": "^1.11.1",
     "@swc/core": "^1.15.18",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.0",
     "@vitest/ui": "^4.0.18",
     "eslint": "~8.57.0",
     "nx": "22.5.3",
