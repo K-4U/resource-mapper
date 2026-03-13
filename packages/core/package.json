@@ -50,7 +50,7 @@
     "svelte": "^5.53.5",
     "svelte-theme": "^1.4.3",
     "tailwindcss": "^4.1.18",
-    "vite-plugin-static-copy": "^3.2.0"
+    "vite-plugin-static-copy": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.2",
